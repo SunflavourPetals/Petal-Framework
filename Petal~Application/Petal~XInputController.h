@@ -224,7 +224,7 @@ namespace Petal::XInput
 		for (; begin != end; ++begin)
 		{
 			(*begin)->AssignResource(resource);
-			if ((*begin)->Check())
+			if ((*begin) != nullptr && (*begin)->Check())
 			{
 				(*begin)->Execution();
 			}
