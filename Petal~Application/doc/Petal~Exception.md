@@ -8,7 +8,7 @@
 
 注：异常类`Petal::Exception`不派生自`std::exception`。
 
-如果预定义了宏`Petal_Enable_ExceptionDescription`，那么`Petal::Exception`会有一个C风格字符串`Petal::ptrc<Petal::ExcepChar> pt_desc`，用于引用描述异常的**字符串字面量**，否则，对象将不会记录描述。
+如果预处理器定义了宏`Petal_Enable_ExceptionDescription`，那么`Petal::Exception`会有一个C风格字符串`Petal::ptrc<Petal::ExcepChar> pt_desc`，用于引用描述异常的**字符串字面量**，否则，对象将不会记录描述。
 
 `Petal::Exception`对象的定义和抛出由框架完成，开发者不应该抛出此类型对象，但是需要catch此类异常，并处理。
 
