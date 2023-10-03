@@ -198,7 +198,7 @@ namespace Petal
 			ResourceStatistics resource{ this->pt_frame_count, static_cast<f64>(this->pt_actual_statistics_count) / this->pt_performance_counter.Frequency() };
 			process.AssignResource(resource);
 			process.Execution();
-			process.EmptyResource();
+			process.RemoveResource();
 			this->pt_statistics_count -= this->pt_target_statistics_count;
 			this->pt_actual_statistics_count = this->pt_statistics_count;
 			this->pt_frame_count = 0;
@@ -222,7 +222,7 @@ namespace Petal
 		ResourceDelta resource{ static_cast<f64>(this->pt_actual_delta_count) / this->pt_performance_counter.Frequency(), this->pt_performance_counter.TotalTime() };
 		process.AssignResource(resource);
 		process.Execution();
-		process.EmptyResource();
+		process.RemoveResource();
 		this->pt_delta_count -= this->pt_target_delta_count;
 		this->pt_actual_delta_count = this->pt_delta_count;
 		++(this->pt_frame_count);

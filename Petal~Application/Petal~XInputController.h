@@ -201,10 +201,7 @@ namespace Petal::XInput
 		WrappedGamepad pt_gamepad;
 		WrappedGamepad pt_last_gamepad;
 	};
-}
 
-namespace Petal::XInput
-{
 	inline win32dword Controller::Update(f64 delta_time, Concept::XInputEventProcessIterator auto begin, Concept::XInputEventProcessIterator auto end)
 	{
 		auto result{ this->QueryState() };
@@ -216,6 +213,7 @@ namespace Petal::XInput
 			{
 				begin->Execution();
 			}
+			begin->RemoveResource();
 		}
 		return result;
 	}
@@ -230,6 +228,7 @@ namespace Petal::XInput
 			{
 				(*begin)->Execution();
 			}
+			(*begin)->RemoveResource();
 		}
 		return result;
 	}
