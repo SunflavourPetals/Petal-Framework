@@ -34,7 +34,7 @@ namespace Petal::Abstract
 		XInputEventProcess() = default;
 		XInputEventProcess(const XInputEventProcess&) = default;
 		XInputEventProcess(XInputEventProcess&&) noexcept = default;
-		~XInputEventProcess() = default;
+		virtual ~XInputEventProcess() = default;
 	};
 }
 
@@ -133,15 +133,15 @@ namespace Petal::XInput
 	class WrappedGamepad final
 	{
 	public:
-		boolean Connected() const noexcept; // ²é¿´¿ØÖÆÆ÷ÊÇ·ñÒÑÁ¬½Ó ĞèÒªÌáÇ°µ÷ÓÃ QueryState »ñÈ¡»ò¸üĞÂ×´Ì¬
-		boolean CheckConnection() noexcept; // ¼ì²é¿ØÖÆÆ÷ÊÇ·ñÒÑÁ¬½Ó ÎŞĞèÌáÇ°µ÷ÓÃ QueryState
+		boolean Connected() const noexcept; // æŸ¥çœ‹æ§åˆ¶å™¨æ˜¯å¦å·²è¿æ¥ éœ€è¦æå‰è°ƒç”¨ QueryState è·å–æˆ–æ›´æ–°çŠ¶æ€
+		boolean CheckConnection() noexcept; // æ£€æŸ¥æ§åˆ¶å™¨æ˜¯å¦å·²è¿æ¥ æ— éœ€æå‰è°ƒç”¨ QueryState
 		boolean CheckConnection() const noexcept;
-		UserIndexValue::Type UserIndex() const noexcept; // ²é¿´¿ØÖÆÆ÷µÄÓÃ»§Ë÷Òı
-		const State& GetState() const noexcept; // »ñµÃ XINPUT_GAMEPAD ĞÅÏ¢ ĞèÒªÌáÇ°µ÷ÓÃ QueryState »ñÈ¡»ò¸üĞÂ×´Ì¬
+		UserIndexValue::Type UserIndex() const noexcept; // æŸ¥çœ‹æ§åˆ¶å™¨çš„ç”¨æˆ·ç´¢å¼•
+		const State& GetState() const noexcept; // è·å¾— XINPUT_GAMEPAD ä¿¡æ¯ éœ€è¦æå‰è°ƒç”¨ QueryState è·å–æˆ–æ›´æ–°çŠ¶æ€
 		const Gamepad& GetGamepad() const noexcept;
-		boolean StateChanged() const noexcept; // ²é¿´ÊäÈë×´Ì¬ÊÇ·ñÓĞ±ä		ĞèÒªÌáÇ°µ÷ÓÃ QueryState »ñÈ¡»ò¸üĞÂ×´Ì¬
-		void ClearState() noexcept; // Çå¿ÕÊôĞÔ
-		boolean Pushed(Button::Type buttons) const noexcept; // ÊäÈë XInputGamepad::Button Ã¶¾ÙµÄ×éºÏ ²é¿´¸Ã×éºÏÊÇ·ñ±»¼¤»î(ÁĞ¾ÙµÄËùÓĞ°´Å¥±»°´ÏÂ)
+		boolean StateChanged() const noexcept; // æŸ¥çœ‹è¾“å…¥çŠ¶æ€æ˜¯å¦æœ‰å˜		éœ€è¦æå‰è°ƒç”¨ QueryState è·å–æˆ–æ›´æ–°çŠ¶æ€
+		void ClearState() noexcept; // æ¸…ç©ºå±æ€§
+		boolean Pushed(Button::Type buttons) const noexcept; // è¾“å…¥ XInputGamepad::Button æšä¸¾çš„ç»„åˆ æŸ¥çœ‹è¯¥ç»„åˆæ˜¯å¦è¢«æ¿€æ´»(åˆ—ä¸¾çš„æ‰€æœ‰æŒ‰é’®è¢«æŒ‰ä¸‹)
 		TriggerValue::Type LeftTrigger() const noexcept;
 		TriggerValue::Type RightTrigger() const noexcept;
 		StickValue::Type LeftStickX() const noexcept;
@@ -156,9 +156,9 @@ namespace Petal::XInput
 		StickValue::Type CalcRStickDown() const noexcept;
 		StickValue::Type CalcRStickLeft() const noexcept;
 		StickValue::Type CalcRStickRight() const noexcept;
-		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept; // Ö¸¶¨ĞÂµÄÓÃ»§Ë÷Òı
-		win32dword QueryState() noexcept; // ²éÑ¯¿ØÖÆÆ÷ÊäÈë×´Ì¬
-		win32dword Vibration(VibrationValue::Type left_motor_speed, VibrationValue::Type right_motor_speed) const noexcept;	// ÉèÖÃ¿ØÖÆÆ÷Õğ¶¯ ×îĞ¡Öµ 0 ×î´óÖµ 65535
+		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept; // æŒ‡å®šæ–°çš„ç”¨æˆ·ç´¢å¼•
+		win32dword QueryState() noexcept; // æŸ¥è¯¢æ§åˆ¶å™¨è¾“å…¥çŠ¶æ€
+		win32dword Vibration(VibrationValue::Type left_motor_speed, VibrationValue::Type right_motor_speed) const noexcept;	// è®¾ç½®æ§åˆ¶å™¨éœ‡åŠ¨ æœ€å°å€¼ 0 æœ€å¤§å€¼ 65535
 		win32dword AudioDeviceIDs(ptr<WChar> render_device_id, win32uint& render_count, ptr<WChar> capture_device_id, win32uint& capture_count) const noexcept;
 		win32dword GetBatteryInformation(BatteryInformation& battery_info) const noexcept;
 		win32dword GetCapabilities(Capabilities& capabilities) const noexcept;
@@ -171,10 +171,10 @@ namespace Petal::XInput
 		~WrappedGamepad() = default;
 		WrappedGamepad& operator = (const WrappedGamepad&) noexcept = default;
 	private:
-		UserIndexValue::Type pt_user_index{ 0 }; // ÓÃ»§Ë÷Òı ÊıÖµÎª 0 µ½ 3
-		State pt_gamepad_state{}; // ¿ØÖÆÆ÷×´Ì¬ µ÷ÓÃ QueryState ºó¸üĞÂ
-		boolean pt_gamepad_connected{}; // ¿ØÖÆÆ÷ÊÇ·ñÒÑÁ¬½Ó µ÷ÓÃ QueryState ºó¸üĞÂ
-		boolean pt_state_changed{}; // ¿ØÖÆÆ÷×´Ì¬ÓĞÎŞ±ä»¯ µ÷ÓÃ QueryState ºó¸üĞÂ
+		UserIndexValue::Type pt_user_index{ 0 }; // ç”¨æˆ·ç´¢å¼• æ•°å€¼ä¸º 0 åˆ° 3
+		State pt_gamepad_state{}; // æ§åˆ¶å™¨çŠ¶æ€ è°ƒç”¨ QueryState åæ›´æ–°
+		boolean pt_gamepad_connected{}; // æ§åˆ¶å™¨æ˜¯å¦å·²è¿æ¥ è°ƒç”¨ QueryState åæ›´æ–°
+		boolean pt_state_changed{}; // æ§åˆ¶å™¨çŠ¶æ€æœ‰æ— å˜åŒ– è°ƒç”¨ QueryState åæ›´æ–°
 	};
 
 	class Controller final
