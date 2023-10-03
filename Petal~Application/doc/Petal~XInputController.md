@@ -1,0 +1,164 @@
+# Petal~XInputController
+
+## 概述
+
+命名空间 Petal::XInput
+
+此标头内容使用XInput实现了用于与手柄交互的包装类：WrappedGamepad 和 Controller。  
+类 WrappedGamepad 封装了 XInputGetState 等函数，并提供了更简单的手柄状态判断方法，更易于检测控制器状态  
+类 Controller 通过保留上一次查询的结果进一步提高了对 push button、release button 等事件的支持；为事件的检测和响应事件，在命名空间`Petal::Abstract`提供了基类`XInputEventProcess`，开发者派生并实现其`boolean Check()`和`void Execution()`方法，分别用于检测事件触发条件和响应事件。  
+为使开发者专注于响应事件，本框架的标头`"Petal~XInputEventProcess.h"`提供了更多实现了`Check()`的派生类供开发者使用。  
+调用 Controller 对象的`Update`方法，开发者提供存储`XInputEventProcess`派生类对象、对象指针或智能指针的容器的迭代器完成事件的触发和响应。  
+
+示例
+```cpp
+#include "Petal~Main.h"
+#include "Petal~VSDebugOutput.h"
+#include "Petal~XInputController.h"
+#include "Petal~FrequencyController.h"
+#include <vector>
+#include <memory>
+
+class XInputControllerDemo
+{
+public:
+	static inline Petal::boolean flag_exit_loop{ false };
+	static int main()
+	{
+		using namespace Petal;
+		using Petal::boolean;
+		
+		// 派生XInputEventProcess
+		class BasicT : public Abstract::XInputEventProcess
+		{
+		public:
+			// 实现事件触发检测方法：按下按钮时触发 pushed 事件
+			boolean Check() override
+			{
+				return (this->Controller().GetWrappedGamepad().Pushed(button) == true &&
+					this->Controller().GetLastWrappedGamepad().Pushed(button) == false);
+			}
+			BasicT(XInput::Button::Type button_) : button(button_) {}
+			XInput::Button::Type button;
+		};
+		class TA : public BasicT
+		{
+		public:
+			// 实现响应事件方法
+			void Execution() override
+			{
+				dout + "A pushed" + ln;
+			}
+			TA() : BasicT(XInput::Button::A) {}
+		};
+		class TX : public BasicT
+		{
+		public:
+			// 实现响应事件方法
+			void Execution() override
+			{
+				dout + "X pushed and exit" + ln;
+				flag_exit_loop = true;
+			}
+			TX() : BasicT(XInput::Button::X) {}
+		};
+
+		std::vector<std::unique_ptr<Abstract::XInputEventProcess>> proc_vector{}; // 创建事件容器
+		proc_vector.push_back(std::make_unique<TA>());
+		proc_vector.push_back(std::make_unique<TX>());
+
+		XInput::Controller c{ 0 }; // 创建控制器对象，并将用户索引设置为 0
+
+		FrequencyController f{ 100.0, 0.005 }; // 设置频率控制器 100 Hz，并允许线程休眠
+		
+		class DeltaProc : public Abstract::Process<FrequencyController::ResourceDelta>
+		{
+		public:
+			DeltaProc(XInput::Controller& c_, decltype(proc_vector)& v_) :
+				Process<FrequencyController::ResourceDelta>(), c(c_), v(v_) {}
+			decltype(proc_vector)& v;
+			XInput::Controller& c;
+			void Execution() override
+			{
+				c.Update(this->Resource().delta_time, v.begin(), v.end());
+			}
+		} delta_proc{ c, proc_vector };
+
+		while (flag_exit_loop == false)
+		{
+			f.LimitedDo(delta_proc);
+		}
+
+		return 0;
+	}
+};
+
+Petal_SetMainClass(XInputControllerDemo);
+```
+
+## 参考
+
+### 命名空间 Petal::Abstract
+
+#### 类 XInputEventProcess
+
+派生自[Petal::Abstract::Process&lt;Petal::XInput::Controller::Resource>]()
+
+##### 函数Controller
+
+返回值 Petal::XInput::Controller&
+根据传入的资源，得到资源中的控制器对象，以便查询控制器状态来判断事件是否触发。
+
+调用方 Petal::XInput::Controller::Update 在使用本类 Check 方法和 Execution 方法期间，保证本类派生类对象的资源引用到了有效资源，并在调用完本类 Check 方法和 Execution 方法后，取消本类派生类对象对资源的引用。
+
+因此开发者不能随意使用此方法
+
+##### 函数DeltaTime
+
+返回值 Petal::f64
+根据传入的资源，得到资源中的间隔时间，此值通常用于检测“XXXHold”事件。
+
+调用方 Petal::XInput::Controller::Update 在使用本类 Check 方法和 Execution 方法期间，保证本类派生类对象的资源引用到了有效资源，并在调用完本类 Check 方法和 Execution 方法后，取消本类派生类对象对资源的引用。
+
+因此开发者不能随意使用此方法
+
+##### 函数Check
+
+返回值 Petal::boolean
+根据传入的资源，检测事件是否被触发
+
+### 命名空间 Petal::XInput
+
+#### 类Button
+
+本类为类枚举类，列举了XInput中不同按钮所对应的码，开发者可以使用位运算随意组合它们。
+各值所代表的按钮可参照[MSDN](https://learn.microsoft.com/zh-cn/windows/win32/api/xinput/ns-xinput-xinput_gamepad)。
+
+类型 Type 指示了本类列举的值的类型。
+
+#### 类StickValue
+
+本类为类枚举类，列举了XInput中摇杆的值的参照，对于 
+WrappedGamepad::LeftStickX  
+WrappedGamepad::LeftStickY  
+WrappedGamepad::RightStickX  
+WrappedGamepad::RightStickY  
+函数，拿到的值为未经处理的值，开发者应当对XInput的XInputGetState和GAMEPAD结构有所了解，
+本枚举类专为未经处理的摇杆的值提供了值  
+full_up{ +0x7fff }  
+full_right{ +0x7fff }  
+full_down{ -0x8000 }  
+full_left{ -0x8000 }  
+half_up{ +0x3fff }  
+half_right{ +0x3fff }  
+half_down{ -0x4000 }  
+half_left{ -0x4000 }  
+
+通常使用WrappedGamepad::CalcXStickDirection系列的方法拿到经过处理的摇杆的值，对于这些值，可以直接使用本枚举类的full、half、threshold等值。
+
+关于死区的值可参照[MSDN](https://learn.microsoft.com/zh-cn/windows/win32/api/xinput/ns-xinput-xinput_gamepad)。
+
+类型 Type 指示了本类列举的值的类型。
+
+### 命名空间 Petal::Concept
+

@@ -1,0 +1,53 @@
+#pragma once
+
+#ifndef Petal_Header_WinTypes
+#define Petal_Header_WinTypes
+
+#include <Windows.h>
+
+namespace Petal
+{
+	using win32int = typename ::INT;
+	using win32uint = typename ::UINT;
+	using win32word = typename ::WORD;
+	using win32byte = typename ::BYTE;
+	using win32bool = typename ::BOOL;
+	using win32dword = typename ::DWORD;
+	using win32short = typename ::SHORT;
+	using win32error = decltype(::GetLastError());
+	using win32atom = typename ::ATOM;
+	using win32lres = typename ::LRESULT;
+	using win32lprm = typename ::LPARAM;
+	using win32wprm = typename ::WPARAM;
+	using win32lptr = typename ::LONG_PTR;
+	using win32ulptr = typename ::ULONG_PTR;
+	using win32handle = typename ::HANDLE;
+	using win32hins = typename ::HINSTANCE;
+	using win32hwnd = typename ::HWND;
+	using win32hmenu = typename ::HMENU;
+	using win32hicon = typename ::HICON;
+	using win32hbrush = typename ::HBRUSH;
+	using win32hcursor = typename ::HCURSOR;
+	using win32msg = typename ::UINT;
+	using win32int = typename ::INT;
+#ifdef Petal_Enable_Unicode
+	using win32tstr = typename ::LPWSTR;
+	using win32ctstr = typename ::LPCWSTR;
+#else
+	using win32tstr = typename ::LPSTR;
+	using win32ctstr = typename ::LPCSTR;
+#endif
+
+	using Win32Rect = typename ::RECT;
+	using Win32Message = typename ::MSG;
+
+#ifdef Petal_Enable_Unicode
+	using WindowClass = typename ::WNDCLASSEXW;
+	using Win32CreateStruct = typename ::CREATESTRUCTW;
+#else
+	using WindowClass = typename ::WNDCLASSEXA;
+	using Win32CreateStruct = typename ::CREATESTRUCTA;
+#endif
+}
+
+#endif // !Petal_Header_WinTypes

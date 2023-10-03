@@ -1,0 +1,123 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="源文件">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;cppm;ixx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="头文件">
+      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
+      <Extensions>h;hh;hpp;hxx;h++;hm;inl;inc;ipp;xsd</Extensions>
+    </Filter>
+    <Filter Include="资源文件">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Petal">
+      <UniqueIdentifier>{3f7dbc50-19b6-40a8-b4c7-342fac626fde}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Petal\Header">
+      <UniqueIdentifier>{ff134313-f127-4258-9d76-14232d099a62}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Petal\Source">
+      <UniqueIdentifier>{511b13a0-661c-42d2-b923-2fe5f00bc2a2}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~Bom.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~FrequencyController.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~Main.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~PerformanceCounter.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~String.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~VSDebugOutput.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~Window.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~WindowManager.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~WindowMessage.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~XInputController.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~XInputEventProcess.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~Exception.cpp">
+      <Filter>Petal\Source</Filter>
+    </ClCompile>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="Petal~BasicTypes.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Bom.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Exception.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~FrequencyController.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Log.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Main.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Output.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~PerformanceCounter.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Process.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~String.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Types.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~VSDebugOutput.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~Window.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~WindowManager.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~WindowMessage.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~WinTypes.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~XInputController.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~XInputEventProcess.h">
+      <Filter>Petal\Header</Filter>
+    </ClInclude>
+  </ItemGroup>
+</Project>
