@@ -101,7 +101,7 @@ namespace Petal
 		static inline constexpr i32 default_window_extra{ 0 };
 		static inline const     win32hicon default_icon{ IWin32::LoadDefaultWinAppIcon() };
 		static inline const     win32hcursor default_cursor{ IWin32::LoadDefaultWinAppCursor() };
-		static inline constexpr win32hbrush default_background_brush{ reinterpret_cast<::HBRUSH>(COLOR_WINDOW) };
+		static inline constexpr win32hbrush default_background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
 		static inline constexpr win32hicon default_icon_sm{ nullptr };
 	private:
 		// WIN32-RegisterClassEx requires that string WindowClass::lpszClassName not be nullptr and not equal to null_tstr.
