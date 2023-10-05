@@ -20,6 +20,7 @@ namespace Petal
 	using StringU8 = typename ::std::basic_string<CharU8>;
 	using StringU16 = typename ::std::basic_string<CharU16>;
 	using StringU32 = typename ::std::basic_string<CharU32>;
+
 #if defined(Petal_Enable_Unicode)
 	using TChar = WChar;
 	using TString = WString;
@@ -27,6 +28,7 @@ namespace Petal
 	using TChar = Char;
 	using TString = String;
 #endif
+
 	namespace EnumChar
 	{
 		inline constexpr Char cr{ '\r' };   // CR : Carriage Return
@@ -79,19 +81,43 @@ namespace Petal
 #endif
 }
 
+namespace Petal::TypeTraits
+{
+	template <typename Ty>
+	struct IsString : ::std::false_type {};
+
+	template <typename Ty, typename Traits, typename Alloc>
+	struct IsString<::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
+
+	template <typename Ty>
+	constexpr bool is_char_type{ ::std::is_same_v<Ty, Char> || ::std::is_same_v<Ty, WChar> || ::std::is_same_v<Ty, CharU8> || ::std::is_same_v<Ty, CharU16> || ::std::is_same_v<Ty, CharU32> };
+
+	template <typename Ty>
+	constexpr bool is_string{ IsString<Ty>::value };
+
+	template <typename Ty>
+	constexpr bool is_string_of_char_type{ IsString<Ty>::value && is_char_type<typename IsString<Ty>::ElemType> };
+	
+	template <typename Ty>
+	constexpr bool is_tchar{ ::std::is_same_v<Ty, TChar> };
+
+	template <typename Ty>
+	constexpr bool is_dbg_char{ ::std::is_same_v<Ty, DbgChar> };
+
+	template <typename Ty>
+	constexpr bool is_excep_char{ ::std::is_same_v<Ty, ExcepChar> };
+}
+
 namespace Petal::Concept
 {
 	template <typename Ty>
-		constexpr bool IsCharType{ ::std::is_same_v<Ty, Char> || ::std::is_same_v<Ty, WChar> || ::std::is_same_v<Ty, CharU8> || ::std::is_same_v<Ty, CharU16> || ::std::is_same_v<Ty, CharU32> };
+	concept CharType = TypeTraits::is_char_type<Ty>;
 
 	template <typename Ty>
-		constexpr bool IsStringType{ ::std::is_same_v<Ty, ::std::basic_string<typename Ty::value_type, typename Ty::traits_type, typename Ty::allocator_type>> && IsCharType<typename Ty::value_type> };
+	concept String = TypeTraits::is_string<Ty>;
 
 	template <typename Ty>
-		concept CharType = IsCharType<Ty>;
-
-	template <typename Ty>
-		concept StringType = IsStringType<Ty>;
+	concept StringOfCharType = TypeTraits::is_string_of_char_type<Ty>;
 }
 
 #ifdef Petal_TStr

@@ -132,13 +132,16 @@
     <ClInclude Include="Petal~Bom.h" />
     <ClInclude Include="Petal~Exception.h" />
     <ClInclude Include="Petal~FrequencyController.h" />
+    <ClInclude Include="Petal~KeyboardController.h" />
     <ClInclude Include="Petal~Log.h" />
     <ClInclude Include="Petal~Main.h" />
     <ClInclude Include="Petal~Output.h" />
     <ClInclude Include="Petal~PerformanceCounter.h" />
     <ClInclude Include="Petal~Process.h" />
+    <ClInclude Include="Petal~SmartPointer.h" />
     <ClInclude Include="Petal~String.h" />
     <ClInclude Include="Petal~Types.h" />
+    <ClInclude Include="Petal~VirtualKey.h" />
     <ClInclude Include="Petal~VSDebugOutput.h" />
     <ClInclude Include="Petal~Window.h" />
     <ClInclude Include="Petal~WindowManager.h" />

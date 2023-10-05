@@ -57,8 +57,8 @@ namespace Petal::XInput::MiddleProcess
 		XHoldProcess(XHoldProcess&&) noexcept = default;
 		~XHoldProcess() = default;
 	private:
-		f64 pt_target_time{};
-		f64 pt_total_time{};
+		f64 pt_target_time{ 1.0 };
+		i64 pt_total_count{};
 		boolean pt_loop_triggering{ false };
 		boolean pt_in_holding{ false };
 	};

@@ -78,6 +78,15 @@
     <ClInclude Include="Petal~XInputEventProcess.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Petal~KeyboardController.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~VirtualKey.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~SmartPointer.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Petal~Bom.cpp">

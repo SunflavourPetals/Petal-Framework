@@ -7,6 +7,8 @@
 #include "Petal~WinTypes.h"
 #include "Petal~String.h"
 #include "Petal~Process.h"
+#include "Petal~SmartPointer.h"
+#include "Petal~PerformanceCounter.h"
 
 #include <Xinput.h>
 
@@ -17,7 +19,6 @@ namespace Petal::XInput
 	class Controller;
 	struct ResourceOfController
 	{
-		const f64 delta_time;
 		const Controller& controller;
 	};
 }
@@ -27,8 +28,6 @@ namespace Petal::Abstract
 	class XInputEventProcess : public Process<Petal::XInput::ResourceOfController>
 	{
 	public:
-		virtual const XInput::Controller& Controller() const final;
-		virtual f64 DeltaTime() const final;
 		virtual boolean Check() = 0;
 	public:
 		XInputEventProcess() = default;
@@ -41,25 +40,15 @@ namespace Petal::Abstract
 namespace Petal::Concept
 {
 	template <typename Ty>
-	concept XInputEventProcessIterator = requires
+	concept XInputEventProcessGeneralIterator = requires
 	{
 		typename ::std::iterator_traits<Ty>::value_type;
-		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename Ty::value_type>;
+		requires ::std::is_const_v<typename TypeTraits::RemoveAllGeneralPointer<typename Ty::value_type>::Type> == false;
+		requires ::std::is_volatile_v<typename TypeTraits::RemoveAllGeneralPointer<typename Ty::value_type>::Type> == false;
+		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGeneralPointer<typename Ty::value_type>::Type>;
 	};
 	template <typename Ty>
-	concept XInputEventProcessPointerIterator = requires (Ty o)
-	{
-		typename ::std::iterator_traits<Ty>::value_type;
-		requires ::std::is_pointer_v<typename Ty::value_type>;
-		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename ::std::remove_pointer_t<typename Ty::value_type>>;
-		(*o)->Check();
-	} || requires (Ty o)
-	{
-		typename ::std::iterator_traits<Ty>::value_type;
-		typename Ty::value_type::element_type;
-		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename Ty::value_type::element_type>;
-		(*o)->Check();
-	};
+	concept XInputEventProcessGeneralPointer = TypeTraits::is_general_pointer<Ty> && ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGeneralPointer<Ty>::Type>;
 }
 
 namespace Petal::XInput
@@ -186,11 +175,14 @@ namespace Petal::XInput
 		void ClearState() noexcept;
 		void ClearLastState() noexcept;
 		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept;
-		win32dword QueryState() noexcept;
-		win32dword Update(f64 delta_time, Concept::XInputEventProcessIterator auto begin, Concept::XInputEventProcessIterator auto end);
-		win32dword Update(f64 delta_time, Concept::XInputEventProcessPointerIterator auto begin, Concept::XInputEventProcessPointerIterator auto end);
+		win32dword Update(Concept::XInputEventProcessGeneralIterator auto begin, Concept::XInputEventProcessGeneralIterator auto end);
 		const WrappedGamepad& GetWrappedGamepad() const noexcept;
 		const WrappedGamepad& GetLastWrappedGamepad() const noexcept;
+		const PerformanceCounter& GetCounter() const noexcept;
+	private:
+		win32dword QueryState() noexcept;
+		static void ExecuteEventProcess(Concept::XInputEventProcessGeneralPointer auto& pointer, Resource& resource);
+		static void ExecuteEventProcess(Abstract::XInputEventProcess& proc, Resource& resource);
 	public:
 		Controller() = default;
 		Controller(UserIndexValue::Type user_index);
@@ -199,40 +191,36 @@ namespace Petal::XInput
 		~Controller() = default;
 		Controller& operator = (const Controller&) noexcept = default;
 	private:
+		PerformanceCounter pt_counter{};
 		WrappedGamepad pt_gamepad;
 		WrappedGamepad pt_last_gamepad;
 	};
-
-	inline win32dword Controller::Update(f64 delta_time, Concept::XInputEventProcessIterator auto begin, Concept::XInputEventProcessIterator auto end)
+	inline win32dword Controller::Update(Concept::XInputEventProcessGeneralIterator auto begin, Concept::XInputEventProcessGeneralIterator auto end)
 	{
 		auto result{ this->QueryState() };
-		Resource resource{ delta_time, *this };
+		this->pt_counter.Count();
+		Resource resource{ *this };
 		for (; begin != end; ++begin)
 		{
-			begin->AssignResource(resource);
-			if (begin->Check())
-			{
-				begin->Execution();
-			}
-			begin->RemoveResource();
+			this->ExecuteEventProcess(*begin, resource);
 		}
 		return result;
 	}
-
-	inline win32dword Controller::Update(f64 delta_time, Concept::XInputEventProcessPointerIterator auto begin, Concept::XInputEventProcessPointerIterator auto end)
+	inline void Controller::ExecuteEventProcess(Abstract::XInputEventProcess& proc, Resource& resource)
 	{
-		auto result{ this->QueryState() };
-		Resource resource{ delta_time, *this };
-		for (; begin != end; ++begin)
+		proc.AssignResource(resource);
+		if (proc.Check())
 		{
-			(*begin)->AssignResource(resource);
-			if ((*begin) != nullptr && (*begin)->Check())
-			{
-				(*begin)->Execution();
-			}
-			(*begin)->RemoveResource();
+			proc.Execution();
 		}
-		return result;
+		proc.RemoveResource();
+	}
+	inline void Controller::ExecuteEventProcess(Concept::XInputEventProcessGeneralPointer auto& pointer, Resource& resource)
+	{
+		if (pointer != nullptr)
+		{
+			Controller::ExecuteEventProcess(*pointer, resource);
+		}
 	}
 }
 

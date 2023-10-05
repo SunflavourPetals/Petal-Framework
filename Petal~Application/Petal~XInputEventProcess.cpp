@@ -230,12 +230,12 @@ namespace Petal::XInput::MiddleProcess
 		{
 			if (this->ThisPositive())
 			{
-				this->pt_total_time += this->DeltaTime();
+				this->pt_total_count += this->Resource().controller.GetCounter().DeltaCounts();
 			}
 			else
 			{
 				this->pt_in_holding = false;
-				this->pt_total_time = 0.0;
+				this->pt_total_count = 0;
 				return false;
 			}
 		}
@@ -243,7 +243,7 @@ namespace Petal::XInput::MiddleProcess
 		{
 			if (!this->LastPositive() && this->ThisPositive())
 			{
-				this->pt_total_time = 0.0;
+				this->pt_total_count = 0;
 				this->pt_in_holding = true;
 			}
 			else
@@ -251,9 +251,9 @@ namespace Petal::XInput::MiddleProcess
 				return false;
 			}
 		}
-		if (this->pt_total_time >= this->pt_target_time)
+		if ((static_cast<f64>(this->pt_total_count) / this->Resource().controller.GetCounter().Frequency()) >= this->pt_target_time)
 		{
-			this->pt_total_time = 0.0;
+			this->pt_total_count = 0;
 			if (!this->pt_loop_triggering)
 			{
 				this->pt_in_holding = false;

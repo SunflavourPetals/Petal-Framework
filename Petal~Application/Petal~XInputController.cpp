@@ -2,18 +2,6 @@
 
 #pragma comment(lib, "Xinput.lib")
 
-namespace Petal::Abstract
-{
-	const XInput::Controller& XInputEventProcess::Controller() const
-	{
-		return this->Resource().controller;
-	}
-	f64 XInputEventProcess::DeltaTime() const
-	{
-		return this->Resource().delta_time;
-	}
-}
-
 namespace Petal::XInput
 {
 	using Petal::boolean;
@@ -187,14 +175,9 @@ namespace Petal::XInput
 	{
 		this->pt_last_gamepad.ClearState();
 	}
-	boolean Controller::UpdateUserIndex(UserIndexValue::Type user_index) noexcept   // 指定新的用户索引
+	boolean Controller::UpdateUserIndex(UserIndexValue::Type user_index) noexcept // 指定新的用户索引
 	{
 		return this->pt_gamepad.UpdateUserIndex(user_index);
-	}
-	win32dword Controller::QueryState() noexcept                     // 查询控制器输入状态
-	{
-		this->pt_last_gamepad = this->pt_gamepad;
-		return this->pt_gamepad.QueryState();
 	}
 	const WrappedGamepad& Controller::GetWrappedGamepad() const noexcept
 	{
@@ -203,5 +186,14 @@ namespace Petal::XInput
 	const WrappedGamepad& Controller::GetLastWrappedGamepad() const noexcept
 	{
 		return this->pt_last_gamepad;
+	}
+	const PerformanceCounter& Controller::GetCounter() const noexcept
+	{
+		return this->pt_counter;
+	}
+	win32dword Controller::QueryState() noexcept // 查询控制器输入状态
+	{
+		this->pt_last_gamepad = this->pt_gamepad;
+		return this->pt_gamepad.QueryState();
 	}
 }
