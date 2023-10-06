@@ -2,7 +2,7 @@
 
 ## 概述
 
-命名空间 Petal::BOM
+命名空间 Petal::BOM  
 
 此标头提供了类型`Bom`用于定义文本文件的BOM，通常用于[Petal::Log系列](Petal~Log.md)对象创建文本文件。
 
@@ -31,26 +31,26 @@ size为BOM占用字节的大小，范围为0~4。
 
 ##### 方法 Data
 
-返回值 Petal::ptrc&lt;Petal::byte>
+返回值 Petal::ptrc&lt;Petal::byte>  
 
 得到Bom对象的BOM，为一个Petal::byte类型数组，大小为4，前[Size()](#ref_BOM_Bom_Size)项有意义，应当被写入文件充当BOM，其余项无意义，不应被写入文件。
 
 ##### 方法 Size {#ref_BOM_Bom_Size}
 
-返回值 Petal::tsize
+返回值 Petal::tsize  
 
 得到Bom对象有效的字节数。
 
 #### 函数模板 RecommendBom
 
-返回值 const Petal::Bom&
+返回值 const Petal::Bom&  
 
 ```cpp
 template <typename CharT, Petal::boolean force_utf_8_with_bom = false>
 [[nodiscard]] constexpr const Bom& RecommendBom() noexcept;
 ``````
 
-提供`CharT`类型，提供相应的BOM
+提供`CharT`类型，提供相应的BOM  
 
  * char：返回`no_bom`
  * wchar_t：根据本机字节序和`wchar_t`的实现，返回`utf_16_le`或`utf_16_be`或`utf_32_le`或`utf_32_be`

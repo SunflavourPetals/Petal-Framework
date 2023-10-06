@@ -39,6 +39,7 @@ namespace Petal
 		inline constexpr Char null{ '\0' }; // NUL : Null Character
 		inline constexpr Char bell{ '\a' }; // BEL : Bell/Alert/Alarm
 	}
+
 	extern const String null_str;
 	extern const WString null_wstr;
 	extern const StringU8 null_u8str;
@@ -89,23 +90,32 @@ namespace Petal::TypeTraits
 	template <typename Ty, typename Traits, typename Alloc>
 	struct IsString<::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
 
+	template <typename Ty, typename Traits, typename Alloc>
+	struct IsString<const ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
+
+	template <typename Ty, typename Traits, typename Alloc>
+	struct IsString<volatile ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
+
+	template <typename Ty, typename Traits, typename Alloc>
+	struct IsString<const volatile ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
+
 	template <typename Ty>
-	constexpr bool is_char_type{ ::std::is_same_v<Ty, Char> || ::std::is_same_v<Ty, WChar> || ::std::is_same_v<Ty, CharU8> || ::std::is_same_v<Ty, CharU16> || ::std::is_same_v<Ty, CharU32> };
+	constexpr bool is_char_type{ ::std::is_same_v<::std::remove_cv_t<Ty>, Char> || ::std::is_same_v<::std::remove_cv_t<Ty>, WChar> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU8> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU16> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU32> };
 
 	template <typename Ty>
 	constexpr bool is_string{ IsString<Ty>::value };
 
 	template <typename Ty>
-	constexpr bool is_string_of_char_type{ IsString<Ty>::value && is_char_type<typename IsString<Ty>::ElemType> };
+	constexpr bool is_string_of_char_type{ is_string<Ty> && is_char_type<typename IsString<Ty>::ElemType> };
 	
 	template <typename Ty>
-	constexpr bool is_tchar{ ::std::is_same_v<Ty, TChar> };
+	constexpr bool is_tchar{ ::std::is_same_v<::std::remove_cv_t<Ty>, TChar> };
 
 	template <typename Ty>
-	constexpr bool is_dbg_char{ ::std::is_same_v<Ty, DbgChar> };
+	constexpr bool is_dbg_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, DbgChar> };
 
 	template <typename Ty>
-	constexpr bool is_excep_char{ ::std::is_same_v<Ty, ExcepChar> };
+	constexpr bool is_excep_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, ExcepChar> };
 }
 
 namespace Petal::Concept

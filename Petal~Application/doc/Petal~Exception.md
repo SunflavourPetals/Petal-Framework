@@ -2,17 +2,17 @@
 
 ## 概述
 
-命名空间 Petal
+命名空间 Petal  
 
-本标头提供了框架使用的异常`Petal::Exception`，框架的异常由异常代码和异常描述(可选项)组成。
+本标头提供了框架使用的异常`Petal::Exception`，框架的异常由异常代码和异常描述(可选项)组成。  
 
-注：异常类`Petal::Exception`不派生自`std::exception`。
+注：异常类`Petal::Exception`不派生自`std::exception`。  
 
-如果预处理器定义了宏`Petal_Enable_ExceptionDescription`，那么`Petal::Exception`会有一个C风格字符串`Petal::ptrc<Petal::ExcepChar> pt_desc`，用于引用描述异常的**字符串字面量**，否则，对象将不会记录描述。
+如果预处理器定义了宏`Petal_Enable_ExceptionDescription`，那么`Petal::Exception`会有一个C风格字符串`Petal::ptrc<Petal::ExcepChar> pt_desc`，用于引用描述异常的**字符串字面量**，否则，对象将不会记录描述。  
 
-`Petal::Exception`对象的定义和抛出由框架完成，开发者不应该抛出此类型对象，但是需要catch此类异常，并处理。
+`Petal::Exception`对象的定义和抛出由框架完成，开发者不应该抛出此类型对象，但是需要catch此类异常，并处理。  
 
-`Petal::ExcepChar`、`Petal_ExcepStr`等内容详见[Petal~String.md](Petal~String.md)。
+`Petal::ExcepChar`、`Petal_ExcepStr`等内容详见[Petal~String.md](Petal~String.md)。  
 
 ## 参考
 
@@ -46,16 +46,16 @@ Petal::ExcepChar 可以是 char 类型也可以是 wchar_t 类型，因此字符
 
 ##### 方法 Code
 
-返回类型 Petal::ExceptionCode
+返回类型 Petal::ExceptionCode  
 
-返回 ExceptionCode 类型的值。
+返回 ExceptionCode 类型的值。  
 
 ##### 方法 Desc
 
-返回类型 Petal::ptrc&lt;Petal::ExcepChar>
+返回类型 Petal::ptrc&lt;Petal::ExcepChar>  
 
-返回对异常的描述，如果未定义宏`Petal_Enable_ExceptionDescription`，那么它将始终返回`Petal_ExcepStr("[Petal] Exception")`
+返回对异常的描述，如果未定义宏`Petal_Enable_ExceptionDescription`，那么它将始终返回`Petal_ExcepStr("[Petal] Exception")`。  
 
 #### 枚举类 ExceptionCode
 
-枚举了异常值，含义见各个枚举名称。
+枚举了异常值，含义见各个枚举名称。  

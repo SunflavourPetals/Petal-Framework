@@ -26,7 +26,7 @@ public:
 				return (this->Resource().controller.GetWrappedGamepad().Pushed(button) == true &&
 					this->Resource().controller.GetLastWrappedGamepad().Pushed(button) == false);
 			}
-			BasicT(XInput::Button::Type button_) : button(button_) {}
+			BasicT(XInput::Button::Type button_) : XInputEventProcess(), button(button_) {}
 			XInput::Button::Type button;
 		};
 		class TA : public BasicT

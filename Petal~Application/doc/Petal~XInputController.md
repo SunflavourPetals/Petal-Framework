@@ -8,37 +8,43 @@
 类 WrappedGamepad 封装了 XInputGetState 等函数，并提供了更简单的手柄状态判断方法，更易于检测控制器状态  
 类 Controller 通过保留上一次查询的结果进一步提高了对 push button、release button 等事件的支持；为事件的检测和响应事件，在命名空间`Petal::Abstract`提供了基类`XInputEventProcess`，开发者派生并实现其`boolean Check()`和`void Execution()`方法，分别用于检测事件触发条件和响应事件。  
 为使开发者专注于响应事件，本框架的标头`"Petal~XInputEventProcess.h"`提供了更多实现了`Check()`的派生类供开发者使用。  
-调用 Controller 对象的`Update`方法，开发者提供存储`XInputEventProcess`派生类对象、对象指针或智能指针的容器的迭代器完成事件的触发和响应。  
+调用 Controller 对象的`Update`方法，  
+开发者提供存储  
+__无cv限定的`XInputEventProcess`派生类对象  
+____或  
+__无cv限定`XInputEventProcess`派生类对象的n层可带cv限定的指针(包括智能指针)  
+的容器的迭代器完成事件的触发和响应。(n ≥ 1 and n ∈ N)  
 
 示例
 ```cpp
 #include "Petal~Main.h"
 #include "Petal~VSDebugOutput.h"
 #include "Petal~XInputController.h"
-#include "Petal~FrequencyController.h"
+
 #include <vector>
 #include <memory>
+#include <format>
+#include <iostream>
 
 class XInputControllerDemo
 {
 public:
-	static inline Petal::boolean flag_exit_loop{ false };
+	static inline bool flag_exit_loop{ false };
 	static int main()
 	{
 		using namespace Petal;
-		using Petal::boolean;
-		
-		// 派生XInputEventProcess
+
+		// 派生 XInputEventProcess
 		class BasicT : public Abstract::XInputEventProcess
 		{
 		public:
-			// 实现事件触发检测方法：按下按钮时触发 pushed 事件
-			boolean Check() override
+			// 实现事件触发检测方法：之前没按下并且现在按下了，触发 pushed 事件
+			Petal::boolean Check() override
 			{
-				return (this->Controller().GetWrappedGamepad().Pushed(button) == true &&
-					this->Controller().GetLastWrappedGamepad().Pushed(button) == false);
+				return (this->Resource().controller.GetWrappedGamepad().Pushed(button) == true &&
+					this->Resource().controller.GetLastWrappedGamepad().Pushed(button) == false);
 			}
-			BasicT(XInput::Button::Type button_) : button(button_) {}
+			BasicT(XInput::Button::Type button_) : XInputEventProcess(), button(button_) {}
 			XInput::Button::Type button;
 		};
 		class TA : public BasicT
@@ -48,6 +54,7 @@ public:
 			void Execution() override
 			{
 				dout + "A pushed" + ln;
+				std::cout << "A pushed\n";
 			}
 			TA() : BasicT(XInput::Button::A) {}
 		};
@@ -57,36 +64,25 @@ public:
 			// 实现响应事件方法
 			void Execution() override
 			{
-				dout + "X pushed and exit" + ln;
+				dout + "X pushed and Exit" + ln;
+				std::cout << "X pushed and Exit\n";
 				flag_exit_loop = true;
 			}
 			TX() : BasicT(XInput::Button::X) {}
 		};
 
-		std::vector<std::unique_ptr<Abstract::XInputEventProcess>> proc_vector{}; // 创建事件容器
+		// 创建存储 XInput 事件处理过程的容器
+		std::vector<std::unique_ptr<Abstract::XInputEventProcess>> proc_vector{};
 		proc_vector.push_back(std::make_unique<TA>());
 		proc_vector.push_back(std::make_unique<TX>());
 
-		XInput::Controller c{ 0 }; // 创建控制器对象，并将用户索引设置为 0
-
-		FrequencyController f{ 100.0, 0.005 }; // 设置频率控制器 100 Hz，并允许线程休眠
-		
-		class DeltaProc : public Abstract::Process<FrequencyController::ResourceDelta>
-		{
-		public:
-			DeltaProc(XInput::Controller& c_, decltype(proc_vector)& v_) :
-				Process<FrequencyController::ResourceDelta>(), c(c_), v(v_) {}
-			decltype(proc_vector)& v;
-			XInput::Controller& c;
-			void Execution() override
-			{
-				c.Update(this->Resource().delta_time, v.begin(), v.end());
-			}
-		} delta_proc{ c, proc_vector };
+		// 创建控制器对象，并将用户索引设置为 0
+		XInput::Controller c{ 0 };
 
 		while (flag_exit_loop == false)
 		{
-			f.LimitedDo(delta_proc);
+			c.Update(proc_vector.begin(), proc_vector.end());
+			::Sleep(1);
 		}
 
 		return 0;
@@ -94,6 +90,7 @@ public:
 };
 
 Petal_SetMainClass(XInputControllerDemo);
+
 ```
 
 ## 参考
