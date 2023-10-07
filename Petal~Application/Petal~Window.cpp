@@ -155,7 +155,21 @@ namespace Petal
 	void Window::MaximizedEvent(MaximizedMessage& e) noexcept {}
 	void Window::MinimizedEvent(MinimizedMessage& e) noexcept {}
 	void Window::MovedEvent(MovedMessage& e) noexcept {}
-	void Window::CloseEvent(CloseMessage& e) noexcept { try { this->Destroy(); } catch (const Exception& e) { e; Petal_VSDbgExcep(e.Desc()); } }
+	void Window::CloseEvent(CloseMessage& e) noexcept
+	{
+		try
+		{
+			this->Destroy();
+		}
+#ifdef Petal_Enable_VSDebugOutput
+		catch (::std::exception& e)
+#else
+		catch (::std::exception&)
+#endif
+		{
+			Petal_VSDbgA(e.what());
+		}
+	}
 	void Window::PaintEvent(PaintMessage& e) noexcept { IWin32::DefaultWindowProcess(this->WindowHandle(), e.Message(), 0, 0); }
 	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
 	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
@@ -184,7 +198,6 @@ namespace Petal
 	void Window::SysDeadCharEvent(SysDeadCharMessage& e) noexcept {}
 	win32lres Window::Window::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
 	{
-		//	dout + std::format("msg {:x}", msg) + lna;
 		switch (msg)
 		{
 		case WM_ACTIVATE:

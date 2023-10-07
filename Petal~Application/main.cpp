@@ -84,7 +84,7 @@ public:
 	}
 };
 
-/*
+
 void* operator new(std::size_t sz)
 {
 	std::printf("已调用全局 new 运算符，大小为 %zu\n", sz);
@@ -102,7 +102,7 @@ void operator delete(void* ptr) noexcept
 	std::puts("已调用全局 delete 运算符");
 	std::free(ptr);
 }
-*/
+
 #include "Petal~Window.h"
 
 class Test
