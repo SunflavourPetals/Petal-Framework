@@ -84,4 +84,49 @@ public:
 	}
 };
 
-Petal_SetMainClass(XInputControllerDemo);
+void* operator new(std::size_t sz)
+{
+	std::printf("已调用全局 new 运算符，大小为 %zu\n", sz);
+	if (sz == 0)
+		++sz; // 避免 std::malloc(0)，它可能会在成功时返回 nullptr
+
+	if (void* ptr = std::malloc(sz))
+		return ptr;
+
+	throw std::bad_alloc{}; // 由 [new.delete.single]/3 要求
+}
+
+void operator delete(void* ptr) noexcept
+{
+	std::puts("已调用全局 delete 运算符");
+	std::free(ptr);
+}
+
+#include "Petal~Window.h"
+
+class Test
+{
+public:
+	static int main()
+	{
+		using namespace Petal;
+		
+		std::cout << "程序开始" << '\n';
+		{
+
+			int* p1 = new int;
+			delete p1;
+
+			int* p2 = new int[10]; // C++11 中保证调用替换
+			delete[] p2;
+
+		}
+		std::cout << "程序结束" << '\n';
+
+		return 0;
+	}
+};
+
+// Petal_SetMainClass(XInputControllerDemo);
+
+Petal_SetMainClass(Test);

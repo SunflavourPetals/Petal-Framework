@@ -40,13 +40,6 @@ namespace Petal
 		inline constexpr Char bell{ '\a' }; // BEL : Bell/Alert/Alarm
 	}
 
-	extern const String null_str;
-	extern const WString null_wstr;
-	extern const StringU8 null_u8str;
-	extern const StringU16 null_u16str;
-	extern const StringU32 null_u32str;
-	extern const TString& null_tstr;
-
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline ::std::basic_string<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(const ::std::basic_string<CharT, Traits, Alloc>& in_str)
 	{

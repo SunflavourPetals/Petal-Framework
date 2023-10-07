@@ -121,8 +121,8 @@ namespace Petal
 		window_class.hCursor = this->cursor;
 		window_class.hbrBackground = this->background_brush;
 		window_class.lpszMenuName = (this->using_int_menu_res) ? IWin32::ToWinResource(this->menu_resource) :
-			((this->menu_name == null_tstr) ? nullptr : this->menu_name.c_str());
-		window_class.lpszClassName = (this->class_name == null_tstr) ? nullptr : this->class_name.c_str();
+			((this->menu_name.length() <= 0) ? nullptr : this->menu_name.c_str());
+		window_class.lpszClassName = (this->class_name.length() <= 0) ? nullptr : this->class_name.c_str();
 		window_class.hIconSm = this->icon_sm;
 		return window_class;
 	}
@@ -209,6 +209,10 @@ namespace Petal
 
 namespace Petal
 {
+	WindowClassSet::~WindowClassSet()
+	{
+		this->UnregisterAll();
+	}
 	[[nodiscard]] WindowClassSet::RegisterResult WindowClassSet::Register(const WrappedWindowClass& wrapped_window_class) noexcept(false)
 	{
 		RegisterResult result{};
@@ -286,9 +290,9 @@ namespace Petal
 	}
 	tsize WindowClassSet::UnregisterAll() noexcept(noexcept(::std::declval<WindowClassSet>().Unregister({})))
 	{
-		for (const auto& pair_atom_str : this->set)
+		while (this->set.size() > 0)
 		{
-			auto result{ this->Unregister(pair_atom_str.first) };
+			auto result{ this->Unregister(this->set.begin()->first)};
 		}
 		return this->set.size();
 	}
@@ -321,6 +325,7 @@ namespace Petal
 	}
 	[[nodiscard]] const TString& WindowClassSet::operator[](win32atom class_atom) const noexcept
 	{
+		static TString null_tstr{};
 		try
 		{
 			auto info_pair{ this->set.find(class_atom) };
@@ -342,10 +347,19 @@ namespace Petal
 			return null_tstr;
 		}
 	}
+	[[nodiscard]] WindowClassSet& WindowClassSet::Instance() noexcept
+	{
+		static WindowClassSet window_class_set{};
+		return window_class_set;
+	}
 }
 
 namespace Petal
 {
+	WindowSet::~WindowSet()
+	{
+		this->DestroyAll();
+	}
 	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
 	{
 		static PetalUnnamed::WindowSetMutex::Mutex mutex;
@@ -526,9 +540,9 @@ namespace Petal
 	}
 	tsize WindowSet::DestroyAll() noexcept(noexcept(::std::declval<WindowSet>().Destroy(*ptr<Abstract::Window>{})))
 	{
-		for (const auto& pair_win : this->set)
+		while (this->set.size() > 0)
 		{
-			auto discard{ this->Destroy(*pair_win.second) };
+			auto result{ this->Destroy(*(this->set.begin()->second)) };
 		}
 		return this->set.size();
 	}
@@ -582,30 +596,23 @@ namespace Petal
 			return nullptr;
 		}
 	}
-}
-
-namespace Petal::IWin32
-{
-	EoLProcess default_eol_process{};
+	[[nodiscard]] WindowSet& WindowSet::Instance() noexcept
+	{
+		static WindowSet window_set{};
+		return window_set;
+	}
 }
 
 namespace Petal
 {
-	WindowClassSet window_class_set{};
-	WindowSet window_set{};
+	WindowClassSet& IWindowClassSet() noexcept { return WindowClassSet::Instance(); }
+	WindowSet& IWindowSet() noexcept { return WindowSet::Instance(); }
 
-	WindowClassSet& IWindowClassSet() noexcept { return window_class_set; }
-	WindowSet& IWindowSet() noexcept { return window_set; }
-
-	i32 MessageLoop(win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max, Abstract::ProcessNR& end_of_loop_process)
+	i32 MessageLoop(win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max)
 	{
 		Win32Message message{};
 		win32bool result{};
 		win32error error{};
-		if (IWindowSet().Empty() == true)
-		{
-			ExitMessageLoop();
-		}
 		for (; ; )
 		{
 			result = PetalUnnamed::IWin32::GetWinMessage(message, window_handle, message_filter_min, message_filter_max);
@@ -627,21 +634,16 @@ namespace Petal
 			PetalUnnamed::IWin32::MessageProcess(message);
 		}
 	out_of_loop:
-		end_of_loop_process.Execution();
 		return static_cast<i32>(message.wParam);
 	}
 
-	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove, boolean yield, win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max, Abstract::ProcessNR& end_of_loop_process)
+	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove, boolean yield, win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max)
 	{
 		Win32Message message{};
 		win32bool result{};
 		u32 flag{ PM_NOREMOVE };
 		if (remove == true) flag = PM_REMOVE;
 		if (yield == false) flag |= PM_NOYIELD;
-		if (IWindowSet().Empty() == true)
-		{
-			ExitMessageLoop();
-		}
 		for (; ; )
 		{
 			result = PetalUnnamed::IWin32::PeekWinMessage(message, window_handle, message_filter_min, message_filter_max, flag);
@@ -659,10 +661,9 @@ namespace Petal
 			}
 		}
 	out_of_loop:
-		end_of_loop_process.Execution();
 		return static_cast<i32>(message.wParam);
 	}
-
+	
 	void ExitMessageLoop(i32 exit_code) noexcept
 	{
 		::PostQuitMessage(exit_code);
@@ -689,11 +690,6 @@ namespace Petal::Ignore
 
 namespace Petal::IWin32
 {
-	void EoLProcess::Execution()
-	{
-		IWindowSet().DestroyAll();
-		IWindowClassSet().UnregisterAll();
-	}
 	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept
 	{
 		return reinterpret_cast<win32ctstr>(static_cast<win32ulptr>(integer));

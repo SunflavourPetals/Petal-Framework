@@ -27,8 +27,8 @@ namespace Petal
 	struct WindowDestroyingResult final { win32bool value{ TRUE }; win32error error{ ERROR_SUCCESS }; };
 	WindowClassSet& IWindowClassSet() noexcept;
 	WindowSet& IWindowSet() noexcept;
-	i32 MessageLoop(win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max, Abstract::ProcessNR& end_of_loop_process);
-	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove, boolean yield, win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max, Abstract::ProcessNR& end_of_loop_process);
+	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
+	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	void ExitMessageLoop(i32 exit_code = 0) noexcept;
 }
 
@@ -171,14 +171,18 @@ namespace Petal
 		[[nodiscard]] boolean Check(win32atom class_atom) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] const TString& operator[](win32atom class_atom) const noexcept;
-	public:
+	private:
+		static [[nodiscard]] WindowClassSet& Instance() noexcept;
+	private:
 		WindowClassSet() = default;
+		~WindowClassSet();
+	public:
 		WindowClassSet(const WindowClassSet&) = delete;
 		WindowClassSet(WindowClassSet&&) noexcept = delete;
-		~WindowClassSet() = default;
 	private:
 		::std::unordered_map<win32atom, TString> set;
 		friend class WindowSet;
+		friend WindowClassSet& IWindowClassSet() noexcept;
 	};
 }
 
@@ -196,30 +200,18 @@ namespace Petal
 		[[nodiscard]] boolean Check(const Abstract::Window& window) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] ptr<Abstract::Window> operator[] (win32hwnd index) const noexcept;
-	public:
+	private:
+		static [[nodiscard]] WindowSet& Instance() noexcept;
+	private:
 		WindowSet() = default;
+		~WindowSet();
+	public:
 		WindowSet(const WindowSet&) = delete;
 		WindowSet(WindowSet&&) noexcept = delete;
-		~WindowSet() = default;
 	private:
 		::std::unordered_map<win32hwnd, ptr<Abstract::Window>> set;
+		friend WindowSet& IWindowSet() noexcept;
 	};
-}
-
-namespace Petal::IWin32
-{
-	class EoLProcess : public Abstract::ProcessNR
-	{
-	public:
-		virtual void Execution() override;
-	};
-	extern EoLProcess default_eol_process;
-}
-
-namespace Petal
-{
-	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0, Abstract::ProcessNR& end_of_loop_process = IWin32::default_eol_process);
-	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0, Abstract::ProcessNR& end_of_loop_process = IWin32::default_eol_process);
 }
 
 #endif // !Petal_Header_WindowManger
