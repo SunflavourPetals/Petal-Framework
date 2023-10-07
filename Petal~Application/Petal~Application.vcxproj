@@ -157,7 +157,6 @@
     <ClCompile Include="Petal~FrequencyController.cpp" />
     <ClCompile Include="Petal~Main.cpp" />
     <ClCompile Include="Petal~PerformanceCounter.cpp" />
-    <ClCompile Include="Petal~String.cpp" />
     <ClCompile Include="Petal~VSDebugOutput.cpp" />
     <ClCompile Include="Petal~Window.cpp" />
     <ClCompile Include="Petal~WindowManager.cpp" />

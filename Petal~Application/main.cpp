@@ -109,16 +109,14 @@ class Test
 public:
 	static int main()
 	{
-		using namespace Petal;
+	//	using namespace Petal;
 		
 		std::cout << "程序开始" << '\n';
 		{
-
-			int* p1 = new int;
-			delete p1;
-
-			int* p2 = new int[10]; // C++11 中保证调用替换
-			delete[] p2;
+		//	int* p1 = new int;
+		//	delete p1;
+		//	int* p2 = new int[10]; // C++11 中保证调用替换
+		//	delete[] p2;
 
 		}
 		std::cout << "程序结束" << '\n';

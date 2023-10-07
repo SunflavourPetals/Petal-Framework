@@ -66,7 +66,7 @@ public:
 			{
 				dout + "X pushed and Exit" + ln;
 				std::cout << "X pushed and Exit\n";
-				flag_exit_loop = true;
+				XInputControllerDemo::flag_exit_loop = true;
 			}
 			TX() : BasicT(XInput::Button::X) {}
 		};

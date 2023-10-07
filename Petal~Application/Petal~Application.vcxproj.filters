@@ -104,9 +104,6 @@
     <ClCompile Include="Petal~PerformanceCounter.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~String.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~VSDebugOutput.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
