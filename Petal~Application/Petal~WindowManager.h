@@ -25,8 +25,8 @@ namespace Petal
 	struct WindowClassUnregisteringResult final { win32bool value{ TRUE }; win32error error{ ERROR_SUCCESS }; };
 	struct WindowCreatingResult final { win32hwnd window_handle{ nullptr }; win32error error{ ERROR_SUCCESS }; };
 	struct WindowDestroyingResult final { win32bool value{ TRUE }; win32error error{ ERROR_SUCCESS }; };
-	WindowClassSet& IWindowClassSet() noexcept;
-	WindowSet& IWindowSet() noexcept;
+	WindowClassSet& IWindowClassSet();
+	WindowSet& IWindowSet();
 	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	void ExitMessageLoop(i32 exit_code = 0) noexcept;
@@ -39,12 +39,6 @@ namespace Petal::IWin32
 	[[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept;
 	[[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept;
 	[[nodiscard]] win32lptr WindowLongPtrGet(win32hwnd hwnd, i32 index) noexcept;
-}
-
-// Developer should ignore things which in name space Petal::Ignore.
-namespace Petal::Ignore
-{
-	win32lres CALLBACK PetalWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w, win32lprm l) noexcept;
 }
 
 namespace Petal::Abstract
@@ -62,12 +56,13 @@ namespace Petal::Abstract
 	public:
 		Window() = default;
 		Window(const Window&) = delete;
-		Window(Window&& window) noexcept = delete;
+		Window(Window&&) noexcept = delete;
 		virtual ~Window() = default;
+		Window& operator= (const Window&) = delete;
+		Window& operator= (Window&&) = delete;
 	private:
 		win32hwnd window_handle{ nullptr };
 		friend class WindowSet;
-		friend win32lres CALLBACK Ignore::PetalWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w, win32lprm l) noexcept;
 	};
 }
 
@@ -75,7 +70,7 @@ namespace Petal
 {
 	class WrappedWindowClass final
 	{
-	public:
+	private:
 		static constexpr [[nodiscard]] auto DefaultWindowProcess() noexcept -> decltype(WindowClass::lpfnWndProc);
 	public:
 		[[nodiscard]] WindowClass BuildWindowClass() const noexcept;
@@ -167,22 +162,24 @@ namespace Petal
 	public:
 		[[nodiscard]] RegisterResult Register(const WrappedWindowClass& wrapped_window_class) noexcept(false);
 		[[nodiscard]] UnregisterResult Unregister(win32atom class_atom) noexcept(false);
-		tsize UnregisterAll() noexcept(noexcept(::std::declval<WindowClassSet>().Unregister({})));
+		tsize UnregisterAll() noexcept(false);
 		[[nodiscard]] boolean Check(win32atom class_atom) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] const TString& operator[](win32atom class_atom) const noexcept;
 	private:
-		static [[nodiscard]] WindowClassSet& Instance() noexcept;
+		static [[nodiscard]] WindowClassSet& Instance();
 	private:
 		WindowClassSet() = default;
 		~WindowClassSet();
 	public:
 		WindowClassSet(const WindowClassSet&) = delete;
 		WindowClassSet(WindowClassSet&&) noexcept = delete;
+		WindowClassSet& operator= (const WindowClassSet&) = delete;
+		WindowClassSet& operator= (WindowClassSet&&) = delete;
 	private:
 		::std::unordered_map<win32atom, TString> set;
 		friend class WindowSet;
-		friend WindowClassSet& IWindowClassSet() noexcept;
+		friend WindowClassSet& IWindowClassSet();
 	};
 }
 
@@ -196,21 +193,23 @@ namespace Petal
 	public:
 		[[nodiscard]] CreateResult Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingParameters& parameters = {}) noexcept(false);
 		[[nodiscard]] DestroyResult Destroy(Abstract::Window& window) noexcept(false);
-		tsize DestroyAll() noexcept(noexcept(::std::declval<WindowSet>().Destroy(*ptr<Abstract::Window>{})));
+		tsize DestroyAll() noexcept(false);
 		[[nodiscard]] boolean Check(const Abstract::Window& window) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] ptr<Abstract::Window> operator[] (win32hwnd index) const noexcept;
 	private:
-		static [[nodiscard]] WindowSet& Instance() noexcept;
+		static [[nodiscard]] WindowSet& Instance();
 	private:
 		WindowSet() = default;
 		~WindowSet();
 	public:
 		WindowSet(const WindowSet&) = delete;
 		WindowSet(WindowSet&&) noexcept = delete;
+		WindowSet& operator= (const WindowSet&) = delete;
+		WindowSet& operator= (WindowSet&&) = delete;
 	private:
 		::std::unordered_map<win32hwnd, ptr<Abstract::Window>> set;
-		friend WindowSet& IWindowSet() noexcept;
+		friend WindowSet& IWindowSet();
 	};
 }
 

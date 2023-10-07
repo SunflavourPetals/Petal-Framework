@@ -37,10 +37,8 @@ namespace Petal
 		using CreateResult = WindowCreatingResult;
 		using ShowCode = WindowShowCode;
 	public:
-		CreateResult Create(win32atom class_atom, const WindowCreatingParameters& parameters = {});
-		CreateResult Create(const WrappedWindowClass& wrapped_window_class, const WindowCreatingParameters& parameters, RegisterResult& register_result);
-		CreateResult Create(const WrappedWindowClass& wrapped_window_class, const WindowCreatingParameters& parameters = {});
-		auto Destroy() noexcept(noexcept(IWindowSet().Destroy(*(static_cast<ptr<Window>>(nullptr))))) -> decltype(IWindowSet().Destroy(*this));
+		CreateResult Create(win32atom class_atom, const WindowCreatingParameters& parameters = {}) noexcept(false);
+		auto Destroy() noexcept(false) -> decltype(IWindowSet().Destroy(*this));
 	public:
 		win32bool Show(ShowCode show_code = ShowCode::Show) noexcept;
 		win32bool ShowNormal() noexcept;
@@ -66,8 +64,8 @@ namespace Petal
 		win32bool Resize(const Size2DI32& new_size) noexcept;
 		win32bool MoveTo(i32 x, i32 y) noexcept;
 		win32bool MoveTo(const Position2DI32& new_pos) noexcept;
-	public:
-		virtual void CreateEvent(CreateMessage& e) noexcept;
+	protected:
+		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
 		virtual void ActiveEvent(ActiveMessage& e) noexcept;
 		virtual void InactiveEvent(InactiveMessage& e) noexcept;
 		virtual void EnterSizeEvent(EnterSizeMessage& e) noexcept;
@@ -108,11 +106,12 @@ namespace Petal
 		virtual void DeadCharEvent(DeadCharMessage& e) noexcept;
 		virtual void SysDeadCharEvent(SysDeadCharMessage& e) noexcept;
 	public:
-		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
-	public:
 		Window() = default;
-		Window(ShowCode show_code, win32atom class_atom, const WindowCreatingParameters& parameters, CreateResult& create_result);
-		Window(win32atom class_atom, const WindowCreatingParameters& parameters = {}, ShowCode show_code = ShowCode::Show);
+		Window(const Window&) = delete;
+		Window(Window&&) noexcept = delete;
+		virtual ~Window() = default;
+		Window& operator= (const Window&) = delete;
+		Window& operator= (Window&&) = delete;
 	private:
 		Size2DI32 pt_limit_client_size{ 120, 90 };
 	private:

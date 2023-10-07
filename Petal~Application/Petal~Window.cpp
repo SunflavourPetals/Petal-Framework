@@ -5,33 +5,11 @@
 
 namespace Petal
 {
-	Window::Window(ShowCode show_code, win32atom class_atom, const WindowCreatingParameters& parameters, CreateResult& create_result)
-	{
-		create_result = this->Create(class_atom, parameters);
-		this->Show(show_code);
-		::UpdateWindow(this->WindowHandle());
-	}
-	Window::Window(win32atom class_atom, const WindowCreatingParameters& parameters, ShowCode show_code)
-	{
-		auto create_result{ this->Create(class_atom, parameters) };
-		this->Show(show_code);
-		::UpdateWindow(this->WindowHandle());
-	}
-	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters)
+	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
 	{
 		return IWindowSet().Create(*this, class_atom, parameters);
 	}
-	Window::CreateResult Window::Create(const WrappedWindowClass& wrapped_window_class, const WindowCreatingParameters& parameters, RegisterResult& register_result)
-	{
-		register_result = IWindowClassSet().Register(wrapped_window_class);
-		return this->Create(register_result.class_atom, parameters);
-	}
-	Window::CreateResult Window::Create(const WrappedWindowClass& wrapped_window_class, const WindowCreatingParameters& parameters)
-	{
-		RegisterResult register_result{};
-		return this->Create(wrapped_window_class, parameters, register_result);
-	}
-	auto Window::Destroy() noexcept(noexcept(IWindowSet().Destroy(*(static_cast<ptr<Window>>(nullptr))))) -> decltype(IWindowSet().Destroy(*this))
+	auto Window::Destroy() noexcept(false) -> decltype(IWindowSet().Destroy(*this))
 	{
 		return IWindowSet().Destroy(*this);
 	}
@@ -165,7 +143,6 @@ namespace Petal
 	{
 		return this->MoveTo(new_pos.x, new_pos.y);
 	}
-	void Window::CreateEvent(CreateMessage& e) noexcept {}
 	void Window::ActiveEvent(ActiveMessage& e) noexcept {}
 	void Window::InactiveEvent(InactiveMessage& e) noexcept {}
 	void Window::EnterSizeEvent(EnterSizeMessage& e) noexcept {}
@@ -210,13 +187,6 @@ namespace Petal
 		//	dout + std::format("msg {:x}", msg) + lna;
 		switch (msg)
 		{
-		case WM_CREATE:
-		{
-			CreateMessage wrapped_msg{ msg, w, l };
-			this->CreateEvent(wrapped_msg);
-			return 0; // Return -1 to block creating.
-		}
-		break;
 		case WM_ACTIVATE:
 		{
 			switch (w)

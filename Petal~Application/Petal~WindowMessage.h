@@ -161,29 +161,6 @@ namespace Petal
 
 namespace Petal
 {
-	class CreateMessage : public BasicWindowMessage
-	{
-	public:
-		const Win32CreateStruct& CreateStruct() const noexcept;
-		win32hmenu Menu() const noexcept;
-		Position2DI32 Position() const noexcept;
-		Size2DI32 Size() const noexcept;
-		auto Style() const noexcept -> decltype(::std::declval<Win32CreateStruct>().style);
-		auto ExStyle() const noexcept -> decltype(::std::declval<Win32CreateStruct>().dwExStyle);
-		win32ctstr Title() const noexcept;
-		win32atom ClassAtom() const noexcept;
-		boolean ValidUserResource() const noexcept;
-		template <typename UserType> inline UserType& UserResource() const noexcept
-		{
-			return const_cast<UserType&>(*(reinterpret_cast<ptrc<UserType>>(this->CreateStruct().lpCreateParams)));
-		}
-	public:
-		CreateMessage(win32msg msg, win32wprm w, win32lprm l);
-		CreateMessage(const CreateMessage&) = default;
-		CreateMessage(CreateMessage&&) noexcept = default;
-		virtual ~CreateMessage() = default;
-	};
-
 	class ActiveMessage : public BasicWindowMessage
 	{
 	public:

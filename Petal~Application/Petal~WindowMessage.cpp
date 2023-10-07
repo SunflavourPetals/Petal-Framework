@@ -209,53 +209,6 @@ namespace Petal
 
 namespace Petal
 {
-	CreateMessage::CreateMessage(win32msg msg, win32wprm w, win32lprm l) :
-		BasicWindowMessage(msg, w, l)
-	{
-
-	}
-	const Win32CreateStruct& CreateMessage::CreateStruct() const noexcept
-	{
-		return *(reinterpret_cast<ptrc<Win32CreateStruct>>(this->Long()));
-	}
-	win32hmenu CreateMessage::Menu() const noexcept
-	{
-		return this->CreateStruct().hMenu;
-	}
-	Position2DI32 CreateMessage::Position() const noexcept
-	{
-		return { this->CreateStruct().x, this->CreateStruct().y };
-	}
-	Size2DI32 CreateMessage::Size() const noexcept
-	{
-		return { this->CreateStruct().cx, this->CreateStruct().cy };
-	}
-	auto CreateMessage::Style() const noexcept -> decltype(::std::declval<Win32CreateStruct>().style)
-	{
-		return this->CreateStruct().style;
-	}
-	auto CreateMessage::ExStyle() const noexcept -> decltype(::std::declval<Win32CreateStruct>().dwExStyle)
-	{
-		return this->CreateStruct().dwExStyle;
-	}
-	win32ctstr CreateMessage::Title() const noexcept
-	{
-		return this->CreateStruct().lpszName;
-	}
-	win32atom CreateMessage::ClassAtom() const noexcept
-	{
-		constexpr bool condition{ (sizeof(win32atom)) < (sizeof(decltype(::std::declval<Win32CreateStruct>().lpszClass))) };
-		constexpr tsize bits{ static_cast<tsize>((static_cast<tsize>(condition) * ((1LLU << (sizeof(win32atom) * 8)) - 1)) | (static_cast<tsize>(!condition) * static_cast<tsize>(-1))) };
-		return static_cast<win32atom>(reinterpret_cast<tsize>(this->CreateStruct().lpszClass) & bits);
-	}
-	boolean CreateMessage::ValidUserResource() const noexcept
-	{
-		return this->CreateStruct().lpCreateParams != nullptr;
-	}
-}
-
-namespace Petal
-{
 	ActiveMessage::ActiveMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
 		pt_clicked(w == WA_CLICKACTIVE)
@@ -266,7 +219,7 @@ namespace Petal
 	{
 		return this->pt_clicked;
 	}
-	win32hwnd ActiveMessage::Deactivated() const noexcept // 
+	win32hwnd ActiveMessage::Deactivated() const noexcept
 	{
 		return reinterpret_cast<win32hwnd>(this->Long());
 	}

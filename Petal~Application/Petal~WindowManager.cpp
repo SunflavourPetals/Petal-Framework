@@ -15,49 +15,13 @@ namespace
 	namespace PetalUnnamed::IWin32
 	{
 		using namespace Petal;
-		ptr<Abstract::Window> temp_window_ptr{ nullptr };
 		[[nodiscard]] win32atom RegisterPetalWindowClass(const WindowClass& window_class) noexcept;
 		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept;
 		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept;
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept;
 		[[nodiscard]] win32bool PeekWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max, win32msg remove) noexcept;
 		void MessageProcess(Win32Message& message) noexcept;
-	}
-	namespace PetalUnnamed::WindowSetMutex
-	{
-		using namespace Petal;
-		using Petal::boolean;
-
-		class Mutex final
-		{
-		public:
-			boolean Valid() const noexcept
-			{
-				return this->mutex_handle != nullptr;
-			}
-			dword Wait() noexcept
-			{
-				return ::WaitForSingleObject(this->mutex_handle, INFINITE);
-			}
-			win32bool Release() noexcept
-			{
-				return ::ReleaseMutex(this->mutex_handle);
-			}
-			Mutex() noexcept
-			{
-#if defined(Petal_Enable_Unicode)
-				this->mutex_handle = ::CreateMutexW(nullptr, FALSE, nullptr);
-#else
-				this->mutex_handle = ::CreateMutexA(nullptr, FALSE, nullptr);
-#endif
-			}
-			~Mutex() noexcept
-			{
-				::CloseHandle(this->mutex_handle);
-			}
-		private:
-			win32handle mutex_handle{ nullptr };
-		};
+		win32lres CALLBACK PetalWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w, win32lprm l) noexcept;
 	}
 }
 
@@ -106,7 +70,7 @@ namespace Petal
 	}
 	constexpr [[nodiscard]] auto WrappedWindowClass::DefaultWindowProcess() noexcept -> decltype(WindowClass::lpfnWndProc)
 	{
-		return &Ignore::PetalWindowProcess;
+		return &PetalUnnamed::IWin32::PetalWindowProcess;
 	}
 	[[nodiscard]] WindowClass WrappedWindowClass::BuildWindowClass() const noexcept
 	{
@@ -288,9 +252,9 @@ namespace Petal
 
 		return result;
 	}
-	tsize WindowClassSet::UnregisterAll() noexcept(noexcept(::std::declval<WindowClassSet>().Unregister({})))
+	tsize WindowClassSet::UnregisterAll() noexcept(false)
 	{
-		while (this->set.size() > 0)
+		while (this->set.begin() != this->set.end())
 		{
 			auto result{ this->Unregister(this->set.begin()->first)};
 		}
@@ -347,7 +311,7 @@ namespace Petal
 			return null_tstr;
 		}
 	}
-	[[nodiscard]] WindowClassSet& WindowClassSet::Instance() noexcept
+	[[nodiscard]] WindowClassSet& WindowClassSet::Instance()
 	{
 		static WindowClassSet window_class_set{};
 		return window_class_set;
@@ -362,15 +326,6 @@ namespace Petal
 	}
 	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
 	{
-		static PetalUnnamed::WindowSetMutex::Mutex mutex;
-
-		if (mutex.Valid() == false)
-		{
-			throw Exception{ Petal_MakeExcepArgs(ExceptionCode::InvalidMutex_In_C_WindowSet_M_Create, "Failed in create mutex when create window") };
-		}
-
-		mutex.Wait();
-
 		CreateResult result{};
 		if (IWindowClassSet().Check(class_atom) == false)
 		{
@@ -384,14 +339,10 @@ namespace Petal
 			}
 			catch (::std::exception&) {}
 
-			mutex.Release();
-
 			return result;
 		}
 
-		PetalUnnamed::IWin32::temp_window_ptr = &target_window;
 		result.window_handle = PetalUnnamed::IWin32::CreatePetalWindow(class_atom, parameters);
-		PetalUnnamed::IWin32::temp_window_ptr = nullptr;
 
 		if (result.window_handle == nullptr)
 		{
@@ -408,41 +359,17 @@ namespace Petal
 			}
 			catch (::std::exception&) {}
 
-			mutex.Release();
-
 			return result;
 		}
 
 		target_window.window_handle = result.window_handle;
 
-		try
-		{
-			this->set[result.window_handle] = &target_window;
-		}
-		catch (::std::exception& e)
-		{
-			e;
-			Petal_VSDbgA(e.what());
-			Petal_VSDbgT("\r\n");
-			mutex.Release();
-			throw Exception{ Petal_MakeExcepArgs(ExceptionCode::FailedInRecordWindow_In_C_WindowSet_M_Create, "Failed in record window to set when create window") };
-		}
-
-		mutex.Release();
+		this->set[result.window_handle] = &target_window;
 
 		return result;
 	}
 	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept(false)
 	{
-		static PetalUnnamed::WindowSetMutex::Mutex mutex;
-
-		if (mutex.Valid() == false)
-		{
-			throw Exception{ Petal_MakeExcepArgs(ExceptionCode::InvalidMutex_In_C_WindowSet_M_Destroy, "Failed in create mutex when destroy window") };
-		}
-
-		mutex.Wait();
-
 		DestroyResult result{};
 
 		auto debug_output
@@ -479,8 +406,6 @@ namespace Petal
 			result.value = FALSE;
 			debug_output(window, result);
 
-			mutex.Release();
-
 			return result;
 		}
 		result.value = ::DestroyWindow(window.WindowHandle());
@@ -490,34 +415,25 @@ namespace Petal
 			result.error = ::GetLastError();
 			debug_output(window, result);
 
-			mutex.Release();
-
 			return result;
 		}
 
 		decltype(this->set.erase(window.WindowHandle())) erase_count;
-		try
-		{
-			erase_count = this->set.erase(window.WindowHandle());
-		}
-		catch (::std::exception&)
-		{
-			erase_count = 0;
-		}
 
-		if (erase_count <= 0)
+		if constexpr (noexcept(this->set.erase(window.WindowHandle())) == false)
 		{
 			try
 			{
-				Petal_VSDbgT("[Petal] Exception in WindowSet::Destroy series method!\r\n");
-				Petal_VSDbgT("\t\tFailed in erase window_handle: ");
-				Petal_VSDbgA(::std::format("{}", static_cast<ptr<void>>(window.WindowHandle())).c_str());
-				Petal_VSDbgT("\r\n");
+				erase_count = this->set.erase(window.WindowHandle());
 			}
-			catch (::std::exception&) {}
-
-			mutex.Release();
-			throw Exception{ Petal_MakeExcepArgs(ExceptionCode::FailedInEraseWindow_In_C_WindowSet_M_Destroy, "Failed in erase window from set when destroy window") };
+			catch (::std::exception&)
+			{
+				erase_count = 0;
+			}
+		}
+		else
+		{
+			erase_count = this->set.erase(window.WindowHandle());
 		}
 
 		try
@@ -534,13 +450,11 @@ namespace Petal
 			ExitMessageLoop();
 		}
 
-		mutex.Release();
-
 		return result;
 	}
-	tsize WindowSet::DestroyAll() noexcept(noexcept(::std::declval<WindowSet>().Destroy(*ptr<Abstract::Window>{})))
+	tsize WindowSet::DestroyAll() noexcept(false)
 	{
-		while (this->set.size() > 0)
+		while (this->set.begin() != this->set.end())
 		{
 			auto result{ this->Destroy(*(this->set.begin()->second)) };
 		}
@@ -596,7 +510,7 @@ namespace Petal
 			return nullptr;
 		}
 	}
-	[[nodiscard]] WindowSet& WindowSet::Instance() noexcept
+	[[nodiscard]] WindowSet& WindowSet::Instance()
 	{
 		static WindowSet window_set{};
 		return window_set;
@@ -605,8 +519,15 @@ namespace Petal
 
 namespace Petal
 {
-	WindowClassSet& IWindowClassSet() noexcept { return WindowClassSet::Instance(); }
-	WindowSet& IWindowSet() noexcept { return WindowSet::Instance(); }
+	WindowClassSet& IWindowClassSet()
+	{
+		return WindowClassSet::Instance();
+	}
+
+	WindowSet& IWindowSet()
+	{
+		return WindowSet::Instance();
+	}
 
 	i32 MessageLoop(win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max)
 	{
@@ -670,24 +591,6 @@ namespace Petal
 	}
 }
 
-namespace Petal::Ignore
-{
-	win32lres CALLBACK PetalWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w, win32lprm l) noexcept
-	{
-		ptr<Abstract::Window> window{ IWindowSet()[window_handle] };
-		if (window != nullptr)
-		{
-			return window->Process(message, w, l);
-		}
-		else if (PetalUnnamed::IWin32::temp_window_ptr != nullptr)
-		{
-			PetalUnnamed::IWin32::temp_window_ptr->window_handle = window_handle;
-			return PetalUnnamed::IWin32::temp_window_ptr->Process(message, w, l);
-		}
-		return IWin32::DefaultWindowProcess(window_handle, message, w, l);
-	}
-}
-
 namespace Petal::IWin32
 {
 	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept
@@ -735,6 +638,19 @@ namespace
 {
 	namespace PetalUnnamed::IWin32
 	{
+		win32lres CALLBACK PetalWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w, win32lprm l) noexcept
+		{
+			try
+			{
+				ptr<Abstract::Window> window{ IWindowSet()[window_handle] };
+				if (window != nullptr)
+				{
+					return window->Process(message, w, l);
+				}
+			}
+			catch (const ::std::exception&) {}
+			return Petal::IWin32::DefaultWindowProcess(window_handle, message, w, l);
+		}
 #ifdef Petal_Enable_Unicode
 		[[nodiscard]] win32atom RegisterPetalWindowClass(const WindowClass& window_class) noexcept
 		{

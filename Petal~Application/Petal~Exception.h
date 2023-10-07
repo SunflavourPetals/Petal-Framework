@@ -29,11 +29,6 @@ namespace Petal
 		// Reason_In_C_XXX_M_XXX // ---- // C means Class,Obj; M means Method; XXX means name of class or method.
 		// Reason_In_F_XXX // ---------- // F means Function.
 		Unknown = 0,
-		// WindowManager
-		InvalidMutex_In_C_WindowSet_M_Create = 0x1001,
-		FailedInRecordWindow_In_C_WindowSet_M_Create = 0x1002,
-		InvalidMutex_In_C_WindowSet_M_Destroy = 0x1008,
-		FailedInEraseWindow_In_C_WindowSet_M_Destroy = 0x1009,
 	};
 	class Exception
 	{

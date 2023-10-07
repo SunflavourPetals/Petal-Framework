@@ -84,6 +84,7 @@ public:
 	}
 };
 
+/*
 void* operator new(std::size_t sz)
 {
 	std::printf("已调用全局 new 运算符，大小为 %zu\n", sz);
@@ -101,7 +102,7 @@ void operator delete(void* ptr) noexcept
 	std::puts("已调用全局 delete 运算符");
 	std::free(ptr);
 }
-
+*/
 #include "Petal~Window.h"
 
 class Test
@@ -109,7 +110,7 @@ class Test
 public:
 	static int main()
 	{
-	//	using namespace Petal;
+		using namespace Petal;
 		
 		std::cout << "程序开始" << '\n';
 		{
@@ -118,6 +119,15 @@ public:
 		//	int* p2 = new int[10]; // C++11 中保证调用替换
 		//	delete[] p2;
 
+			WrappedWindowClass wc{ Petal_TStr("my-class") };
+			auto [atom, error] = wc.Register();
+
+			Window w;
+			w.Create(atom);
+
+			w.Show();
+
+			MessageLoop();
 		}
 		std::cout << "程序结束" << '\n';
 
