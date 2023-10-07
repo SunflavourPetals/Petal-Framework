@@ -101,24 +101,6 @@ Petal_SetMainClass(XInputControllerDemo);
 
 派生自[Petal::Abstract::Process&lt;Petal::XInput::Controller::Resource>]()
 
-##### 函数Controller
-
-返回值 Petal::XInput::Controller&
-根据传入的资源，得到资源中的控制器对象，以便查询控制器状态来判断事件是否触发。
-
-调用方 Petal::XInput::Controller::Update 在使用本类 Check 方法和 Execution 方法期间，保证本类派生类对象的资源引用到了有效资源，并在调用完本类 Check 方法和 Execution 方法后，取消本类派生类对象对资源的引用。
-
-因此开发者不能随意使用此方法
-
-##### 函数DeltaTime
-
-返回值 Petal::f64
-根据传入的资源，得到资源中的间隔时间，此值通常用于检测“XXXHold”事件。
-
-调用方 Petal::XInput::Controller::Update 在使用本类 Check 方法和 Execution 方法期间，保证本类派生类对象的资源引用到了有效资源，并在调用完本类 Check 方法和 Execution 方法后，取消本类派生类对象对资源的引用。
-
-因此开发者不能随意使用此方法
-
 ##### 函数Check
 
 返回值 Petal::boolean
