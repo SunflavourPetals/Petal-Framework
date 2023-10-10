@@ -62,10 +62,10 @@ namespace Petal::TypeTraits
 	template <typename Ty>
 	constexpr bool is_smart_pointer{ IsSmartPointer<Ty>::value };
 
-	// general pointer
+	// generic pointer
 
 	template <typename Ty>
-	constexpr bool is_general_pointer{ is_smart_pointer<Ty> || is_raw_pointer<Ty> };
+	constexpr bool is_generic_pointer{ is_smart_pointer<Ty> || is_raw_pointer<Ty> };
 }
 
 namespace Petal::Concept
@@ -77,7 +77,7 @@ namespace Petal::Concept
 	concept SmartPointer = TypeTraits::is_smart_pointer<Ty>;
 
 	template <typename Ty>
-	concept GeneralPointer = TypeTraits::is_general_pointer<Ty>;
+	concept GenericPointer = TypeTraits::is_generic_pointer<Ty>;
 }
 
 namespace Petal::TypeTraits
@@ -302,195 +302,195 @@ namespace Petal::TypeTraits
 	template <typename Ty>
 	using RemoveAllSmartPointerType = typename RemoveAllSmartPointer<Ty>::Type;
 
-	// Remove one general pointer type
+	// Remove one generic pointer type
 
 	template <typename Ty>
-	struct RemoveOneGeneralPointer
-	{
-		using Type = Ty;
-	};
-
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<Ty*>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<::std::unique_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<::std::shared_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<::std::weak_ptr<Ty>>
+	struct RemoveOneGenericPointer
 	{
 		using Type = Ty;
 	};
 
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<Ty* const>
+	struct RemoveOneGenericPointer<Ty*>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const ::std::unique_ptr<Ty>>
+	struct RemoveOneGenericPointer<::std::unique_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const ::std::shared_ptr<Ty>>
+	struct RemoveOneGenericPointer<::std::shared_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const ::std::weak_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<Ty* volatile>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<volatile ::std::unique_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<volatile ::std::shared_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-	template <typename Ty>
-	struct RemoveOneGeneralPointer<volatile ::std::weak_ptr<Ty>>
+	struct RemoveOneGenericPointer<::std::weak_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<Ty* const volatile>
+	struct RemoveOneGenericPointer<Ty* const>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const volatile ::std::unique_ptr<Ty>>
+	struct RemoveOneGenericPointer<const ::std::unique_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const volatile ::std::shared_ptr<Ty>>
+	struct RemoveOneGenericPointer<const ::std::shared_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveOneGeneralPointer<const volatile ::std::weak_ptr<Ty>>
-	{
-		using Type = Ty;
-	};
-
-	template <typename Ty>
-	using RemoveOneGeneralPointerType = typename RemoveOneGeneralPointer<Ty>::Type;
-
-	// Remove all general pointer
-
-	template <typename Ty>
-	struct RemoveAllGeneralPointer
+	struct RemoveOneGenericPointer<const ::std::weak_ptr<Ty>>
 	{
 		using Type = Ty;
 	};
 
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<Ty*>
+	struct RemoveOneGenericPointer<Ty* volatile>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<::std::unique_ptr<Ty>>
+	struct RemoveOneGenericPointer<volatile ::std::unique_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<::std::shared_ptr<Ty>>
+	struct RemoveOneGenericPointer<volatile ::std::shared_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<::std::weak_ptr<Ty>>
+	struct RemoveOneGenericPointer<volatile ::std::weak_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<Ty* const>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const ::std::unique_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const ::std::shared_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const ::std::weak_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<Ty* volatile>
+	struct RemoveOneGenericPointer<Ty* const volatile>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<volatile ::std::unique_ptr<Ty>>
+	struct RemoveOneGenericPointer<const volatile ::std::unique_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<volatile ::std::shared_ptr<Ty>>
+	struct RemoveOneGenericPointer<const volatile ::std::shared_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 	template <typename Ty>
-	struct RemoveAllGeneralPointer<volatile ::std::weak_ptr<Ty>>
+	struct RemoveOneGenericPointer<const volatile ::std::weak_ptr<Ty>>
 	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<Ty* const volatile>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const volatile ::std::unique_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const volatile ::std::shared_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
-	};
-	template <typename Ty>
-	struct RemoveAllGeneralPointer<const volatile ::std::weak_ptr<Ty>>
-	{
-		using Type = typename RemoveAllGeneralPointer<Ty>::Type;
+		using Type = Ty;
 	};
 
 	template <typename Ty>
-	using RemoveAllGeneralPointerType = typename RemoveAllGeneralPointer<Ty>::Type;
+	using RemoveOneGenericPointerType = typename RemoveOneGenericPointer<Ty>::Type;
+
+	// Remove all generic pointer
+
+	template <typename Ty>
+	struct RemoveAllGenericPointer
+	{
+		using Type = Ty;
+	};
+
+	template <typename Ty>
+	struct RemoveAllGenericPointer<Ty*>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<::std::unique_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<::std::shared_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<::std::weak_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+
+	template <typename Ty>
+	struct RemoveAllGenericPointer<Ty* const>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const ::std::unique_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const ::std::shared_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const ::std::weak_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+
+	template <typename Ty>
+	struct RemoveAllGenericPointer<Ty* volatile>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<volatile ::std::unique_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<volatile ::std::shared_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<volatile ::std::weak_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+
+	template <typename Ty>
+	struct RemoveAllGenericPointer<Ty* const volatile>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const volatile ::std::unique_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const volatile ::std::shared_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+	template <typename Ty>
+	struct RemoveAllGenericPointer<const volatile ::std::weak_ptr<Ty>>
+	{
+		using Type = typename RemoveAllGenericPointer<Ty>::Type;
+	};
+
+	template <typename Ty>
+	using RemoveAllGenericPointerType = typename RemoveAllGenericPointer<Ty>::Type;
 }
 
 #endif // !Petal_Header_SmartPointer

@@ -133,6 +133,7 @@
     <ClInclude Include="Petal~Exception.h" />
     <ClInclude Include="Petal~FrequencyController.h" />
     <ClInclude Include="Petal~KeyboardController.h" />
+    <ClInclude Include="Petal~KeyboardEventProcess.h" />
     <ClInclude Include="Petal~Log.h" />
     <ClInclude Include="Petal~Main.h" />
     <ClInclude Include="Petal~Output.h" />
@@ -152,9 +153,12 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="main_2.cpp" />
     <ClCompile Include="Petal~Bom.cpp" />
     <ClCompile Include="Petal~Exception.cpp" />
     <ClCompile Include="Petal~FrequencyController.cpp" />
+    <ClCompile Include="Petal~KeyboardController.cpp" />
+    <ClCompile Include="Petal~KeyboardEventProcess.cpp" />
     <ClCompile Include="Petal~Main.cpp" />
     <ClCompile Include="Petal~PerformanceCounter.cpp" />
     <ClCompile Include="Petal~VSDebugOutput.cpp" />

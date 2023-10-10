@@ -44,9 +44,9 @@ namespace Petal::XInput
 		return !this->ThisPositive();
 	}
 	// XInputButtonHoldProcess
-	ButtonHoldProcess::ButtonHoldProcess(Button::Type buttons, f64 target_time, boolean loop_mode) :
+	ButtonHoldProcess::ButtonHoldProcess(Button::Type buttons, i64 target_count, boolean loop_mode) :
 		ButtonProcess(buttons),
-		XHoldProcess(target_time, loop_mode)
+		XHoldProcess(target_count, loop_mode)
 	{
 
 	}
@@ -109,9 +109,9 @@ namespace Petal::XInput
 		return !this->ThisPositive();
 	}
 	// XInputTriggerHoldProcess
-	TriggerHoldProcess::TriggerHoldProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value, f64 target_time, boolean loop_mode) :
+	TriggerHoldProcess::TriggerHoldProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value, i64 target_count, boolean loop_mode) :
 		TriggerProcess(dimension, target_value),
-		XHoldProcess(target_time, loop_mode)
+		XHoldProcess(target_count, loop_mode)
 	{
 
 	}
@@ -174,9 +174,9 @@ namespace Petal::XInput
 		return !this->ThisPositive();
 	}
 	// XInputStickHoldProcess
-	StickHoldProcess::StickHoldProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value, f64 target_time, boolean loop_mode) :
+	StickHoldProcess::StickHoldProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value, i64 target_count, boolean loop_mode) :
 		StickProcess(dimension, direction, target_value),
-		XHoldProcess(target_time, loop_mode)
+		XHoldProcess(target_count, loop_mode)
 	{
 
 	}
@@ -201,20 +201,20 @@ namespace Petal::XInput
 namespace Petal::XInput::MiddleProcess
 {
 	// XInputXHold
-	XHoldProcess::XHoldProcess(f64 target_time, boolean loop_mode) :
+	XHoldProcess::XHoldProcess(i64 target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
-		pt_target_time(target_time),
+		pt_target_count(target_count),
 		pt_loop_triggering(loop_mode)
 	{
 
 	}
-	void XHoldProcess::UpdateTargetTime(f64 target_time) noexcept
+	void XHoldProcess::UpdateTargetCount(i64 target_count) noexcept
 	{
-		this->pt_target_time = target_time;
+		this->pt_target_count = target_count;
 	}
-	f64 XHoldProcess::TargetTime() const noexcept
+	i64 XHoldProcess::TargetCount() const noexcept
 	{
-		return this->pt_target_time;
+		return this->pt_target_count;
 	}
 	void XHoldProcess::UpdateLoopMode(boolean loop_mode) noexcept
 	{
@@ -230,7 +230,7 @@ namespace Petal::XInput::MiddleProcess
 		{
 			if (this->ThisPositive())
 			{
-				this->pt_total_count += this->Resource().controller.GetCounter().DeltaCounts();
+				this->pt_total_count += this->Resource().delta_count;
 			}
 			else
 			{
@@ -251,7 +251,7 @@ namespace Petal::XInput::MiddleProcess
 				return false;
 			}
 		}
-		if ((static_cast<f64>(this->pt_total_count) / this->Resource().controller.GetCounter().Frequency()) >= this->pt_target_time)
+		if (this->pt_total_count >= this->pt_target_count)
 		{
 			this->pt_total_count = 0;
 			if (!this->pt_loop_triggering)

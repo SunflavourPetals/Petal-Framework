@@ -47,17 +47,17 @@ namespace Petal::XInput::MiddleProcess
 	public:
 		virtual boolean Check();
 	public:
-		virtual void UpdateTargetTime(f64 target_time) noexcept final; // hold target_time to triggering
-		virtual f64 TargetTime() const noexcept final;
-		virtual void UpdateLoopMode(boolean loop_mode) noexcept final; // loop triggering target_time to target_time
+		virtual void UpdateTargetCount(i64 target_count) noexcept final; // hold target_count to triggering
+		virtual i64 TargetCount() const noexcept final;
+		virtual void UpdateLoopMode(boolean loop_mode) noexcept final; // loop triggering target_count to target_count
 		virtual boolean LoopMode() const noexcept final;
 	public:
-		XHoldProcess(f64 target_time = 1.0, boolean loop_mode = false);
+		XHoldProcess(i64 target_count = 1, boolean loop_mode = false);
 		XHoldProcess(const XHoldProcess&) = default;
 		XHoldProcess(XHoldProcess&&) noexcept = default;
 		~XHoldProcess() = default;
 	private:
-		f64 pt_target_time{ 1.0 };
+		i64 pt_target_count{ 1 };
 		i64 pt_total_count{};
 		boolean pt_loop_triggering{ false };
 		boolean pt_in_holding{ false };
@@ -174,7 +174,7 @@ namespace Petal::XInput
 	public:
 		virtual boolean Check() override;
 	public:
-		ButtonHoldProcess(Button::Type buttons = Button::A, f64 target_time = 1.0, boolean loop_mode = false);
+		ButtonHoldProcess(Button::Type buttons = Button::A, i64 target_count = 1, boolean loop_mode = false);
 	};
 	// TriggerProcess Derived
 	class TriggerPushProcess : public MiddleProcess::TriggerProcess
@@ -218,7 +218,7 @@ namespace Petal::XInput
 	public:
 		virtual boolean Check() override;
 	public:
-		TriggerHoldProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold, f64 target_time = 1.0, boolean loop_mode = false);
+		TriggerHoldProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold, i64 target_count = 1, boolean loop_mode = false);
 	};
 	// StickProcess Derived
 	class StickPushProcess : public MiddleProcess::StickProcess
@@ -262,7 +262,7 @@ namespace Petal::XInput
 	public:
 		virtual boolean Check() override;
 	public:
-		StickHoldProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold, f64 target_time = 1.0, boolean loop_mode = false);
+		StickHoldProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold, i64 target_count = 1, boolean loop_mode = false);
 	};
 }
 

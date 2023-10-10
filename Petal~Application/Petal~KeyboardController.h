@@ -8,26 +8,42 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 #include "Petal~VirtualKey.h"
+#include "Petal~SmartPointer.h"
 
 #include <unordered_map>
 
 namespace Petal::Keyboard
 {
 	using Petal::boolean;
-	struct StoredState final
-	{
-		win32short state{};
-		win32short last_state{};
-		boolean pushed{};
-		u8 unused_pad1{};
-		boolean last_pushed{};
-		u8 unused_pad2{};
-	};
-	using StateContainer = ::std::unordered_map<VirtualKey::Type, StoredState>;
 	class Controller;
+	class StoredState final
+	{
+	public:
+		win32short Value() const noexcept;
+		boolean Pushed() const noexcept;
+	private:
+		void Update(win32short new_state) noexcept;
+	public:
+		StoredState() = default;
+		StoredState(const StoredState&) = default;
+		StoredState(StoredState&&) = default;
+		~StoredState() = default;
+		StoredState& operator=(const StoredState&) = default;
+	private:
+		win32short pt_state{};
+		boolean pt_pushed{};
+		u8 pt_unused_pad{};
+		friend class Controller;
+	};
+	struct StoredPairState
+	{
+		StoredState state;
+		StoredState last_state;
+	};
+	using StateContainer = ::std::unordered_map<VirtualKey::Type, StoredPairState>;
 	struct ResourceOfController
 	{
-		const f64 delta_time;
+		const i64 delta_count{};
 		const Controller& controller;
 	};
 }
@@ -37,8 +53,6 @@ namespace Petal::Abstract
 	class KeyboardEventProcess : public Process<Petal::Keyboard::ResourceOfController>
 	{
 	public:
-		virtual const Keyboard::Controller& Controller() const final;
-		virtual f64 DeltaTime() const final;
 		virtual boolean Check() = 0;
 	public:
 		KeyboardEventProcess() = default;
@@ -51,25 +65,15 @@ namespace Petal::Abstract
 namespace Petal::Concept
 {
 	template <typename Ty>
-	concept KeyboardEventProcessIterator = requires
+	concept KeyboardEventProcessGeneralIterator = requires
 	{
 		typename ::std::iterator_traits<Ty>::value_type;
-		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename Ty::value_type>;
+		requires ::std::is_const_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
+		requires ::std::is_volatile_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
+		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type>;
 	};
 	template <typename Ty>
-	concept KeyboardtEventProcessPointerIterator = requires (Ty o)
-	{
-		typename ::std::iterator_traits<Ty>::value_type;
-		requires ::std::is_pointer_v<typename Ty::value_type>;
-		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename ::std::remove_pointer_t<typename Ty::value_type>>;
-		(*o)->Check();
-	} || requires (Ty o)
-	{
-		typename ::std::iterator_traits<Ty>::value_type;
-		typename Ty::value_type::element_type;
-		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename Ty::value_type::element_type>;
-		(*o)->Check();
-	};
+	concept KeyboardEventProcessGeneralPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
 }
 
 namespace Petal::Keyboard
@@ -79,23 +83,45 @@ namespace Petal::Keyboard
 	public:
 		using Resource = ResourceOfController;
 	public:
-		const StateContainer& KeyStateContainer() const noexcept;
-		win32short KeyState(VirtualKey::Type vk) const noexcept;
-		win32short LastKeyState(VirtualKey::Type vk) const noexcept;
-		boolean Pushed(VirtualKey::Type vk) const noexcept;
-		boolean LastPushed(VirtualKey::Type vk) const noexcept;
+		const StoredState& GetState(VirtualKey::Type vk) const noexcept;
+		const StoredState& GetLastState(VirtualKey::Type vk) const noexcept;
+		StateContainer& GetStateContainer() noexcept;
+		const StateContainer& GetStateContainer() const noexcept;
+		boolean Register(VirtualKey::Type key) noexcept;
+		boolean Unregister(VirtualKey::Type key) noexcept;
+		void Update(Concept::KeyboardEventProcessGeneralIterator auto begin, Concept::KeyboardEventProcessGeneralIterator auto end, i64 delta_count = 0);
+	private:
+		StateContainer::const_iterator FindStoredState(VirtualKey::Type vk) const noexcept;
+		void QueryState() noexcept;
+		static const StoredState& NullState() noexcept;
+		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
+		static void ExecuteEventProcess(Concept::KeyboardEventProcessGeneralPointer auto& pointer, Resource& resource);
 	public:
 		Controller() = default;
-		Controller(const StateContainer& o);
-		Controller(StateContainer&& o);
 		Controller(const Controller&) = default;
 		Controller(Controller&&) noexcept = default;
 		~Controller() = default;
-		Controller& operator = (const Controller&) noexcept = default;
+		Controller& operator = (const Controller&) = default;
 		Controller& operator = (Controller&&) noexcept = default;
-	private:
-		StateContainer pt_key_state;
+	public:
+		StateContainer key_state_container;
 	};
+	inline void Controller::Update(Concept::KeyboardEventProcessGeneralIterator auto begin, Concept::KeyboardEventProcessGeneralIterator auto end, i64 delta_count)
+	{
+		this->QueryState();
+		Resource resource{ delta_count, *this };
+		for (; begin != end; ++begin)
+		{
+			this->ExecuteEventProcess(*begin, resource);
+		}
+	}
+	inline void Controller::ExecuteEventProcess(Concept::KeyboardEventProcessGeneralPointer auto& pointer, Resource& resource)
+	{
+		if (pointer != nullptr)
+		{
+			Controller::ExecuteEventProcess(*pointer, resource);
+		}
+	}
 }
 
 #endif // !Petal_Header_KeyboardController

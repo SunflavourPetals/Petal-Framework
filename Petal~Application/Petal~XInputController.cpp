@@ -187,13 +187,18 @@ namespace Petal::XInput
 	{
 		return this->pt_last_gamepad;
 	}
-	const PerformanceCounter& Controller::GetCounter() const noexcept
-	{
-		return this->pt_counter;
-	}
 	win32dword Controller::QueryState() noexcept // ²éÑ¯¿ØÖÆÆ÷ÊäÈë×´Ì¬
 	{
 		this->pt_last_gamepad = this->pt_gamepad;
 		return this->pt_gamepad.QueryState();
+	}
+	void Controller::ExecuteEventProcess(Abstract::XInputEventProcess& proc, Resource& resource)
+	{
+		proc.AssignResource(resource);
+		if (proc.Check())
+		{
+			proc.Execution();
+		}
+		proc.RemoveResource();
 	}
 }

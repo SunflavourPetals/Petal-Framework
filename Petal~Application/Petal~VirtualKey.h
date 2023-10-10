@@ -52,6 +52,26 @@ namespace Petal
 			static constexpr vk Stop{ VK_MEDIA_STOP };
 			static constexpr vk PlayPause{ VK_MEDIA_PLAY_PAUSE };
 		};
+		class Numpad
+		{
+		public:
+			static constexpr vk Num0{ VK_NUMPAD0 }; // numpad 0
+			static constexpr vk Num1{ VK_NUMPAD1 }; // numpad 1
+			static constexpr vk Num2{ VK_NUMPAD2 }; // numpad 2
+			static constexpr vk Num3{ VK_NUMPAD3 }; // numpad 3
+			static constexpr vk Num4{ VK_NUMPAD4 }; // numpad 4
+			static constexpr vk Num5{ VK_NUMPAD5 }; // numpad 5
+			static constexpr vk Num6{ VK_NUMPAD6 }; // numpad 6
+			static constexpr vk Num7{ VK_NUMPAD7 }; // numpad 7
+			static constexpr vk Num8{ VK_NUMPAD8 }; // numpad 8
+			static constexpr vk Num9{ VK_NUMPAD9 }; // numpad 9
+			static constexpr vk Multiply{ VK_MULTIPLY }; // numpad *
+			static constexpr vk Add{ VK_ADD }; // numpad +
+			static constexpr vk Separator{ VK_SEPARATOR };
+			static constexpr vk Subtract{ VK_SUBTRACT }; // numpad -
+			static constexpr vk Decimal{ VK_DECIMAL };
+			static constexpr vk Divide{ VK_DIVIDE }; // numpad /
+		};
 		static constexpr vk Backspace{ VK_BACK };
 		static constexpr vk Tab{ VK_TAB };
 		static constexpr vk Enter{ VK_RETURN }; // Carriage Return
@@ -117,22 +137,6 @@ namespace Petal
 		static constexpr vk RWin{ VK_RWIN };
 		static constexpr vk Apps{ VK_APPS };
 		static constexpr vk Sleep{ VK_SLEEP };
-		static constexpr vk Num0{ VK_NUMPAD0 }; // numpad 0
-		static constexpr vk Num1{ VK_NUMPAD1 }; // numpad 1
-		static constexpr vk Num2{ VK_NUMPAD2 }; // numpad 2
-		static constexpr vk Num3{ VK_NUMPAD3 }; // numpad 3
-		static constexpr vk Num4{ VK_NUMPAD4 }; // numpad 4
-		static constexpr vk Num5{ VK_NUMPAD5 }; // numpad 5
-		static constexpr vk Num6{ VK_NUMPAD6 }; // numpad 6
-		static constexpr vk Num7{ VK_NUMPAD7 }; // numpad 7
-		static constexpr vk Num8{ VK_NUMPAD8 }; // numpad 8
-		static constexpr vk Num9{ VK_NUMPAD9 }; // numpad 9
-		static constexpr vk Multiply{ VK_MULTIPLY }; // numpad *
-		static constexpr vk Add{ VK_ADD }; // numpad +
-		static constexpr vk Separator{ VK_SEPARATOR };
-		static constexpr vk Subtract{ VK_SUBTRACT }; // numpad -
-		static constexpr vk Decimal{ VK_DECIMAL };
-		static constexpr vk Divide{ VK_DIVIDE }; // numpad /
 		static constexpr vk F1{ VK_F1 };
 		static constexpr vk F2{ VK_F2 };
 		static constexpr vk F3{ VK_F3 };

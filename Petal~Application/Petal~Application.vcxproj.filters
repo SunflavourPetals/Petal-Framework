@@ -87,6 +87,9 @@
     <ClInclude Include="Petal~SmartPointer.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
+    <ClInclude Include="Petal~KeyboardEventProcess.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Petal~Bom.cpp">
@@ -123,6 +126,15 @@
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~KeyboardController.cpp">
+      <Filter>PetalFramework\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~KeyboardEventProcess.cpp">
+      <Filter>PetalFramework\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="main_2.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>

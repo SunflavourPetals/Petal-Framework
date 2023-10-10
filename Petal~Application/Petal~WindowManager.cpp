@@ -153,9 +153,9 @@ namespace Petal
 			this->window_title = StringToCStyleString(new_title);
 		}
 #ifdef Petal_Enable_VSDebugOutput
-		catch (::std::exception& e)
+		catch (const ::std::exception& e)
 #else
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 #endif
 		{
 			Petal_VSDbgT("[Petal] std::exception: ");
@@ -187,18 +187,29 @@ namespace Petal
 		{
 			result.error = ::GetLastError();
 
-			Petal_VSDbgT("[Petal] Failed in WindowClassSet::Register method!\r\n");
-			Petal_VSDbgT("\t\tclass_name: \"");
-			Petal_VSDebugOutput(wrapped_window_class.ClassName().c_str());
-			Petal_VSDbgT("\"\r\n");
-			Petal_VSDbgT("\t\terror code: ");
-			Petal_VSDbgA(::std::format("{}", result.error).c_str());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] Failed in WindowClassSet::Register method!\r\n");
+				Petal_VSDbgT("\t\tclass_name: \"");
+				Petal_VSDebugOutput(wrapped_window_class.ClassName().c_str());
+				Petal_VSDbgT("\"\r\n");
+				Petal_VSDbgT("\t\terror code: ");
+				Petal_VSDbgA(::std::format("{}", result.error).c_str());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 
 			return result;
 		}
 
 		this->set[result.class_atom] = wrapped_window_class.ClassName();
+
+		try
+		{
+			Petal_VSDbgA(::std::format("[Petal] Window class(atom:{}) has been registered", result.class_atom).c_str());
+			Petal_VSDbgT("\r\n");
+		}
+		catch (const ::std::exception&) {}
 
 		return result;
 	}
@@ -210,13 +221,17 @@ namespace Petal
 		{
 			[](const win32atom& class_atom, const UnregisterResult& result)
 			{
-				Petal_VSDbgT("[Petal] Failed in WindowClassSet::Unregister series method!\r\n");
-				Petal_VSDbgT("\t\tclass_atom: ");
-				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-				Petal_VSDbgT("\r\n");
-				Petal_VSDbgT("\t\terror code: ");
-				Petal_VSDbgA(::std::format("{}", result.error).c_str());
-				Petal_VSDbgT("\r\n");
+				try
+				{
+					Petal_VSDbgT("[Petal] Failed in WindowClassSet::Unregister series method!\r\n");
+					Petal_VSDbgT("\t\tclass_atom: ");
+					Petal_VSDbgA(::std::format("{}", class_atom).c_str());
+					Petal_VSDbgT("\r\n");
+					Petal_VSDbgT("\t\terror code: ");
+					Petal_VSDbgA(::std::format("{}", result.error).c_str());
+					Petal_VSDbgT("\r\n");
+				}
+				catch (const ::std::exception&) {}
 			}
 		};
 
@@ -241,14 +256,22 @@ namespace Petal
 
 		if (erase_count <= 0)
 		{
-			Petal_VSDbgT("[Petal] Exception in WindowClassSet::Unregister series method!\r\n");
-			Petal_VSDbgT("\t\tFailed in erase class_atom: ");
-			Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] Exception in WindowClassSet::Unregister series method!\r\n");
+				Petal_VSDbgT("\t\tFailed in erase class_atom: ");
+				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 		}
 
-		Petal_VSDbgA(::std::format("[Petal] Window class(atom:{}) has been unregistered", class_atom).c_str());
-		Petal_VSDbgT("\r\n");
+		try
+		{
+			Petal_VSDbgA(::std::format("[Petal] Window class(atom:{}) has been unregistered", class_atom).c_str());
+			Petal_VSDbgT("\r\n");
+		}
+		catch (const ::std::exception&) {}
 
 		return result;
 	}
@@ -272,14 +295,18 @@ namespace Petal
 			return true;
 		}
 #ifdef Petal_Enable_VSDebugOutput
-		catch (::std::exception& e)
+		catch (const ::std::exception& e)
 #else
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 #endif
 		{
-			Petal_VSDbgT("[Petal] std::exception: ");
-			Petal_VSDbgA(e.what());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] std::exception: ");
+				Petal_VSDbgA(e.what());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 			return false;
 		}
 	}
@@ -300,14 +327,18 @@ namespace Petal
 			return info_pair->second;
 		}
 #ifdef Petal_Enable_VSDebugOutput
-		catch (::std::exception& e)
+		catch (const ::std::exception& e)
 #else
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 #endif
 		{
-			Petal_VSDbgT("[Petal] std::exception: ");
-			Petal_VSDbgA(e.what());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] std::exception: ");
+				Petal_VSDbgA(e.what());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 			return null_tstr;
 		}
 	}
@@ -337,7 +368,7 @@ namespace Petal
 				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
 				Petal_VSDbgT(" in window_class_set\r\n");
 			}
-			catch (::std::exception&) {}
+			catch (const ::std::exception&) {}
 
 			return result;
 		}
@@ -357,7 +388,7 @@ namespace Petal
 				Petal_VSDbgA(::std::format("{}", result.error).c_str());
 				Petal_VSDbgT("\r\n");
 			}
-			catch (::std::exception&) {}
+			catch (const ::std::exception&) {}
 
 			return result;
 		}
@@ -366,10 +397,19 @@ namespace Petal
 
 		this->set[result.window_handle] = &target_window;
 
+		try
+		{
+			Petal_VSDbgA(::std::format("[Petal] Window(handle:{}) has been created", static_cast<void*>(result.window_handle)).c_str());
+			Petal_VSDbgT("\r\n");
+		}
+		catch (const ::std::exception&) {}
+
 		return result;
 	}
 	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept(false)
 	{
+	//	::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_set_mutex);
+
 		DestroyResult result{};
 
 		auto debug_output
@@ -386,7 +426,7 @@ namespace Petal
 					Petal_VSDbgA(::std::format("{}", result.error).c_str());
 					Petal_VSDbgT("\r\n");
 				}
-				catch (::std::exception&) {}
+				catch (const ::std::exception&) {}
 			}
 		};
 
@@ -395,7 +435,7 @@ namespace Petal
 		{
 			window_pair = this->set.find(window.WindowHandle());
 		}
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 		{
 			window_pair = this->set.end();
 		}
@@ -426,7 +466,7 @@ namespace Petal
 			{
 				erase_count = this->set.erase(window.WindowHandle());
 			}
-			catch (::std::exception&)
+			catch (const ::std::exception&)
 			{
 				erase_count = 0;
 			}
@@ -441,7 +481,7 @@ namespace Petal
 			Petal_VSDbgA(::std::format("[Petal] Window(handle:{}) has been destroyed", static_cast<void*>(window.window_handle)).c_str());
 			Petal_VSDbgT("\r\n");
 		}
-		catch (::std::exception&) {}
+		catch (const ::std::exception&) {}
 
 		window.window_handle = nullptr;
 
@@ -472,14 +512,18 @@ namespace Petal
 			return true;
 		}
 #ifdef Petal_Enable_VSDebugOutput
-		catch (::std::exception& e)
+		catch (const ::std::exception& e)
 #else
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 #endif
 		{
-			Petal_VSDbgT("[Petal] std::exception: ");
-			Petal_VSDbgA(e.what());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] std::exception: ");
+				Petal_VSDbgA(e.what());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 			return false;
 		}
 	}
@@ -499,14 +543,18 @@ namespace Petal
 			return window_pair->second;
 		}
 #ifdef Petal_Enable_VSDebugOutput
-		catch (::std::exception& e)
+		catch (const ::std::exception& e)
 #else
-		catch (::std::exception&)
+		catch (const ::std::exception&)
 #endif
 		{
-			Petal_VSDbgT("[Petal] std::exception: ");
-			Petal_VSDbgA(e.what());
-			Petal_VSDbgT("\r\n");
+			try
+			{
+				Petal_VSDbgT("[Petal] std::exception: ");
+				Petal_VSDbgA(e.what());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
 			return nullptr;
 		}
 	}
@@ -544,9 +592,13 @@ namespace Petal
 				break;
 			case -1:
 				error = ::GetLastError();
-				Petal_VSDbgT("[Petal] Exception in Petal::MessageLoop, error code: ");
-				Petal_VSDbgA(::std::format("{}", error).c_str());
-				Petal_VSDbgT("\r\n");
+				try
+				{
+					Petal_VSDbgT("[Petal] Exception in Petal::MessageLoop, error code: ");
+					Petal_VSDbgA(::std::format("{}", error).c_str());
+					Petal_VSDbgT("\r\n");
+				}
+				catch (const ::std::exception&) {}
 				goto out_of_loop;
 				break;
 			default:

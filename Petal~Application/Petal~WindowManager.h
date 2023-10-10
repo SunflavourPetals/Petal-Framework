@@ -10,11 +10,6 @@
 
 #include <unordered_map>
 
-namespace Petal::Abstract
-{
-	class Window;
-}
-
 namespace Petal
 {
 	class WrappedWindowClass;
