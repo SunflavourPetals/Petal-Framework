@@ -277,9 +277,14 @@ namespace Petal
 	}
 	tsize WindowClassSet::UnregisterAll() noexcept(false)
 	{
-		while (this->set.begin() != this->set.end())
+		::std::vector<win32atom> win_class_set;
+		for (const auto& e : this->set)
 		{
-			auto result{ this->Unregister(this->set.begin()->first)};
+			win_class_set.push_back(e.first);
+		}
+		for (auto& e : win_class_set)
+		{
+			auto result{ this->Unregister(this->set.begin()->first) };
 		}
 		return this->set.size();
 	}
@@ -494,9 +499,14 @@ namespace Petal
 	}
 	tsize WindowSet::DestroyAll() noexcept(false)
 	{
-		while (this->set.begin() != this->set.end())
+		::std::vector<ptr<Abstract::Window>> win_ptr_set;
+		for (const auto& e : this->set)
 		{
-			auto result{ this->Destroy(*(this->set.begin()->second)) };
+			win_ptr_set.push_back(e.second);
+		}
+		for (auto& e : win_ptr_set)
+		{
+			auto result{ this->Destroy(*e) };
 		}
 		return this->set.size();
 	}
