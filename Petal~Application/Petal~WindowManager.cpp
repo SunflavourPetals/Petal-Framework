@@ -27,6 +27,13 @@ namespace
 
 namespace Petal::Abstract
 {
+	Window::~Window()
+	{
+		if (this->WindowHandle() != nullptr)
+		{
+			this->Destroy();
+		}
+	}
 	[[nodiscard]] win32hwnd Window::WindowHandle() const noexcept
 	{
 		return this->window_handle;
@@ -34,6 +41,14 @@ namespace Petal::Abstract
 	[[nodiscard]] boolean Window::Valid() const noexcept
 	{
 		return this->window_handle != nullptr;
+	}
+	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
+	{
+		return IWindowSet().Create(*this, class_atom, parameters);
+	}
+	Window::DestroyResult Window::Destroy() noexcept(false)
+	{
+		return IWindowSet().Destroy(*this);
 	}
 	[[nodiscard]] dword Window::WindowStyle() const noexcept
 	{
@@ -356,10 +371,6 @@ namespace Petal
 
 namespace Petal
 {
-	WindowSet::~WindowSet()
-	{
-		this->DestroyAll();
-	}
 	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
 	{
 		CreateResult result{};

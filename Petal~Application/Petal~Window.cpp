@@ -5,18 +5,6 @@
 
 namespace Petal
 {
-	Window::~Window()
-	{
-		this->Destroy();
-	}
-	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
-	{
-		return IWindowSet().Create(*this, class_atom, parameters);
-	}
-	auto Window::Destroy() noexcept(false) -> decltype(IWindowSet().Destroy(*this))
-	{
-		return IWindowSet().Destroy(*this);
-	}
 	win32bool Window::Show(ShowCode show_code) noexcept
 	{
 		return ::ShowWindow(this->WindowHandle(), static_cast<int>(show_code));

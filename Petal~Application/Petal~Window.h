@@ -33,12 +33,7 @@ namespace Petal
 	class Window : public Abstract::Window
 	{
 	public:
-		using RegisterResult = WindowClassRegisteringResult;
-		using CreateResult = WindowCreatingResult;
 		using ShowCode = WindowShowCode;
-	public:
-		CreateResult Create(win32atom class_atom, const WindowCreatingParameters& parameters = {}) noexcept(false);
-		auto Destroy() noexcept(false) -> decltype(IWindowSet().Destroy(*this));
 	public:
 		win32bool Show(ShowCode show_code = ShowCode::Show) noexcept;
 		win32bool ShowNormal() noexcept;
@@ -109,7 +104,7 @@ namespace Petal
 		Window() = default;
 		Window(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
-		virtual ~Window();
+		virtual ~Window() = default;
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
 	private:
