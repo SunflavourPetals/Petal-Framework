@@ -9,9 +9,6 @@
 #include "Petal~String.h"
 
 #include <Windows.h>
-#ifdef CreateEvent
-#undef CreateEvent
-#endif
 
 namespace Petal
 {
