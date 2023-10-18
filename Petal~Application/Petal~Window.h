@@ -109,7 +109,7 @@ namespace Petal
 		Window() = default;
 		Window(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
-		virtual ~Window() = default;
+		virtual ~Window();
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
 	private:

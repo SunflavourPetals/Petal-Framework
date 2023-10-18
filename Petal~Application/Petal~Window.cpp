@@ -5,6 +5,10 @@
 
 namespace Petal
 {
+	Window::~Window()
+	{
+		this->Destroy();
+	}
 	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
 	{
 		return IWindowSet().Create(*this, class_atom, parameters);
