@@ -3,10 +3,13 @@
 
 #include <Windows.h>
 
+namespace
+{
+	constexpr Petal::PerformanceCounter::Tick zero{ 0LL };
+}
+
 namespace Petal
 {
-	static constexpr i64 zero{ 0LL };
-
 	PerformanceCounter::PerformanceCounter() noexcept
 	{
 		this->Reset();
@@ -24,7 +27,7 @@ namespace Petal
 	}
 	void PerformanceCounter::Count() noexcept
 	{
-		i64 prev = this->pt_current;
+		Tick prev = this->pt_current;
 		if (this->pt_state_paused == true)
 		{
 			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
@@ -68,11 +71,11 @@ namespace Petal
 			this->pt_state_paused = false;
 		}
 	}
-	i64 PerformanceCounter::Frequency() const noexcept
+	PerformanceCounter::Tick PerformanceCounter::Frequency() const noexcept
 	{
 		return this->pt_frequency;
 	}
-	i64 PerformanceCounter::TotalCounts() const noexcept
+	PerformanceCounter::Tick PerformanceCounter::TotalCounts() const noexcept
 	{
 		if (this->pt_state_paused == true)
 		{
@@ -80,23 +83,23 @@ namespace Petal
 		}
 		return (this->pt_current - this->pt_total_paused - this->pt_base);
 	}
-	i64 PerformanceCounter::DeltaCounts() const noexcept
+	PerformanceCounter::Tick PerformanceCounter::DeltaCounts() const noexcept
 	{
 		return this->pt_delta;
 	}
-	i64 PerformanceCounter::DeltaCountsPaused() const noexcept
+	PerformanceCounter::Tick PerformanceCounter::DeltaCountsPaused() const noexcept
 	{
 		return this->pt_delta_paused;
 	}
-	f64 PerformanceCounter::TotalTime() const noexcept
+	PerformanceCounter::Second PerformanceCounter::TotalTime() const noexcept
 	{
 		return this->TotalCounts() / static_cast<f64>(this->pt_frequency);
 	}
-	f64 PerformanceCounter::DeltaTime() const noexcept
+	PerformanceCounter::Second PerformanceCounter::DeltaTime() const noexcept
 	{
 		return this->DeltaCounts() / static_cast<f64>(this->pt_frequency);
 	}
-	f64 PerformanceCounter::DeltaTimePaused() const noexcept
+	PerformanceCounter::Second PerformanceCounter::DeltaTimePaused() const noexcept
 	{
 		return this->DeltaCountsPaused() / static_cast<f64>(this->pt_frequency);
 	}

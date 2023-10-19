@@ -201,18 +201,18 @@ namespace Petal::XInput
 namespace Petal::XInput::MiddleProcess
 {
 	// XInputXHold
-	XHoldProcess::XHoldProcess(i64 target_count, boolean loop_mode) :
+	XHoldProcess::XHoldProcess(Tick target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
 		pt_target_count(target_count),
 		pt_loop_triggering(loop_mode)
 	{
 
 	}
-	void XHoldProcess::UpdateTargetCount(i64 target_count) noexcept
+	void XHoldProcess::UpdateTargetCount(Tick target_count) noexcept
 	{
 		this->pt_target_count = target_count;
 	}
-	i64 XHoldProcess::TargetCount() const noexcept
+	XHoldProcess::Tick XHoldProcess::TargetCount() const noexcept
 	{
 		return this->pt_target_count;
 	}
