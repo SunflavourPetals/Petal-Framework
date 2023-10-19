@@ -22,15 +22,18 @@ namespace Petal::WinMain
 	extern const boolean& valid;
 }
 
+#ifndef Petal_Enable_PetalMain
+
 #define Petal_SetMainFunc(MainFunc) \
 namespace Petal::UserEntrance \
 {   \
 	extern const fptr<int> pt_user_main{ &::MainFunc };  \
 	extern const ptrc<TChar> pt_user_main_name{ Petal_TStr(#MainFunc) };  \
 }
-
 #define Petal_SetMainClass(MainClass) Petal_SetMainFunc(MainClass::main)
 #define Petal_SetMainSpace(MainSpace) Petal_SetMainClass(MainSpace)
 #define Petal_SetDefaultMainClass     Petal_SetMainClass(Main)
+
+#endif // !Petal_Enable_PetalMain
 
 #endif // !Petal_Header_Main

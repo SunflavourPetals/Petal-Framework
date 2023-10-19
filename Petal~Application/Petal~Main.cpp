@@ -158,11 +158,19 @@ namespace Petal::WinMain
 	const boolean& valid{ arguments.Valid() };
 }
 
+#ifndef Petal_Enable_PetalMain
+
 namespace Petal::UserEntrance
 {
 	extern const fptr<int> pt_user_main;
 	extern const ptrc<TChar> pt_user_main_name;
 }
+
+#else
+
+int PetalMain();
+
+#endif // !Petal_Enable_PetalMain
 
 namespace Petal::XMain
 {
@@ -177,7 +185,11 @@ namespace Petal::XMain
 		Petal_VSDbgT(" is valid now\r\n");
 
 		Petal_VSDbgT("[Petal] User entrance: ");
+#ifndef Petal_Enable_PetalMain
 		Petal_VSDebugOutput(UserEntrance::pt_user_main_name);
+#else
+		Petal_VSDbgT("PetalMain");
+#endif
 		Petal_VSDbgT("\r\n");
 	}
 }
@@ -194,7 +206,11 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 	Petal::Main::arguments.InitAsInvalid();
 	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	Petal::XMain::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
+#ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
+#else
+	return ::PetalMain();
+#endif
 }
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
@@ -207,7 +223,11 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	Petal::Main::arguments.Init(argc, argv, envp);
 	Petal::WinMain::arguments.InitAsInvalid();
 	Petal::XMain::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
+#ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
+#else
+	return ::PetalMain();
+#endif
 }
 #else
 INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_line, _In_ INT cmd_show)
@@ -221,7 +241,11 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 	Petal::Main::arguments.InitAsInvalid();
 	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	Petal::XMain::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
+#ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
+#else
+	return ::PetalMain();
+#endif
 }
 int main(int argc, char* argv[], char* envp[])
 {
@@ -234,6 +258,10 @@ int main(int argc, char* argv[], char* envp[])
 	Petal::Main::arguments.Init(argc, argv, envp);
 	Petal::WinMain::arguments.InitAsInvalid();
 	Petal::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
+#ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
+#else
+	return ::PetalMain();
+#endif
 }
 #endif

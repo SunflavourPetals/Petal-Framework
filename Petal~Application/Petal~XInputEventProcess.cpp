@@ -9,9 +9,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean ButtonPushProcess::Check()
+	boolean ButtonPushProcess::Check(const Resource& resource)
 	{
-		return (!this->LastPositive() && this->ThisPositive());
+		return (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller));
 	}
 	// XInputButtonReleaseProcess
 	ButtonReleaseProcess::ButtonReleaseProcess(Button::Type buttons) :
@@ -19,9 +19,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean ButtonReleaseProcess::Check()
+	boolean ButtonReleaseProcess::Check(const Resource& resource)
 	{
-		return (this->LastPositive() && !this->ThisPositive());
+		return (this->LastPositive(resource.controller) && !this->ThisPositive(resource.controller));
 	}
 	// XInputButtonPositiveProcess
 	ButtonPositiveProcess::ButtonPositiveProcess(Button::Type buttons) :
@@ -29,9 +29,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean ButtonPositiveProcess::Check()
+	boolean ButtonPositiveProcess::Check(const Resource& resource)
 	{
-		return this->ThisPositive();
+		return this->ThisPositive(resource.controller);
 	}
 	// XInputButtonNegativeProcess
 	ButtonNegativeProcess::ButtonNegativeProcess(Button::Type buttons) :
@@ -39,9 +39,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean ButtonNegativeProcess::Check()
+	boolean ButtonNegativeProcess::Check(const Resource& resource)
 	{
-		return !this->ThisPositive();
+		return !this->ThisPositive(resource.controller);
 	}
 	// XInputButtonHoldProcess
 	ButtonHoldProcess::ButtonHoldProcess(Button::Type buttons, i64 target_count, boolean loop_mode) :
@@ -54,17 +54,17 @@ namespace Petal::XInput
 	{
 		return this->ButtonProcess::GamepadPositive(gamepad);
 	}
-	boolean ButtonHoldProcess::LastPositive() const
+	boolean ButtonHoldProcess::LastPositive(const Controller& controller) const
 	{
-		return this->ButtonProcess::LastPositive();
+		return this->ButtonProcess::LastPositive(controller);
 	}
-	boolean ButtonHoldProcess::ThisPositive() const
+	boolean ButtonHoldProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->ButtonProcess::ThisPositive();
+		return this->ButtonProcess::ThisPositive(controller);
 	}
-	boolean ButtonHoldProcess::Check()
+	boolean ButtonHoldProcess::Check(const Resource& resource)
 	{
-		return this->XHoldProcess::Check();
+		return this->XHoldProcess::Check(resource);
 	}
 
 	// = = XInputTriggerProcess Derived = =
@@ -74,9 +74,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean TriggerPushProcess::Check()
+	boolean TriggerPushProcess::Check(const Resource& resource)
 	{
-		return (!this->LastPositive() && this->ThisPositive());
+		return (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller));
 	}
 	// XInputTriggerReleaseProcess
 	TriggerReleaseProcess::TriggerReleaseProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value) :
@@ -84,9 +84,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean TriggerReleaseProcess::Check()
+	boolean TriggerReleaseProcess::Check(const Resource& resource)
 	{
-		return (this->LastPositive() && !this->ThisPositive());
+		return (this->LastPositive(resource.controller) && !this->ThisPositive(resource.controller));
 	}
 	// XInputTriggerPositiveProcess
 	TriggerPositiveProcess::TriggerPositiveProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value) :
@@ -94,9 +94,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean TriggerPositiveProcess::Check()
+	boolean TriggerPositiveProcess::Check(const Resource& resource)
 	{
-		return this->ThisPositive();
+		return this->ThisPositive(resource.controller);
 	}
 	// XInputTriggerNegativeProcess
 	TriggerNegativeProcess::TriggerNegativeProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value) :
@@ -104,9 +104,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean TriggerNegativeProcess::Check()
+	boolean TriggerNegativeProcess::Check(const Resource& resource)
 	{
-		return !this->ThisPositive();
+		return !this->ThisPositive(resource.controller);
 	}
 	// XInputTriggerHoldProcess
 	TriggerHoldProcess::TriggerHoldProcess(XInput::TriggerDimension dimension, TriggerValue::Type target_value, i64 target_count, boolean loop_mode) :
@@ -119,17 +119,17 @@ namespace Petal::XInput
 	{
 		return this->TriggerProcess::GamepadPositive(gamepad);
 	}
-	boolean TriggerHoldProcess::LastPositive() const
+	boolean TriggerHoldProcess::LastPositive(const Controller& controller) const
 	{
-		return this->TriggerProcess::LastPositive();
+		return this->TriggerProcess::LastPositive(controller);
 	}
-	boolean TriggerHoldProcess::ThisPositive() const
+	boolean TriggerHoldProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->TriggerProcess::ThisPositive();
+		return this->TriggerProcess::ThisPositive(controller);
 	}
-	boolean TriggerHoldProcess::Check()
+	boolean TriggerHoldProcess::Check(const Resource& resource)
 	{
-		return this->XHoldProcess::Check();
+		return this->XHoldProcess::Check(resource);
 	}
 
 	// = = XInputStickProcess Derived = =
@@ -139,9 +139,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean StickPushProcess::Check()
+	boolean StickPushProcess::Check(const Resource& resource)
 	{
-		return (!this->LastPositive() && this->ThisPositive());
+		return (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller));
 	}
 	// XInputStickReleaseProcess
 	StickReleaseProcess::StickReleaseProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value) :
@@ -149,9 +149,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean StickReleaseProcess::Check()
+	boolean StickReleaseProcess::Check(const Resource& resource)
 	{
-		return (this->LastPositive() && !this->ThisPositive());
+		return (this->LastPositive(resource.controller) && !this->ThisPositive(resource.controller));
 	}
 	// XInputStickPositiveProcess
 	StickPositiveProcess::StickPositiveProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value) :
@@ -159,9 +159,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean StickPositiveProcess::Check()
+	boolean StickPositiveProcess::Check(const Resource& resource)
 	{
-		return this->ThisPositive();
+		return this->ThisPositive(resource.controller);
 	}
 	// XInputStickNegativeProcess
 	StickNegativeProcess::StickNegativeProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value) :
@@ -169,9 +169,9 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean StickNegativeProcess::Check()
+	boolean StickNegativeProcess::Check(const Resource& resource)
 	{
-		return !this->ThisPositive();
+		return !this->ThisPositive(resource.controller);
 	}
 	// XInputStickHoldProcess
 	StickHoldProcess::StickHoldProcess(XInput::StickDimension dimension, XInput::DirectionDimension direction, StickValue::Type target_value, i64 target_count, boolean loop_mode) :
@@ -184,17 +184,17 @@ namespace Petal::XInput
 	{
 		return this->StickProcess::GamepadPositive(gamepad);
 	}
-	boolean StickHoldProcess::LastPositive() const
+	boolean StickHoldProcess::LastPositive(const Controller& controller) const
 	{
-		return this->StickProcess::LastPositive();
+		return this->StickProcess::LastPositive(controller);
 	}
-	boolean StickHoldProcess::ThisPositive() const
+	boolean StickHoldProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->StickProcess::ThisPositive();
+		return this->StickProcess::ThisPositive(controller);
 	}
-	boolean StickHoldProcess::Check()
+	boolean StickHoldProcess::Check(const Resource& resource)
 	{
-		return this->XHoldProcess::Check();
+		return this->XHoldProcess::Check(resource);
 	}
 }
 
@@ -224,13 +224,13 @@ namespace Petal::XInput::MiddleProcess
 	{
 		return this->pt_loop_triggering;
 	}
-	boolean XHoldProcess::Check()
+	boolean XHoldProcess::Check(const Resource& resource)
 	{
 		if (this->pt_in_holding)
 		{
-			if (this->ThisPositive())
+			if (this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count += this->Resource().delta_count;
+				this->pt_total_count += resource.delta_count;
 			}
 			else
 			{
@@ -241,7 +241,7 @@ namespace Petal::XInput::MiddleProcess
 		}
 		else
 		{
-			if (!this->LastPositive() && this->ThisPositive())
+			if (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller))
 			{
 				this->pt_total_count = 0;
 				this->pt_in_holding = true;
@@ -282,13 +282,13 @@ namespace Petal::XInput::MiddleProcess
 	{
 		return ((gamepad.wButtons & this->pt_buttons) == this->pt_buttons);
 	}
-	boolean ButtonProcess::LastPositive() const
+	boolean ButtonProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
 	}
-	boolean ButtonProcess::ThisPositive() const
+	boolean ButtonProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
 	}
 
 	// XInputTriggerProcess
@@ -332,13 +332,13 @@ namespace Petal::XInput::MiddleProcess
 		}
 		return false;
 	}
-	boolean TriggerProcess::LastPositive() const
+	boolean TriggerProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
 	}
-	boolean TriggerProcess::ThisPositive() const
+	boolean TriggerProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
 	}
 
 	// XInputStickProcess
@@ -429,12 +429,12 @@ namespace Petal::XInput::MiddleProcess
 		}
 		return false;
 	}
-	boolean StickProcess::LastPositive() const
+	boolean StickProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
 	}
-	boolean StickProcess::ThisPositive() const
+	boolean StickProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(this->Resource().controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
 	}
 }

@@ -631,7 +631,7 @@ namespace Petal
 		return static_cast<i32>(message.wParam);
 	}
 
-	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove, boolean yield, win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max)
+	i32 MessageLoop(Abstract::Process<>& user_process, boolean remove, boolean yield, win32hwnd window_handle, win32msg message_filter_min, win32msg message_filter_max)
 	{
 		Win32Message message{};
 		win32bool result{};

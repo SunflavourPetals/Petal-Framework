@@ -28,7 +28,9 @@ namespace Petal::Abstract
 	class XInputEventProcess : public Process<Petal::XInput::ResourceOfController>
 	{
 	public:
-		virtual boolean Check() = 0;
+		using Resource = Petal::XInput::ResourceOfController;
+	public:
+		virtual boolean Check(const Resource&) = 0;
 	public:
 		XInputEventProcess() = default;
 		XInputEventProcess(const XInputEventProcess&) = default;

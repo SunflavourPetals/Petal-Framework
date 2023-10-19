@@ -25,13 +25,13 @@ namespace Petal::Keyboard::MiddleProcess
 	{
 		return this->pt_loop_triggering;
 	}
-	boolean XHoldProcess::Check()
+	boolean XHoldProcess::Check(const Resource& resource)
 	{
 		if (this->pt_in_holding)
 		{
-			if (this->ThisPositive())
+			if (this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count += this->Resource().delta_count;
+				this->pt_total_count += resource.delta_count;
 			}
 			else
 			{
@@ -42,7 +42,7 @@ namespace Petal::Keyboard::MiddleProcess
 		}
 		else
 		{
-			if (!this->LastPositive() && this->ThisPositive())
+			if (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller))
 			{
 				this->pt_total_count = 0;
 				this->pt_in_holding = true;
@@ -82,13 +82,13 @@ namespace Petal::Keyboard::MiddleProcess
 	{
 		return state.Pushed();
 	}
-	boolean XKeyProcess::LastPositive() const
+	boolean XKeyProcess::LastPositive(const Controller& controller) const
 	{
-		return this->KeyPositive(this->Resource().controller.GetLastState(this->pt_key));
+		return this->KeyPositive(controller.GetLastState(this->pt_key));
 	}
-	boolean XKeyProcess::ThisPositive() const
+	boolean XKeyProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->KeyPositive(this->Resource().controller.GetState(this->pt_key));
+		return this->KeyPositive(controller.GetState(this->pt_key));
 	}
 }
 
@@ -99,36 +99,36 @@ namespace Petal::Keyboard
 	{
 
 	}
-	boolean KeyPushProcess::Check()
+	boolean KeyPushProcess::Check(const Resource& resource)
 	{
-		return (!this->LastPositive() && this->ThisPositive());
+		return (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller));
 	}
 	KeyReleaseProcess::KeyReleaseProcess(VirtualKey::Type target_key) :
 		XKeyProcess(target_key)
 	{
 
 	}
-	boolean KeyReleaseProcess::Check()
+	boolean KeyReleaseProcess::Check(const Resource& resource)
 	{
-		return (this->LastPositive() && !this->ThisPositive());
+		return (this->LastPositive(resource.controller) && !this->ThisPositive(resource.controller));
 	}
 	KeyPositiveProcess::KeyPositiveProcess(VirtualKey::Type target_key) :
 		XKeyProcess(target_key)
 	{
 
 	}
-	boolean KeyPositiveProcess::Check()
+	boolean KeyPositiveProcess::Check(const Resource& resource)
 	{
-		return this->ThisPositive();
+		return this->ThisPositive(resource.controller);
 	}
 	KeyNegativeProcess::KeyNegativeProcess(VirtualKey::Type target_key) :
 		XKeyProcess(target_key)
 	{
 
 	}
-	boolean KeyNegativeProcess::Check()
+	boolean KeyNegativeProcess::Check(const Resource& resource)
 	{
-		return !this->ThisPositive();
+		return !this->ThisPositive(resource.controller);
 	}
 	KeyHoldProcess::KeyHoldProcess(VirtualKey::Type target_key, i64 target_count, boolean loop_mode) :
 		XKeyProcess(target_key),
@@ -140,16 +140,16 @@ namespace Petal::Keyboard
 	{
 		return this->XKeyProcess::KeyPositive(state);
 	}
-	boolean KeyHoldProcess::LastPositive() const
+	boolean KeyHoldProcess::LastPositive(const Controller& controller) const
 	{
-		return this->XKeyProcess::LastPositive();
+		return this->XKeyProcess::LastPositive(controller);
 	}
-	boolean KeyHoldProcess::ThisPositive() const
+	boolean KeyHoldProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->XKeyProcess::ThisPositive();
+		return this->XKeyProcess::ThisPositive(controller);
 	}
-	boolean KeyHoldProcess::Check()
+	boolean KeyHoldProcess::Check(const Resource& resource)
 	{
-		return this->XHoldProcess::Check();
+		return this->XHoldProcess::Check(resource);
 	}
 }

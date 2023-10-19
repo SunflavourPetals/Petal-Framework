@@ -53,7 +53,9 @@ namespace Petal::Abstract
 	class KeyboardEventProcess : public Process<Petal::Keyboard::ResourceOfController>
 	{
 	public:
-		virtual boolean Check() = 0;
+		using Resource = Petal::Keyboard::ResourceOfController;
+	public:
+		virtual boolean Check(const Resource&) = 0;
 	public:
 		KeyboardEventProcess() = default;
 		KeyboardEventProcess(const KeyboardEventProcess&) = default;

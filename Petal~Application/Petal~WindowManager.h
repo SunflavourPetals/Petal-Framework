@@ -23,7 +23,7 @@ namespace Petal
 	WindowClassSet& IWindowClassSet();
 	WindowSet& IWindowSet();
 	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
-	i32 MessageLoop(Abstract::ProcessNR& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
+	i32 MessageLoop(Abstract::Process<>& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	void ExitMessageLoop(i32 exit_code = 0) noexcept;
 }
 

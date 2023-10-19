@@ -87,11 +87,9 @@ namespace Petal::Keyboard
 	}
 	void Controller::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
 	{
-		proc.AssignResource(resource);
-		if (proc.Check())
+		if (proc.Check(resource))
 		{
-			proc.Execution();
+			proc.Execution(resource);
 		}
-		proc.RemoveResource();
 	}
 }
