@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -153,7 +153,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="main_2.cpp" />
     <ClCompile Include="Petal~Bom.cpp" />
     <ClCompile Include="Petal~Exception.cpp" />
     <ClCompile Include="Petal~FrequencyController.cpp" />
