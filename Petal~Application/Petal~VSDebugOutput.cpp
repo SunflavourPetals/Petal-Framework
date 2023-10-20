@@ -3,35 +3,21 @@
 
 namespace Petal::Debug
 {
-	void VSDebugOutputA::Output(ptrc<InnerChar> data, tsize count)
+	void VSDebugOutputA::Output(InnerStringView str)
 	{
-		if (data == nullptr) return;
-		InnerString str{};
-		str.assign(data, count);
-		this->Output(str);
-	}
-	void VSDebugOutputA::Output(const InnerString& str)
-	{
-		InnerString c_str{ StringToCStyleString(str) };
-		::OutputDebugStringA(c_str.c_str());
+		InnerString c_str{};
+		c_str.assign(str.data(), str.size());
+		this->OutputCStr(c_str.c_str());
 	}
 	void VSDebugOutputA::OutputCStr(ptrc<InnerChar> c_str) const noexcept
 	{
 		::OutputDebugStringA(c_str);
 	}
-	void VSDebugOutputW::Output(ptrc<InnerChar> data, tsize count)
+	void VSDebugOutputW::Output(InnerStringView str)
 	{
-		if (data == nullptr) return;
-		InnerString str{};
-		str.assign(data, count);
-		this->Output(str);
-	}
-	void VSDebugOutputW::Output(const InnerString& str)
-	{
-		{
-			InnerString cstr{ StringToCStyleString(str) };
-			::OutputDebugStringW(cstr.c_str());
-		}
+		InnerString c_str{};
+		c_str.assign(str.data(), str.size());
+		this->OutputCStr(c_str.c_str());
 	}
 	void VSDebugOutputW::OutputCStr(ptrc<InnerChar> c_str) const noexcept
 	{

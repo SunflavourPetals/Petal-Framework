@@ -13,10 +13,10 @@ namespace Petal::Debug
 	{
 	public:
 		using InnerChar = Char;
-		using InnerString = ::std::basic_string<Char>;
+		using InnerString = ::std::basic_string<InnerChar>;
+		using InnerStringView = ::std::basic_string_view<InnerChar>;
 	public:
-		virtual void Output(ptrc<InnerChar> data, tsize count);
-		virtual void Output(const InnerString& str);
+		virtual void Output(InnerStringView str);
 		virtual void OutputCStr(ptrc<InnerChar> c_str) const noexcept final;
 	};
 
@@ -24,10 +24,10 @@ namespace Petal::Debug
 	{
 	public:
 		using InnerChar = WChar;
-		using InnerString = ::std::basic_string<WChar>;
+		using InnerString = ::std::basic_string<InnerChar>;
+		using InnerStringView = ::std::basic_string_view<InnerChar>;
 	public:
-		virtual void Output(ptrc<InnerChar> data, tsize count);
-		virtual void Output(const InnerString& str);
+		virtual void Output(InnerStringView str);
 		virtual void OutputCStr(ptrc<InnerChar> c_str) const noexcept final;
 	};
 }

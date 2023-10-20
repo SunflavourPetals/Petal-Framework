@@ -19,6 +19,7 @@ namespace Petal::Log
 	public:
 		using InnerChar = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerChar;
 		using InnerString = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerString;
+		using InnerStringView = ::std::basic_string_view<InnerChar>;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());
@@ -30,8 +31,7 @@ namespace Petal::Log
 		void Close();
 		void ByteWrite(ptrc<byte> data, tsize size);
 		void WriteBom(const BOM::Bom& bom);
-		virtual void Output(ptrc<InnerChar> data, tsize count);
-		virtual void Output(const InnerString& str);
+		virtual void Output(InnerStringView str);
 	public:
 		LogStream() = default;
 		LogStream(const ::std::string& file_name, const BOM::Bom& bom);
@@ -137,14 +137,9 @@ namespace Petal::Log
 		this->ByteWrite(bom.Data(), bom.Size());
 	}
 	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Output(ptrc<InnerChar> data, tsize count)
+	inline void LogStream<CharT, Traits, Alloc>::Output(InnerStringView str)
 	{
-		this->ByteWrite(reinterpret_cast<ptrc<byte>>(data), sizeof(InnerChar) * count);
-	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Output(const InnerString& str)
-	{
-		this->Output(str.data(), str.length());
+		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename InnerStringView::value_type) * str.size());
 	}
 }
 

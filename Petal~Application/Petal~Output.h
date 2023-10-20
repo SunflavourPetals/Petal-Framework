@@ -25,11 +25,11 @@ namespace Petal::Abstract
 	public:
 		using InnerChar = CharT;
 		using InnerString = ::std::basic_string<InnerChar, Traits, Alloc>;
+		using InnerStringView = ::std::basic_string_view<InnerChar>;
 	public:
-		virtual void Output(ptrc<InnerChar> data, tsize count) = 0;
-		virtual void Output(const InnerString& str) = 0;
+		virtual void Output(InnerStringView str) = 0;
 	public:
-		inline virtual BasicOutput& operator+(const InnerString& str)
+		inline virtual BasicOutput& operator+(InnerStringView str)
 		{
 			this->Output(str);
 			return *this;
@@ -54,14 +54,7 @@ namespace Petal::Abstract
 namespace Petal
 {
 	template <typename CharT>
-	struct LineBreakCStr
-	{
-		using InnerChar = CharT;
-		ptrc<InnerChar> str;
-		tsize size;
-	};
-	template <typename CharT>
-	inline [[nodiscard]] LineBreakCStr<CharT> GetLn(LineBreakMode mode) noexcept
+	inline ::std::basic_string_view<CharT> GetLn(LineBreakMode mode) noexcept
 	{
 		using InnerChar = CharT;
 		static constexpr InnerChar cr{ static_cast<InnerChar>(EnumChar::cr) };
@@ -91,10 +84,9 @@ namespace Petal
 		return { &CRLF[2], 0 };
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline void ln(Abstract::BasicOutput<CharT, Traits, Alloc>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.Output(ptr<CharT>{}, {})))
+	inline void ln(Abstract::BasicOutput<CharT, Traits, Alloc>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.Output({})))
 	{
-		auto [c_str, size] { GetLn<CharT>(output.line_break_mode) };
-		output.Output(c_str, size);
+		output.Output(GetLn<CharT>(output.line_break_mode));
 	};
 }
 
