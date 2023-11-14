@@ -18,9 +18,7 @@ public:
 				dout + "Create" + ln;
 				//	e.continue_creation = false;
 			}
-		};
-
-		MyWindow w;
+		} w;
 
 		w.Create(WindowClassArgs{ Petal_TStr("my window class") }.Register().class_atom);
 
