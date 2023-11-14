@@ -25,6 +25,18 @@ namespace
 	}
 }
 
+namespace Petal::Framework::Impl
+{
+	class WindowAccessor final
+	{
+	public:
+		static void Assign(Abstract::Window& target_window, win32hwnd resource)
+		{
+			target_window.window_handle = resource;
+		}
+	};
+}
+
 namespace Petal::Abstract
 {
 	Window::~Window()
@@ -68,14 +80,6 @@ namespace Petal
 		if (o.get() == nullptr) return hash(0);
 		return hash(o->atom);
 	}
-	class WindowAccessor final
-	{
-	public:
-		static void Assign(Abstract::Window& target_window, win32hwnd resource)
-		{
-			target_window.window_handle = resource;
-		}
-	};
 }
 
 namespace Petal
@@ -508,7 +512,7 @@ namespace Petal
 			goto return_label;
 		}
 
-		WindowAccessor::Assign(target_window, result.window_handle);
+		Framework::Impl::WindowAccessor::Assign(target_window, result.window_handle);
 
 		this->set[result.window_handle] = &target_window;
 
@@ -597,7 +601,7 @@ namespace Petal
 		}
 		catch (const ::std::exception&) {}
 
-		WindowAccessor::Assign(window, nullptr);
+		Framework::Impl::WindowAccessor::Assign(window, nullptr);
 
 		return_label:
 
@@ -826,9 +830,9 @@ namespace
 						if (create_struct_ptr != nullptr && create_struct_ptr->lpCreateParams != nullptr)
 						{
 							Abstract::Window& window{ *reinterpret_cast<ptr<Abstract::Window>>(create_struct_ptr->lpCreateParams) };
-							WindowAccessor::Assign(window, window_handle);
+							Framework::Impl::WindowAccessor::Assign(window, window_handle);
 							auto result{ window.Process(message, w, l) };
-							WindowAccessor::Assign(window, {});
+							Framework::Impl::WindowAccessor::Assign(window, {});
 							return result;
 						}
 					}

@@ -19,7 +19,6 @@ namespace Petal
 	class WindowClassSet;
 	class WindowSet;
 	class WindowClassNameAtomHash;
-	class WindowAccessor;
 	struct WindowClassNameAtomPair final
 	{
 		using Name = TString;
@@ -76,6 +75,11 @@ namespace Petal::IWin32
 	[[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept;
 	[[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept;
 	[[nodiscard]] win32lptr WindowLongPtrGet(win32hwnd hwnd, i32 index) noexcept;
+}
+
+namespace Petal::Framework::Impl
+{
+	class WindowAccessor; // non export, used only for .cpp impl
 }
 
 namespace Petal
@@ -195,7 +199,7 @@ namespace Petal::Abstract
 		Window& operator= (Window&&) = delete;
 	private:
 		win32hwnd window_handle{ nullptr };
-		friend class WindowAccessor;
+		friend class Framework::Impl::WindowAccessor;
 	};
 }
 
