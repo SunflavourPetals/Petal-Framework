@@ -49,6 +49,22 @@ namespace Petal::Abstract
 	using OutputU8 = BasicOutput<CharU8>;
 	using OutputU16 = BasicOutput<CharU16>;
 	using OutputU32 = BasicOutput<CharU32>;
+
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+	class BasicCOutput : public BasicOutput<CharT, Traits, Alloc>
+	{
+	public:
+		using InnerChar = CharT;
+		using InnerString = ::std::basic_string<InnerChar, Traits, Alloc>;
+		using InnerStringView = ::std::basic_string_view<InnerChar>;
+	public:
+		virtual void OutputCStr(ptrc<InnerChar> c_str) = 0;
+	};
+	using COutputA = BasicCOutput<Char>;
+	using COutputW = BasicCOutput<WChar>;
+	using COutputU8 = BasicCOutput<CharU8>;
+	using COutputU16 = BasicCOutput<CharU16>;
+	using COutputU32 = BasicCOutput<CharU32>;
 }
 
 namespace Petal

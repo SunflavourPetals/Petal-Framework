@@ -125,14 +125,14 @@
     <ClCompile Include="Petal~XInputEventProcess.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="main.cpp">
-      <Filter>源文件</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~KeyboardController.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
     <ClCompile Include="Petal~KeyboardEventProcess.cpp">
       <Filter>PetalFramework\Source</Filter>
+    </ClCompile>
+    <ClCompile Include="main.cpp">
+      <Filter>源文件</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

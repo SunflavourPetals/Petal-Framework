@@ -135,6 +135,7 @@ namespace Petal
 	{
 		return this->MoveTo(new_pos.x, new_pos.y);
 	}
+	void Window::CreateEvent(CreateMessage& e) noexcept {}
 	void Window::ActiveEvent(ActiveMessage& e) noexcept {}
 	void Window::InactiveEvent(InactiveMessage& e) noexcept {}
 	void Window::EnterSizeEvent(EnterSizeMessage& e) noexcept {}
@@ -192,6 +193,20 @@ namespace Petal
 	{
 		switch (msg)
 		{
+		case WM_CREATE:
+		{
+			CreateMessage wrapped_msg{ msg, w, l };
+			this->CreateEvent(wrapped_msg);
+			if (wrapped_msg.continue_creation == true)
+			{
+				return 0;
+			}
+			else
+			{
+				return -1;
+			}
+		}
+		break;
 		case WM_ACTIVATE:
 		{
 			switch (w)

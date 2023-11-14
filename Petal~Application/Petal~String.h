@@ -29,9 +29,11 @@ namespace Petal
 #if defined(Petal_Enable_Unicode)
 	using TChar = WChar;
 	using TString = WString;
+	using TStringView = WStringView;
 #else
 	using TChar = Char;
 	using TString = String;
+	using TStringView = StringView;
 #endif
 
 	namespace EnumChar

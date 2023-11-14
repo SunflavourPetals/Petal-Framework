@@ -10,6 +10,10 @@
 
 #include <Windows.h>
 
+#ifdef CreateEvent
+#undef CreateEvent
+#endif
+
 namespace Petal
 {
 	enum class WindowShowCode : int
@@ -58,6 +62,7 @@ namespace Petal
 		win32bool MoveTo(const Position2DI32& new_pos) noexcept;
 	protected:
 		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
+		virtual void CreateEvent(CreateMessage& e) noexcept;
 		virtual void ActiveEvent(ActiveMessage& e) noexcept;
 		virtual void InactiveEvent(InactiveMessage& e) noexcept;
 		virtual void EnterSizeEvent(EnterSizeMessage& e) noexcept;

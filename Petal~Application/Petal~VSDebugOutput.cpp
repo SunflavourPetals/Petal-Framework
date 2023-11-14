@@ -5,21 +5,19 @@ namespace Petal::Debug
 {
 	void VSDebugOutputA::Output(InnerStringView str)
 	{
-		InnerString c_str{};
-		c_str.assign(str.data(), str.size());
+		InnerString c_str{ str.data(), str.size() };
 		this->OutputCStr(c_str.c_str());
 	}
-	void VSDebugOutputA::OutputCStr(ptrc<InnerChar> c_str) const noexcept
+	void VSDebugOutputA::OutputCStr(ptrc<InnerChar> c_str)
 	{
 		::OutputDebugStringA(c_str);
 	}
 	void VSDebugOutputW::Output(InnerStringView str)
 	{
-		InnerString c_str{};
-		c_str.assign(str.data(), str.size());
+		InnerString c_str{ str.data(), str.size() };
 		this->OutputCStr(c_str.c_str());
 	}
-	void VSDebugOutputW::OutputCStr(ptrc<InnerChar> c_str) const noexcept
+	void VSDebugOutputW::OutputCStr(ptrc<InnerChar> c_str)
 	{
 		::OutputDebugStringW(c_str);
 	}

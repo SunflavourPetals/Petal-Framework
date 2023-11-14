@@ -161,6 +161,18 @@ namespace Petal
 
 namespace Petal
 {
+	class CreateMessage : public BasicWindowMessage
+	{
+	public:
+		const Win32CreateStruct& CreateStruct() const noexcept;
+	public:
+		CreateMessage(win32msg msg, win32wprm w, win32lprm l);
+		CreateMessage(const CreateMessage&) = default;
+		CreateMessage(CreateMessage&&) noexcept = default;
+		virtual ~CreateMessage() = default;
+	public:
+		boolean continue_creation{ true };
+	};
 	class ActiveMessage : public BasicWindowMessage
 	{
 	public:

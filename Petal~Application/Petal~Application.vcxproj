@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -117,11 +117,12 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_PetalMain_FALSE;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
+      <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
     <Link>
-      <SubSystem>Console</SubSystem>
+      <SubSystem>Windows</SubSystem>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <GenerateDebugInformation>true</GenerateDebugInformation>

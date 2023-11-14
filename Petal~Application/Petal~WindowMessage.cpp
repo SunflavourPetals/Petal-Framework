@@ -209,6 +209,19 @@ namespace Petal
 
 namespace Petal
 {
+	CreateMessage::CreateMessage(win32msg msg, win32wprm w, win32lprm l) :
+		BasicWindowMessage(msg, w, l)
+	{
+
+	}
+	const Win32CreateStruct& CreateMessage::CreateStruct() const noexcept
+	{
+		return *reinterpret_cast<ptr<Win32CreateStruct>>(this->Long());
+	}
+}
+
+namespace Petal
+{
 	ActiveMessage::ActiveMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
 		pt_clicked(w == WA_CLICKACTIVE)

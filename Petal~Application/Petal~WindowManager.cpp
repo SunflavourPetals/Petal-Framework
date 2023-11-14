@@ -17,7 +17,7 @@ namespace
 		using namespace Petal;
 		[[nodiscard]] win32atom RegisterPetalWindowClass(const WindowClass& window_class) noexcept;
 		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept;
-		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept;
+		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept;
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept;
 		[[nodiscard]] win32bool PeekWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max, win32msg remove) noexcept;
 		void MessageProcess(Win32Message& message) noexcept;
@@ -42,9 +42,9 @@ namespace Petal::Abstract
 	{
 		return this->window_handle != nullptr;
 	}
-	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
+	win32error Window::Create(win32atom class_atom, const WindowCreatingArgs& args) noexcept(false)
 	{
-		return IWindowSet().Create(*this, class_atom, parameters);
+		return IWindowSet().Create(*this, class_atom, args).error;
 	}
 	Window::DestroyResult Window::Destroy() noexcept(false)
 	{
@@ -62,7 +62,25 @@ namespace Petal::Abstract
 
 namespace Petal
 {
-	WrappedWindowClass::WrappedWindowClass(const TString& class_name, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
+	::std::size_t WindowClassNameAtomHash::operator() (const ::std::unique_ptr<WindowClassNameAtomPair>& o) const noexcept(noexcept(::std::declval<::std::hash<win32atom>>().operator()({})))
+	{
+		::std::hash<win32atom> hash{};
+		if (o.get() == nullptr) return hash(0);
+		return hash(o->atom);
+	}
+	class WindowAccessor final
+	{
+	public:
+		static void Assign(Abstract::Window& target_window, win32hwnd resource)
+		{
+			target_window.window_handle = resource;
+		}
+	};
+}
+
+namespace Petal
+{
+	WindowClassArgs::WindowClassArgs(const TString& class_name, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
 		style(style),
 		class_extra(class_extra),
 		window_extra(window_extra),
@@ -73,21 +91,21 @@ namespace Petal
 	{
 		this->UpdateClassName(class_name);
 	}
-	WrappedWindowClass::WrappedWindowClass(const TString& class_name, const TString& menu_name, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
-		WrappedWindowClass(class_name, icon, cursor, background_brush, icon_sm, style, class_extra, window_extra)
+	WindowClassArgs::WindowClassArgs(const TString& class_name, const TString& menu_name, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
+		WindowClassArgs(class_name, icon, cursor, background_brush, icon_sm, style, class_extra, window_extra)
 	{
 		this->UsingMenuName(menu_name);
 	}
-	WrappedWindowClass::WrappedWindowClass(const TString& class_name, word menu_resource, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
-		WrappedWindowClass(class_name, icon, cursor, background_brush, icon_sm, style, class_extra, window_extra)
+	WindowClassArgs::WindowClassArgs(const TString& class_name, word menu_resource, win32hicon icon, win32hcursor cursor, win32hbrush background_brush, win32hicon icon_sm, dword style, i32 class_extra, i32 window_extra) :
+		WindowClassArgs(class_name, icon, cursor, background_brush, icon_sm, style, class_extra, window_extra)
 	{
 		this->UsingMenuName(menu_resource);
 	}
-	constexpr [[nodiscard]] auto WrappedWindowClass::DefaultWindowProcess() noexcept -> decltype(WindowClass::lpfnWndProc)
+	constexpr [[nodiscard]] auto WindowClassArgs::DefaultWindowProcess() noexcept -> decltype(WindowClass::lpfnWndProc)
 	{
 		return &PetalUnnamed::IWin32::PetalWindowProcess;
 	}
-	[[nodiscard]] WindowClass WrappedWindowClass::BuildWindowClass() const noexcept
+	[[nodiscard]] WindowClass WindowClassArgs::BuildWindowClass() const noexcept
 	{
 		WindowClass window_class{};
 		window_class.cbSize = sizeof(WindowClass);
@@ -105,33 +123,33 @@ namespace Petal
 		window_class.hIconSm = this->icon_sm;
 		return window_class;
 	}
-	[[nodiscard]] const TString& WrappedWindowClass::ClassName() const noexcept
+	[[nodiscard]] const TString& WindowClassArgs::ClassName() const noexcept
 	{
 		return this->class_name;
 	}
-	[[nodiscard]] const TString& WrappedWindowClass::MenuName() const noexcept
+	[[nodiscard]] const TString& WindowClassArgs::MenuName() const noexcept
 	{
 		return this->menu_name;
 	}
-	void WrappedWindowClass::UpdateClassName(const TString& class_name) noexcept(noexcept(StringToCStyleString(class_name)))
+	void WindowClassArgs::UpdateClassName(const TString& class_name) noexcept(noexcept(StringToCStyleString(class_name)))
 	{
 		this->class_name = StringToCStyleString(class_name);
 	}
-	void WrappedWindowClass::UpdateMenuName(const TString& menu_name) noexcept(noexcept(StringToCStyleString(menu_name)))
+	void WindowClassArgs::UpdateMenuName(const TString& menu_name) noexcept(noexcept(StringToCStyleString(menu_name)))
 	{
 		this->menu_name = StringToCStyleString(menu_name);
 	}
-	void WrappedWindowClass::UsingMenuName(const TString& menu_name) noexcept(noexcept(::std::declval<WrappedWindowClass>().UpdateMenuName(menu_name)))
+	void WindowClassArgs::UsingMenuName(const TString& menu_name) noexcept(noexcept(::std::declval<WindowClassArgs>().UpdateMenuName(menu_name)))
 	{
 		this->UpdateMenuName(menu_name);
 		this->using_int_menu_res = false;
 	}
-	void WrappedWindowClass::UsingMenuName(word menu_resource) noexcept
+	void WindowClassArgs::UsingMenuName(word menu_resource) noexcept
 	{
 		this->menu_resource = menu_resource;
 		this->using_int_menu_res = true;
 	}
-	void WrappedWindowClass::EnableDoubleClickMessage(boolean enable) noexcept
+	void WindowClassArgs::EnableDoubleClickMessage(boolean enable) noexcept
 	{
 		if (enable == true)
 		{
@@ -143,7 +161,7 @@ namespace Petal
 			this->style &= (full ^ CS_DBLCLKS);
 		}
 	}
-	[[nodiscard]] WindowClassRegisteringResult WrappedWindowClass::Register() const noexcept(false)
+	WindowClassArgs::RegisterResult WindowClassArgs::Register() noexcept(false)
 	{
 		return IWindowClassSet().Register(*this);
 	}
@@ -151,17 +169,16 @@ namespace Petal
 
 namespace Petal
 {
-	WindowCreatingParameters::WindowCreatingParameters(const TString& title, const Size2DI32& size, const Position2DI32& position, dword style, dword ex_style, win32hmenu menu, ptr<void> user_res_p) :
+	WindowCreatingArgs::WindowCreatingArgs(const TString& title, const Size2DI32& size, const Position2DI32& position, dword style, dword ex_style, win32hmenu menu) :
 		position(position),
 		size(size),
 		ex_style(ex_style),
 		style(style),
-		menu(menu),
-		user_res_p(user_res_p)
+		menu(menu)
 	{
 		this->UpdateTitle(title);
 	}
-	boolean WindowCreatingParameters::UpdateTitle(const TString& new_title) noexcept
+	boolean WindowCreatingArgs::UpdateTitle(const TString& new_title) noexcept
 	{
 		try
 		{
@@ -180,7 +197,7 @@ namespace Petal
 		}
 		return true;
 	}
-	[[nodiscard]] const TString& WindowCreatingParameters::Title() const noexcept
+	[[nodiscard]] const TString& WindowCreatingArgs::Title() const noexcept
 	{
 		return this->window_title;
 	}
@@ -192,7 +209,7 @@ namespace Petal
 	{
 		this->UnregisterAll();
 	}
-	[[nodiscard]] WindowClassSet::RegisterResult WindowClassSet::Register(const WrappedWindowClass& wrapped_window_class) noexcept(false)
+	[[nodiscard]] WindowClassSet::RegisterResult WindowClassSet::Register(const WindowClassArgs& wrapped_window_class) noexcept(false)
 	{
 		RegisterResult result{};
 		WindowClass window_class{ wrapped_window_class.BuildWindowClass() };
@@ -201,89 +218,98 @@ namespace Petal
 		if (result.class_atom == 0)
 		{
 			result.error = ::GetLastError();
-
 			try
 			{
 				Petal_VSDbgT("[Petal] Failed in WindowClassSet::Register method!\r\n");
 				Petal_VSDbgT("\t\tclass_name: \"");
 				Petal_VSDebugOutput(wrapped_window_class.ClassName().c_str());
 				Petal_VSDbgT("\"\r\n");
-				Petal_VSDbgT("\t\terror code: ");
-				Petal_VSDbgA(::std::format("{}", result.error).c_str());
-				Petal_VSDbgT("\r\n");
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.error).c_str());
 			}
 			catch (const ::std::exception&) {}
 
 			return result;
 		}
 
-		this->set[result.class_atom] = wrapped_window_class.ClassName();
+		::std::unique_ptr<Pair> data_ptr{ ::std::make_unique<Pair>(wrapped_window_class.ClassName(), result.class_atom) };
+
+		this->set.Insert(::std::move(data_ptr));
 
 		try
 		{
-			Petal_VSDbgA(::std::format("[Petal] Window class(atom:{}) has been registered", result.class_atom).c_str());
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered"), result.class_atom).c_str());
 			Petal_VSDbgT("\r\n");
 		}
 		catch (const ::std::exception&) {}
 
 		return result;
 	}
-	[[nodiscard]] WindowClassSet::UnregisterResult WindowClassSet::Unregister(win32atom class_atom) noexcept(false)
+	[[nodiscard]] WindowClassSet::UnregisterResult WindowClassSet::Unregister(Pair::Atom class_atom) noexcept(false)
 	{
 		UnregisterResult result{};
 
 		auto debug_output
 		{
-			[](const win32atom& class_atom, const UnregisterResult& result)
+			[](const Pair::Atom& class_atom, const UnregisterResult& result) noexcept
 			{
 				try
 				{
 					Petal_VSDbgT("[Petal] Failed in WindowClassSet::Unregister series method!\r\n");
-					Petal_VSDbgT("\t\tclass_atom: ");
-					Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-					Petal_VSDbgT("\r\n");
-					Petal_VSDbgT("\t\terror code: ");
-					Petal_VSDbgA(::std::format("{}", result.error).c_str());
-					Petal_VSDbgT("\r\n");
+					Petal_VSDbg(::std::format(Petal_DbgStr("\t\tin class_atom: {}\r\n"), class_atom).c_str());
+					switch (result.condition)
+					{
+					case WindowClassSet::UnregisterResult::Condition::Win32:
+						Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
+						break;
+					case WindowClassSet::UnregisterResult::Condition::PetalFramework:
+						switch (result.framework_error)
+						{
+						case WindowClassSet::UnregisterResult::Error::Unknown:
+							Petal_VSDbgT("\t\tPetal: unknown reason\r\n");
+							break;
+						case WindowClassSet::UnregisterResult::Error::CannotFindPair:
+							Petal_VSDbgT("\t\tPetal: cannot find atom in IWindowClassSet()\r\n");
+							break;
+						default:
+							Petal_VSDbg(::std::format(Petal_DbgStr("\t\tPetal: error code {}\r\n"), static_cast<i16>(result.framework_error)).c_str());
+							break;
+						}
+						break;
+					default:
+						Petal_VSDbgT("\t\tUnknown reason\r\n");
+						break;
+					}
+					
 				}
 				catch (const ::std::exception&) {}
 			}
 		};
 
-		auto name{ this->set.find(class_atom) };
-		if (name == this->set.end())
+		auto data{ this->set.Find(class_atom) };
+		if (data == nullptr)
 		{
-			result.error = ERROR_OBJECT_NOT_FOUND;
+			result.condition = UnregisterResult::Condition::PetalFramework;
+			result.framework_error = UnregisterResult::Error::CannotFindPair;
 			result.value = FALSE;
 			debug_output(class_atom, result);
 			return result;
 		}
+
 		result.value = PetalUnnamed::IWin32::UnregisterPetalWindowClass(class_atom);
 
 		if (result.value == FALSE)
 		{
-			result.error = ::GetLastError();
+			result.condition = UnregisterResult::Condition::Win32;
+			result.win32_error = ::GetLastError();
 			debug_output(class_atom, result);
 			return result;
 		}
 
-		auto erase_count{ this->set.erase(class_atom) };
-
-		if (erase_count <= 0)
-		{
-			try
-			{
-				Petal_VSDbgT("[Petal] Exception in WindowClassSet::Unregister series method!\r\n");
-				Petal_VSDbgT("\t\tFailed in erase class_atom: ");
-				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-				Petal_VSDbgT("\r\n");
-			}
-			catch (const ::std::exception&) {}
-		}
+		this->set.Erase(class_atom);
 
 		try
 		{
-			Petal_VSDbgA(::std::format("[Petal] Window class(atom:{}) has been unregistered", class_atom).c_str());
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered"), class_atom).c_str());
 			Petal_VSDbgT("\r\n");
 		}
 		catch (const ::std::exception&) {}
@@ -292,23 +318,23 @@ namespace Petal
 	}
 	tsize WindowClassSet::UnregisterAll() noexcept(false)
 	{
-		::std::vector<win32atom> win_class_set;
-		for (const auto& e : this->set)
+		::std::vector<win32atom> atom_set;
+		for (const auto& e : this->set.atom_to_data)
 		{
-			win_class_set.push_back(e.first);
+			atom_set.push_back(e.first);
 		}
-		for (auto& e : win_class_set)
+		for (auto&& e : atom_set)
 		{
-			auto result{ this->Unregister(this->set.begin()->first) };
+			auto result{ this->Unregister(e) };
 		}
-		return this->set.size();
+		return this->set.atom_to_data.size();
 	}
-	[[nodiscard]] boolean WindowClassSet::Check(win32atom class_atom) const noexcept
+	[[nodiscard]] boolean WindowClassSet::Check(Pair::Atom class_atom) const noexcept
 	{
 		try
 		{
-			auto name{ this->set.find(class_atom) };
-			if (name == this->set.end())
+			auto data{ this->set.Find(class_atom) };
+			if (data == nullptr)
 			{
 				return false;
 			}
@@ -332,19 +358,19 @@ namespace Petal
 	}
 	[[nodiscard]] boolean WindowClassSet::Empty() const noexcept
 	{
-		return this->set.empty();
+		return this->set.atom_to_data.empty();
 	}
-	[[nodiscard]] const TString& WindowClassSet::operator[](win32atom class_atom) const noexcept
+	[[nodiscard]] const TString& WindowClassSet::operator[](Pair::Atom class_atom) const noexcept
 	{
-		static TString null_tstr{};
+		static const TString null_tstr{};
 		try
 		{
-			auto info_pair{ this->set.find(class_atom) };
-			if (info_pair == this->set.end())
+			auto info_pair{ this->set.Find(class_atom) };
+			if (info_pair == nullptr)
 			{
 				return null_tstr;
 			}
-			return info_pair->second;
+			return info_pair->name;
 		}
 #ifdef Petal_Enable_VSDebugOutput
 		catch (const ::std::exception& e)
@@ -361,17 +387,96 @@ namespace Petal
 			catch (const ::std::exception&) {}
 			return null_tstr;
 		}
+		return null_tstr;
+	}
+	[[nodiscard]] WindowClassSet::Pair::Atom WindowClassSet::operator[](Pair::NameView class_name) const noexcept
+	{
+		try
+		{
+			auto info_pair{ this->set.Find(class_name) };
+			if (info_pair == nullptr)
+			{
+				return 0;
+			}
+			return info_pair->atom;
+		}
+#ifdef Petal_Enable_VSDebugOutput
+		catch (const ::std::exception& e)
+#else
+		catch (const ::std::exception&)
+#endif
+		{
+			try
+			{
+				Petal_VSDbgT("[Petal] std::exception: ");
+				Petal_VSDbgA(e.what());
+				Petal_VSDbgT("\r\n");
+			}
+			catch (const ::std::exception&) {}
+			return 0;
+		}
+		return 0;
 	}
 	[[nodiscard]] WindowClassSet& WindowClassSet::Instance()
 	{
 		static WindowClassSet window_class_set{};
 		return window_class_set;
 	}
+
+	void WindowClassSet::Set::Insert(WindowClassSet::Set::Unique&& data_ptr)
+	{
+		if (data_ptr == nullptr)
+		{
+			Petal_VSDbgT("[Petal] Failed in Petal::WindowClassSet::Set::Insert: data_ptr is nullptr\r\n");
+			return;
+		}
+		this->name_to_data[data_ptr->name] = data_ptr.get();
+		this->atom_to_data[data_ptr->atom] = ::std::move(data_ptr);
+	}
+	tsize WindowClassSet::Set::Erase(WindowClassSet::Pair::Atom atom)
+	{
+		auto result = this->atom_to_data.find(atom);
+		if (result == this->atom_to_data.end())
+		{
+			return 0;
+		}
+		this->name_to_data.erase(result->second->name);
+		return this->atom_to_data.erase(atom);
+	}
+	tsize WindowClassSet::Set::Erase(WindowClassSet::Pair::Name name)
+	{
+		auto result = this->name_to_data.find(name);
+		if (result == this->name_to_data.end())
+		{
+			return 0;
+		}
+		Pair::Atom target_atom = result->second->atom;
+		this->name_to_data.erase(result->second->name);
+		return this->atom_to_data.erase(target_atom);
+	}
+	ptrc<WindowClassSet::Pair> WindowClassSet::Set::Find(WindowClassSet::Pair::Atom atom) const
+	{
+		auto result{ this->atom_to_data.find(atom) };
+		if (result == this->atom_to_data.end())
+		{
+			return nullptr;
+		}
+		return result->second.get();
+	}
+	ptrc<WindowClassSet::Pair> WindowClassSet::Set::Find(WindowClassSet::Pair::NameView name) const
+	{
+		auto result{ this->name_to_data.find(name) };
+		if (result == this->name_to_data.end())
+		{
+			return nullptr;
+		}
+		return result->second;
+	}
 }
 
 namespace Petal
 {
-	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingParameters& parameters) noexcept(false)
+	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingArgs& args) noexcept(false)
 	{
 		CreateResult result{};
 		if (IWindowClassSet().Check(class_atom) == false)
@@ -380,16 +485,14 @@ namespace Petal
 			try
 			{
 				Petal_VSDbgT("[Petal] Failed in WindowSet::Create method!\r\n");
-				Petal_VSDbgT("\t\tCan not find class_atom: ");
-				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-				Petal_VSDbgT(" in window_class_set\r\n");
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\tCan not find class_atom: {} in window_class_set\r\n"), class_atom).c_str());
 			}
 			catch (const ::std::exception&) {}
 
-			return result;
+			goto return_label;
 		}
 
-		result.window_handle = PetalUnnamed::IWin32::CreatePetalWindow(class_atom, parameters);
+		result.window_handle = PetalUnnamed::IWin32::CreatePetalWindow(class_atom, target_window, args);
 
 		if (result.window_handle == nullptr)
 		{
@@ -397,35 +500,35 @@ namespace Petal
 			try
 			{
 				Petal_VSDbgT("[Petal] Failed in WindowSet::Create method!\r\n");
-				Petal_VSDbgT("\t\tclass_atom: \"");
-				Petal_VSDbgA(::std::format("{}", class_atom).c_str());
-				Petal_VSDbgT("\"\r\n");
-				Petal_VSDbgT("\t\terror code: ");
-				Petal_VSDbgA(::std::format("{}", result.error).c_str());
-				Petal_VSDbgT("\r\n");
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\tclass_atom: \"{}\"\r\n"), class_atom).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.error).c_str());
 			}
 			catch (const ::std::exception&) {}
-
-			return result;
+			
+			goto return_label;
 		}
 
-		target_window.window_handle = result.window_handle;
+		WindowAccessor::Assign(target_window, result.window_handle);
 
 		this->set[result.window_handle] = &target_window;
 
 		try
 		{
-			Petal_VSDbgA(::std::format("[Petal] Window(handle:{}) has been created", static_cast<void*>(result.window_handle)).c_str());
-			Petal_VSDbgT("\r\n");
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been created\r\n"), static_cast<void*>(result.window_handle)).c_str());
 		}
 		catch (const ::std::exception&) {}
+
+		return_label:
+
+		if (IWindowSet().Empty())
+		{
+			ExitMessageLoop();
+		}
 
 		return result;
 	}
 	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept(false)
 	{
-	//	::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_set_mutex);
-
 		DestroyResult result{};
 
 		auto debug_output
@@ -435,12 +538,8 @@ namespace Petal
 				try
 				{
 					Petal_VSDbgT("[Petal] Failed in WindowSet::Destroy series method!\r\n");
-					Petal_VSDbgT("\t\tWindow_handle: ");
-					Petal_VSDbgA(::std::format("{}", static_cast<ptr<void>>(window.WindowHandle())).c_str());
-					Petal_VSDbgT("\r\n");
-					Petal_VSDbgT("\t\terror code: ");
-					Petal_VSDbgA(::std::format("{}", result.error).c_str());
-					Petal_VSDbgT("\r\n");
+					Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow_handle: {}\r\n"), static_cast<ptr<void>>(window.WindowHandle())).c_str());
+					Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.error).c_str());
 				}
 				catch (const ::std::exception&) {}
 			}
@@ -462,7 +561,7 @@ namespace Petal
 			result.value = FALSE;
 			debug_output(window, result);
 
-			return result;
+			goto return_label;
 		}
 		result.value = ::DestroyWindow(window.WindowHandle());
 
@@ -471,7 +570,7 @@ namespace Petal
 			result.error = ::GetLastError();
 			debug_output(window, result);
 
-			return result;
+			goto return_label;
 		}
 
 		decltype(this->set.erase(window.WindowHandle())) erase_count;
@@ -494,12 +593,13 @@ namespace Petal
 
 		try
 		{
-			Petal_VSDbgA(::std::format("[Petal] Window(handle:{}) has been destroyed", static_cast<void*>(window.window_handle)).c_str());
-			Petal_VSDbgT("\r\n");
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), static_cast<void*>(window.WindowHandle())).c_str());
 		}
 		catch (const ::std::exception&) {}
 
-		window.window_handle = nullptr;
+		WindowAccessor::Assign(window, nullptr);
+
+		return_label:
 
 		if (IWindowSet().Empty() == true)
 		{
@@ -615,9 +715,7 @@ namespace Petal
 				error = ::GetLastError();
 				try
 				{
-					Petal_VSDbgT("[Petal] Exception in Petal::MessageLoop, error code: ");
-					Petal_VSDbgA(::std::format("{}", error).c_str());
-					Petal_VSDbgT("\r\n");
+					Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Exception in Petal::MessageLoop, error code: {}\r\n"), error).c_str());
 				}
 				catch (const ::std::exception&) {}
 				goto out_of_loop;
@@ -720,6 +818,21 @@ namespace
 				{
 					return window->Process(message, w, l);
 				}
+				else
+				{
+					if (message == WM_CREATE)
+					{
+						ptrc<Win32CreateStruct> create_struct_ptr{ reinterpret_cast<ptr<Win32CreateStruct>>(l) };
+						if (create_struct_ptr != nullptr && create_struct_ptr->lpCreateParams != nullptr)
+						{
+							Abstract::Window& window{ *reinterpret_cast<ptr<Abstract::Window>>(create_struct_ptr->lpCreateParams) };
+							WindowAccessor::Assign(window, window_handle);
+							auto result{ window.Process(message, w, l) };
+							WindowAccessor::Assign(window, {});
+							return result;
+						}
+					}
+				}
 			}
 			catch (const ::std::exception&) {}
 			return Petal::IWin32::DefaultWindowProcess(window_handle, message, w, l);
@@ -733,26 +846,26 @@ namespace
 		{
 			return ::UnregisterClassW(Petal::IWin32::ToWinResource(class_atom), WinMain::hins);
 		}
-		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept
+		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
 		{
-			Win32Rect rect{ 0, 0, parameters.size.width, parameters.size.height };
-			::AdjustWindowRectEx(&rect, parameters.style, parameters.menu != nullptr, parameters.ex_style);
+			Win32Rect rect{ 0, 0, args.size.width, args.size.height };
+			::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
 			i32 width{ rect.right - rect.left };
 			i32 height{ rect.bottom - rect.top };
 			return ::CreateWindowExW
 			(
-				parameters.ex_style,
+				args.ex_style,
 				Petal::IWin32::ToWinResource(class_atom),
-				parameters.Title().c_str(),
-				parameters.style,
-				parameters.position.x,
-				parameters.position.y,
+				args.Title().c_str(),
+				args.style,
+				args.position.x,
+				args.position.y,
 				width,
 				height,
 				nullptr,
-				parameters.menu,
+				args.menu,
 				WinMain::hins,
-				static_cast<::LPVOID>(parameters.user_res_p)
+				static_cast<::LPVOID>(&window)
 			);
 		}
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept
@@ -777,26 +890,26 @@ namespace
 		{
 			return ::UnregisterClassA(Petal::IWin32::ToWinResource(class_atom), WinMain::hins);
 		}
-		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, const WindowCreatingParameters& parameters) noexcept
+		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
 		{
-			Win32Rect rect{ 0, 0, parameters.size.width, parameters.size.height };
-			::AdjustWindowRectEx(&rect, parameters.style, parameters.menu != nullptr, parameters.ex_style);
+			Win32Rect rect{ 0, 0, args.size.width, args.size.height };
+			::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
 			i32 width{ rect.right - rect.left };
 			i32 height{ rect.bottom - rect.top };
 			return ::CreateWindowExA
 			(
-				parameters.ex_style,
+				args.ex_style,
 				Petal::IWin32::ToWinResource(class_atom),
-				parameters.Title().c_str(),
-				parameters.style,
-				parameters.position.x,
-				parameters.position.y,
+				args.Title().c_str(),
+				args.style,
+				args.position.x,
+				args.position.y,
 				width,
 				height,
 				nullptr,
-				parameters.menu,
+				args.menu,
 				WinMain::hins,
-				static_cast<::LPVOID>(parameters.user_res_p)
+				static_cast<::LPVOID>(&window)
 			);
 		}
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept

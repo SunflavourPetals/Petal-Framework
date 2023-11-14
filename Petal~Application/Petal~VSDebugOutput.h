@@ -9,26 +9,18 @@
 
 namespace Petal::Debug
 {
-	class VSDebugOutputA : public Abstract::BasicOutput<Char>
+	class VSDebugOutputA : public Abstract::COutputA
 	{
 	public:
-		using InnerChar = Char;
-		using InnerString = ::std::basic_string<InnerChar>;
-		using InnerStringView = ::std::basic_string_view<InnerChar>;
-	public:
 		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str) const noexcept final;
+		virtual void OutputCStr(ptrc<InnerChar> c_str) final;
 	};
 
-	class VSDebugOutputW : public Abstract::BasicOutput<WChar>
+	class VSDebugOutputW : public Abstract::COutputW
 	{
 	public:
-		using InnerChar = WChar;
-		using InnerString = ::std::basic_string<InnerChar>;
-		using InnerStringView = ::std::basic_string_view<InnerChar>;
-	public:
 		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str) const noexcept final;
+		virtual void OutputCStr(ptrc<InnerChar> c_str) final;
 	};
 }
 

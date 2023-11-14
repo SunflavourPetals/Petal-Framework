@@ -48,6 +48,10 @@ namespace Petal
 	using WindowClass = typename ::WNDCLASSEXA;
 	using Win32CreateStruct = typename ::CREATESTRUCTA;
 #endif
+
+	inline constexpr win32error win32_no_error{ ERROR_SUCCESS };
+	inline constexpr win32bool win32_true{ TRUE };
+	inline constexpr win32bool win32_false{ FALSE };
 }
 
 #endif // !Petal_Header_WinTypes
