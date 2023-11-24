@@ -54,9 +54,9 @@ namespace Petal::Abstract
 	{
 		return this->window_handle != nullptr;
 	}
-	win32error Window::Create(win32atom class_atom, const WindowCreatingArgs& args) noexcept(false)
+	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingArgs& args) noexcept(false)
 	{
-		return IWindowSet().Create(*this, class_atom, args).error;
+		return IWindowSet().Create(*this, class_atom, args);
 	}
 	Window::DestroyResult Window::Destroy() noexcept(false)
 	{
@@ -241,8 +241,7 @@ namespace Petal
 
 		try
 		{
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered"), result.class_atom).c_str());
-			Petal_VSDbgT("\r\n");
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered\r\n"), result.class_atom).c_str());
 		}
 		catch (const ::std::exception&) {}
 
@@ -283,7 +282,6 @@ namespace Petal
 						Petal_VSDbgT("\t\tUnknown reason\r\n");
 						break;
 					}
-					
 				}
 				catch (const ::std::exception&) {}
 			}
@@ -483,9 +481,25 @@ namespace Petal
 	[[nodiscard]] WindowSet::CreateResult WindowSet::Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingArgs& args) noexcept(false)
 	{
 		CreateResult result{};
+
+		if (target_window.WindowHandle() != nullptr)
+		{
+			result.condition = CreateResult::Condition::PetalFramework;
+			result.framework_error = CreateResult::Error::WindowHasBeenCreated;
+			try
+			{
+				Petal_VSDbgT("[Petal] Failed in WindowSet::Create method!\r\n");
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow(handle:{}) has been created\r\n"), static_cast<ptr<void>>(target_window.WindowHandle())).c_str());
+			}
+			catch (const ::std::exception&) {}
+
+			goto return_label;
+		}
+
 		if (IWindowClassSet().Check(class_atom) == false)
 		{
-			result.error = ERROR_CANNOT_FIND_WND_CLASS;
+			result.condition = CreateResult::Condition::PetalFramework;
+			result.framework_error = CreateResult::Error::CannotFindWindowClassFromIWindowClassSet;
 			try
 			{
 				Petal_VSDbgT("[Petal] Failed in WindowSet::Create method!\r\n");
@@ -500,15 +514,17 @@ namespace Petal
 
 		if (result.window_handle == nullptr)
 		{
-			result.error = ::GetLastError();
+			result.condition = CreateResult::Condition::Win32;
+			result.win32_error = ::GetLastError();
 			try
 			{
 				Petal_VSDbgT("[Petal] Failed in WindowSet::Create method!\r\n");
 				Petal_VSDbg(::std::format(Petal_DbgStr("\t\tclass_atom: \"{}\"\r\n"), class_atom).c_str());
-				Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.error).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
 			}
 			catch (const ::std::exception&) {}
-			
+			Framework::Impl::WindowAccessor::Assign(target_window, {});
+
 			goto return_label;
 		}
 
@@ -543,7 +559,29 @@ namespace Petal
 				{
 					Petal_VSDbgT("[Petal] Failed in WindowSet::Destroy series method!\r\n");
 					Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow_handle: {}\r\n"), static_cast<ptr<void>>(window.WindowHandle())).c_str());
-					Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.error).c_str());
+					switch (result.condition)
+					{
+					case WindowSet::DestroyResult::Condition::Win32:
+						Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
+						break;
+					case WindowSet::DestroyResult::Condition::PetalFramework:
+						switch (result.framework_error)
+						{
+						case WindowSet::DestroyResult::Error::Unknown:
+							Petal_VSDbgT("\t\tPetal: unknown reason\r\n");
+							break;
+						case WindowSet::DestroyResult::Error::CannotFindWindowFromIWindowSet:
+							Petal_VSDbgT("\t\tPetal: cannot find window from IWindowSet()\r\n");
+							break;
+						default:
+							Petal_VSDbg(::std::format(Petal_DbgStr("\t\tPetal: error code {}\r\n"), static_cast<i16>(result.framework_error)).c_str());
+							break;
+						}
+						break;
+					default:
+						Petal_VSDbgT("\t\tUnknown reason\r\n");
+						break;
+					}
 				}
 				catch (const ::std::exception&) {}
 			}
@@ -561,17 +599,18 @@ namespace Petal
 
 		if (window_pair == this->set.end())
 		{
-			result.error = ERROR_INVALID_WINDOW_HANDLE;
-			result.value = FALSE;
+			result.condition = DestroyResult::Condition::PetalFramework;
+			result.framework_error = DestroyResult::Error::CannotFindWindowFromIWindowSet;
 			debug_output(window, result);
 
 			goto return_label;
 		}
-		result.value = ::DestroyWindow(window.WindowHandle());
+		result.return_value = ::DestroyWindow(window.WindowHandle());
 
-		if (result.value == FALSE)
+		if (result.return_value == win32_false)
 		{
-			result.error = ::GetLastError();
+			result.condition = DestroyResult::Condition::Win32;
+			result.win32_error = ::GetLastError();
 			debug_output(window, result);
 
 			goto return_label;

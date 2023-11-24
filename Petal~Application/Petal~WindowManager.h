@@ -8,6 +8,9 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 
+#ifndef Petal_Enable_IWindowSetImplByHashMap
+#include <map>
+#endif
 #include <unordered_map>
 #include <unordered_set>
 #include <memory>
@@ -53,13 +56,42 @@ namespace Petal
 	};
 	struct WindowCreatingResult final
 	{
+		enum class Condition : i16
+		{
+			Unknown = 0,
+			Success = 1,
+			Win32,
+			PetalFramework,
+		};
+		enum class Error : i16
+		{
+			Unknown = 0,
+			CannotFindWindowClassFromIWindowClassSet,
+			WindowHasBeenCreated,
+		};
+		Condition condition{ Condition::Success };
+		Error framework_error{ Error::Unknown };
+		win32error win32_error{ win32_no_error };
 		win32hwnd window_handle{ nullptr };
-		win32error error{ win32_no_error };
 	};
 	struct WindowDestroyingResult final
 	{
-		win32bool value{ win32_true };
-		win32error error{ win32_no_error };
+		enum class Condition : i16
+		{
+			Unknown = 0,
+			Success = 1,
+			Win32,
+			PetalFramework,
+		};
+		enum class Error : i16
+		{
+			Unknown = 0,
+			CannotFindWindowFromIWindowSet,
+		};
+		Condition condition{ Condition::Success };
+		Error framework_error{ Error::Unknown };
+		win32bool return_value{ win32_false };
+		win32error win32_error{ win32_no_error };
 	};
 	WindowClassSet& IWindowClassSet();
 	WindowSet& IWindowSet();
@@ -179,13 +211,14 @@ namespace Petal::Abstract
 	class Window
 	{
 	public:
+		using CreateResult = WindowCreatingResult;
 		using DestroyResult = WindowDestroyingResult;
 	public:
 		virtual win32lres Process(win32msg message, win32wprm w, win32lprm l) noexcept = 0;
 	public:
 		[[nodiscard]] win32hwnd WindowHandle() const noexcept;
 		[[nodiscard]] boolean Valid() const noexcept;
-		win32error Create(win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
+		CreateResult Create(win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
 		DestroyResult Destroy() noexcept(false);
 	protected:
 		[[nodiscard]] dword WindowStyle() const noexcept;
@@ -262,7 +295,11 @@ namespace Petal
 		using CreateResult = WindowCreatingResult;
 		using DestroyResult = WindowDestroyingResult;
 	private:
+#ifdef Petal_Enable_IWindowSetImplByHashMap
 		using Set = ::std::unordered_map<win32hwnd, ptr<Abstract::Window>>;
+#else
+		using Set = ::std::map<win32hwnd, ptr<Abstract::Window>>;
+#endif
 	public:
 		[[nodiscard]] CreateResult Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
 		[[nodiscard]] DestroyResult Destroy(Abstract::Window& window) noexcept(false);
