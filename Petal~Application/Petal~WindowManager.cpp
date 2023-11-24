@@ -540,11 +540,6 @@ namespace Petal
 
 		return_label:
 
-		if (IWindowSet().Empty())
-		{
-			ExitMessageLoop();
-		}
-
 		return result;
 	}
 	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept(false)
@@ -644,10 +639,7 @@ namespace Petal
 
 		return_label:
 
-		if (IWindowSet().Empty() == true)
-		{
-			ExitMessageLoop();
-		}
+		if (IWindowSet().ShouldQuit() == true) { ExitMessageLoop(); }
 
 		return result;
 	}
@@ -722,6 +714,18 @@ namespace Petal
 			return nullptr;
 		}
 	}
+	void WindowSet::UpdateQuitWhenEmpty(boolean should_quit_when_empty) noexcept
+	{
+		this->quit_when_empty = should_quit_when_empty;
+	}
+	boolean WindowSet::QuitWhenEmpty() const noexcept
+	{
+		return this->quit_when_empty;
+	}
+	boolean WindowSet::ShouldQuit() const noexcept
+	{
+		return this->QuitWhenEmpty() && this->Empty();
+	}
 	[[nodiscard]] WindowSet& WindowSet::Instance()
 	{
 		static WindowSet window_set{};
@@ -746,6 +750,7 @@ namespace Petal
 		Win32Message message{};
 		win32bool result{};
 		win32error error{};
+		if (IWindowSet().ShouldQuit() == true) { ExitMessageLoop(); }
 		for (; ; )
 		{
 			result = PetalUnnamed::IWin32::GetWinMessage(message, window_handle, message_filter_min, message_filter_max);
@@ -779,6 +784,7 @@ namespace Petal
 		u32 flag{ PM_NOREMOVE };
 		if (remove == true) flag = PM_REMOVE;
 		if (yield == false) flag |= PM_NOYIELD;
+		if (IWindowSet().ShouldQuit() == true) { ExitMessageLoop(); }
 		for (; ; )
 		{
 			result = PetalUnnamed::IWin32::PeekWinMessage(message, window_handle, message_filter_min, message_filter_max, flag);

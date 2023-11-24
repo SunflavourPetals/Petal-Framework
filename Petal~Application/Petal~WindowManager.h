@@ -307,6 +307,10 @@ namespace Petal
 		[[nodiscard]] boolean Check(const Abstract::Window& window) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] ptr<Abstract::Window> operator[] (win32hwnd index) const noexcept;
+	public:
+		void UpdateQuitWhenEmpty(boolean should_quit_when_empty) noexcept;
+		boolean QuitWhenEmpty() const noexcept;
+		boolean ShouldQuit() const noexcept;
 	private:
 		static [[nodiscard]] WindowSet& Instance();
 	private:
@@ -319,6 +323,7 @@ namespace Petal
 		WindowSet& operator= (WindowSet&&) = delete;
 	private:
 		Set set;
+		boolean quit_when_empty{ true };
 		friend WindowSet& IWindowSet();
 	};
 }

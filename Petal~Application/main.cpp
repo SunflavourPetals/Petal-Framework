@@ -1,6 +1,9 @@
 #include "Petal~Main.h"
 #include "Petal~Window.h"
 #include "Petal~VSDebugOutput.h"
+
+#include <format>
+
 class Main
 {
 public:
@@ -11,8 +14,7 @@ public:
 		{
 			void CreateEvent(CreateMessage& e) noexcept override
 			{
-				dout + "Create" + ln;
-				//	e.continue_creation = false;
+				dout + std::format("Create: {}", e.continue_creation) + ln;
 			}
 		} w;
 		w.Create(WindowClassArgs{ Petal_TStr("my window class") }.Register().class_atom);
