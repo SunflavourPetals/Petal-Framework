@@ -56,9 +56,9 @@ namespace Petal
 #endif
 		return ::SetWindowPos(this->WindowHandle(), nullptr, 0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, SWP_NOMOVE);
 	}
-	void Window::Repaint() noexcept
+	win32bool Window::Repaint(win32uint flags) noexcept
 	{
-		this->Process(WM_PAINT, NULL, NULL);
+		return ::RedrawWindow(this->WindowHandle(), nullptr, nullptr, flags);
 	}
 	win32bool Window::UpdateWindow() noexcept
 	{
@@ -83,6 +83,27 @@ namespace Petal
 	void Window::UpdateMinimumSize(i32 new_width, i32 new_height) noexcept
 	{
 		this->pt_limit_client_size = { new_width, new_height };
+	}
+	::std::optional<Win32Rect> Window::WindowRect() const noexcept
+	{
+		Win32Rect rect{};
+		win32bool result{ this->WindowRect(rect) };
+		if (result == win32_false) return ::std::nullopt;
+		return ::std::make_optional<Win32Rect>(rect);
+	}
+	::std::optional<Win32Rect> Window::ClientRect() const noexcept
+	{
+		Win32Rect rect{};
+		win32bool result{ this->ClientRect(rect) };
+		if (result == win32_false) return ::std::nullopt;
+		return ::std::make_optional<Win32Rect>(rect);
+	}
+	::std::optional<Size2DI32> Window::ClientSize() const noexcept
+	{
+		Size2DI32 size{};
+		win32bool result{ this->ClientSize(size) };
+		if (result == win32_false) return ::std::nullopt;
+		return ::std::make_optional<Size2DI32>(size);
 	}
 	win32bool Window::WindowRect(Win32Rect& rect) const noexcept
 	{
@@ -163,7 +184,7 @@ namespace Petal
 			Petal_VSDbgA(e.what());
 		}
 	}
-	void Window::PaintEvent(PaintMessage& e) noexcept { IWin32::DefaultWindowProcess(this->WindowHandle(), e.Message(), 0, 0); }
+	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
 	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
 	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
 	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept {}
@@ -552,5 +573,9 @@ namespace Petal
 			break;
 		}
 		return IWin32::DefaultWindowProcess(this->WindowHandle(), msg, w, l);
+	}
+	win32lres Window::DefaultDraw(PaintMessage& e) noexcept
+	{
+		return IWin32::DefaultWindowProcess(this->WindowHandle(), e.Message(), 0, 0);
 	}
 }

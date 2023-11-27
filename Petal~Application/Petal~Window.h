@@ -8,6 +8,7 @@
 #include "Petal~Types.h"
 #include "Petal~String.h"
 
+#include <optional>
 #include <Windows.h>
 
 #ifdef CreateEvent
@@ -42,7 +43,7 @@ namespace Petal
 		win32bool ShowMinimize() noexcept;
 		win32bool Hide() noexcept;
 		win32bool ShowNoBorder(boolean no_border_mode = true) noexcept;
-		void Repaint() noexcept;
+		win32bool Repaint(win32uint flags = RDW_INTERNALPAINT || RDW_UPDATENOW || RDW_ALLCHILDREN) noexcept;
 		win32bool UpdateWindow() noexcept;
 		boolean MainWindowState() const noexcept;
 		void UpdateMainWindowState(boolean new_state) noexcept;
@@ -51,6 +52,9 @@ namespace Petal
 		void UpdateMinimumSize(const Size2DI32& new_size) noexcept;
 		void UpdateMinimumSize(i32 new_width, i32 new_height) noexcept;
 
+		::std::optional<Win32Rect> WindowRect() const noexcept;
+		::std::optional<Win32Rect> ClientRect() const noexcept;
+		::std::optional<Size2DI32> ClientSize() const noexcept;
 		win32bool WindowRect(Win32Rect& rect) const noexcept;
 		win32bool ClientRect(Win32Rect& rect) const noexcept;
 		win32bool ClientSize(Size2DI32& size) const noexcept;
@@ -102,6 +106,8 @@ namespace Petal
 		virtual void CharEvent(CharMessage& e) noexcept;
 		virtual void DeadCharEvent(DeadCharMessage& e) noexcept;
 		virtual void SysDeadCharEvent(SysDeadCharMessage& e) noexcept;
+	public:
+		win32lres DefaultDraw(PaintMessage& e) noexcept;
 	public:
 		Window() = default;
 		Window(const Window&) = delete;
