@@ -7,6 +7,8 @@
 #include "Petal~String.h"
 #include "Petal~Output.h"
 
+#include <format>
+
 namespace Petal::Debug
 {
 	class VSDebugOutputA : public Abstract::COutputA
@@ -28,6 +30,40 @@ namespace Petal
 {
 	extern Debug::VSDebugOutputA dout;
 	extern Debug::VSDebugOutputW dowt;
+}
+
+namespace Petal::Debug
+{
+	template <typename... Args>
+	inline void print(StringView fmt, Args&&... args)
+	{
+		dout + ::std::vformat(fmt, ::std::make_format_args(::std::forward<Args>(args)...));
+	}
+	inline void println()
+	{
+		dout + ln;
+	}
+	template <typename... Args>
+	inline void println(StringView fmt, Args&&... args)
+	{
+		print(fmt, ::std::forward<Args>(args)...);
+		println();
+	}
+	template <typename... Args>
+	inline void wprint(WStringView fmt, Args&&... args)
+	{
+		dowt + ::std::vformat(fmt, ::std::make_wformat_args(::std::forward<Args>(args)...));
+	}
+	inline void wprintln()
+	{
+		dowt + ln;
+	}
+	template <typename... Args>
+	inline void wprintln(WStringView fmt, Args&&... args)
+	{
+		wprint(fmt, ::std::forward<Args>(args)...);
+		wprintln();
+	}
 }
 
 #ifdef Petal_VSDebugOutputA
