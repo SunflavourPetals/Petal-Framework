@@ -84,7 +84,7 @@
     <ClInclude Include="Petal~VirtualKey.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Petal~SmartPointer.h">
+    <ClInclude Include="Petal~PointerTraits.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
     <ClInclude Include="Petal~KeyboardEventProcess.h">

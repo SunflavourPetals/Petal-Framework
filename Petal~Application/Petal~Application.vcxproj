@@ -140,7 +140,7 @@
     <ClInclude Include="Petal~Output.h" />
     <ClInclude Include="Petal~PerformanceCounter.h" />
     <ClInclude Include="Petal~Process.h" />
-    <ClInclude Include="Petal~SmartPointer.h" />
+    <ClInclude Include="Petal~PointerTraits.h" />
     <ClInclude Include="Petal~String.h" />
     <ClInclude Include="Petal~Types.h" />
     <ClInclude Include="Petal~VirtualKey.h" />

@@ -7,7 +7,7 @@
 #include "Petal~WinTypes.h"
 #include "Petal~String.h"
 #include "Petal~Process.h"
-#include "Petal~SmartPointer.h"
+#include "Petal~PointerTraits.h"
 
 #include <Xinput.h>
 
