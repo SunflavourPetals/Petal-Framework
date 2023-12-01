@@ -30,9 +30,9 @@ namespace Petal::Framework::Impl
 	class WindowAccessor final
 	{
 	public:
-		static void Assign(Abstract::Window& target_window, win32hwnd resource)
+		static void Assign(Abstract::Window& target_window, win32hwnd source) noexcept
 		{
-			target_window.window_handle = resource;
+			target_window.window_handle = source;
 		}
 	};
 }

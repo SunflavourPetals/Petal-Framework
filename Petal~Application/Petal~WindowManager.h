@@ -22,6 +22,13 @@ namespace Petal
 	class WindowClassSet;
 	class WindowSet;
 	class WindowClassNameAtomHash;
+	enum class WindowOperationResultCondition : i16
+	{
+		Unknown = 0,
+		Success = 1,
+		Win32,
+		PetalFramework,
+	};
 	struct WindowClassNameAtomPair final
 	{
 		using Name = TString;
@@ -37,13 +44,7 @@ namespace Petal
 	};
 	struct WindowClassUnregisteringResult final
 	{
-		enum class Condition : i16
-		{
-			Unknown = 0,
-			Success = 1,
-			Win32,
-			PetalFramework,
-		};
+		using Condition = WindowOperationResultCondition;
 		enum class Error : i16
 		{
 			Unknown = 0,
@@ -56,13 +57,7 @@ namespace Petal
 	};
 	struct WindowCreatingResult final
 	{
-		enum class Condition : i16
-		{
-			Unknown = 0,
-			Success = 1,
-			Win32,
-			PetalFramework,
-		};
+		using Condition = WindowOperationResultCondition;
 		enum class Error : i16
 		{
 			Unknown = 0,
@@ -76,13 +71,7 @@ namespace Petal
 	};
 	struct WindowDestroyingResult final
 	{
-		enum class Condition : i16
-		{
-			Unknown = 0,
-			Success = 1,
-			Win32,
-			PetalFramework,
-		};
+		using Condition = WindowOperationResultCondition;
 		enum class Error : i16
 		{
 			Unknown = 0,
