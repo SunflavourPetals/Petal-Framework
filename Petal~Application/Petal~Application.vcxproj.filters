@@ -90,6 +90,12 @@
     <ClInclude Include="Petal~KeyboardEventProcess.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
+    <ClInclude Include="RawInputWindow.h">
+      <Filter>头文件</Filter>
+    </ClInclude>
+    <ClInclude Include="Petal~RawInputKeyboardController.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Petal~Bom.cpp">
@@ -133,6 +139,9 @@
     </ClCompile>
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~RawInputKeyboardController.cpp">
+      <Filter>PetalFramework\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

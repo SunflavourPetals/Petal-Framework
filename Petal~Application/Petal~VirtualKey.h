@@ -3,6 +3,8 @@
 #ifndef Petal_Header_VirtualKey
 #define Petal_Header_VirtualKey
 
+#include "Petal~BasicTypes.h"
+
 #include <WinUser.h>
 
 namespace Petal
@@ -13,7 +15,7 @@ namespace Petal
 	class VirtualKey
 	{
 	private:
-		using vk = int;
+		using vk = u8;
 	public:
 		using Type = vk;
 	public:
