@@ -33,7 +33,7 @@ namespace Petal::XInput::MiddleProcess
 	class BasicMiddleProcess : public Abstract::XInputEventProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const = 0;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const = 0;
 		virtual boolean LastPositive(const Controller& controller) const = 0;
 		virtual boolean ThisPositive(const Controller& controller) const = 0;
 	public:
@@ -69,7 +69,7 @@ namespace Petal::XInput::MiddleProcess
 	class ButtonProcess : virtual public BasicMiddleProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
 		virtual boolean LastPositive(const Controller& controller) const override;
 		virtual boolean ThisPositive(const Controller& controller) const override;
 	public:
@@ -88,7 +88,7 @@ namespace Petal::XInput::MiddleProcess
 	class TriggerProcess : virtual public BasicMiddleProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
 		virtual boolean LastPositive(const Controller& controller) const override;
 		virtual boolean ThisPositive(const Controller& controller) const override;
 	public:
@@ -110,7 +110,7 @@ namespace Petal::XInput::MiddleProcess
 	class StickProcess : virtual public BasicMiddleProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
 		virtual boolean LastPositive(const Controller& controller) const override;
 		virtual boolean ThisPositive(const Controller& controller) const override;
 	public:
@@ -171,7 +171,7 @@ namespace Petal::XInput
 	class ButtonHoldProcess : public MiddleProcess::ButtonProcess, public MiddleProcess::XHoldProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override final;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
 		virtual boolean LastPositive(const Controller& controller) const override final;
 		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:
@@ -215,7 +215,7 @@ namespace Petal::XInput
 	class TriggerHoldProcess : public MiddleProcess::TriggerProcess, public MiddleProcess::XHoldProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override final;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
 		virtual boolean LastPositive(const Controller& controller) const override final;
 		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:
@@ -259,7 +259,7 @@ namespace Petal::XInput
 	class StickHoldProcess : public MiddleProcess::StickProcess, public MiddleProcess::XHoldProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const Gamepad& gamepad) const override final;
+		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
 		virtual boolean LastPositive(const Controller& controller) const override final;
 		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:

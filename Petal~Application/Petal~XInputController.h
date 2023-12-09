@@ -126,8 +126,7 @@ namespace Petal::XInput
 	{
 	public:
 		boolean Connected() const noexcept; // 查看控制器是否已连接 需要提前调用 QueryState 获取或更新状态
-		boolean CheckConnection() noexcept; // 检查控制器是否已连接 无需提前调用 QueryState
-		boolean CheckConnection() const noexcept;
+		boolean CheckConnection() const noexcept; // 检查控制器是否已连接 无需提前调用 QueryState
 		UserIndexValue::Type UserIndex() const noexcept; // 查看控制器的用户索引
 		const State& GetState() const noexcept; // 获得 XINPUT_GAMEPAD 信息 需要提前调用 QueryState 获取或更新状态
 		const Gamepad& GetGamepad() const noexcept;
@@ -161,11 +160,12 @@ namespace Petal::XInput
 		WrappedGamepad(const WrappedGamepad&) = default;
 		WrappedGamepad(WrappedGamepad&&) noexcept = default;
 		~WrappedGamepad() = default;
-		WrappedGamepad& operator = (const WrappedGamepad&) noexcept = default;
+		WrappedGamepad& operator=(const WrappedGamepad&) noexcept = default;
+		WrappedGamepad& operator=(WrappedGamepad&&) noexcept = default;
 	private:
-		UserIndexValue::Type pt_user_index{ 0 }; // 用户索引 数值为 0 到 3
 		State pt_gamepad_state{}; // 控制器状态 调用 QueryState 后更新
-		boolean pt_gamepad_connected{}; // 控制器是否已连接 调用 QueryState 后更新
+		UserIndexValue::Type pt_user_index{ 0 }; // 用户索引 数值为 0 到 3
+		mutable boolean pt_gamepad_connected{}; // 控制器是否已连接 调用 QueryState 后更新
 		boolean pt_state_changed{}; // 控制器状态有无变化 调用 QueryState 后更新
 	};
 

@@ -14,16 +14,12 @@ namespace Petal::XInput
 	{
 		return this->pt_gamepad_connected;
 	}
-	boolean WrappedGamepad::CheckConnection() noexcept
-	{
-		this->pt_gamepad_connected = const_cast<ptrc<WrappedGamepad>>(this)->CheckConnection();
-		return this->Connected();
-	}
 	boolean WrappedGamepad::CheckConnection() const noexcept
 	{
 		XINPUT_STATE state{};
 		win32dword result{ ::XInputGetState(this->pt_user_index, &state) };
-		return result != ERROR_DEVICE_NOT_CONNECTED;
+		this->pt_gamepad_connected = result != ERROR_DEVICE_NOT_CONNECTED;
+		return this->Connected();
 	}
 	UserIndexValue::Type WrappedGamepad::UserIndex() const noexcept
 	{

@@ -50,7 +50,7 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean ButtonHoldProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean ButtonHoldProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
 		return this->ButtonProcess::GamepadPositive(gamepad);
 	}
@@ -115,7 +115,7 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean TriggerHoldProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean TriggerHoldProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
 		return this->TriggerProcess::GamepadPositive(gamepad);
 	}
@@ -180,7 +180,7 @@ namespace Petal::XInput
 	{
 
 	}
-	boolean StickHoldProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean StickHoldProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
 		return this->StickProcess::GamepadPositive(gamepad);
 	}
@@ -278,17 +278,17 @@ namespace Petal::XInput::MiddleProcess
 	{
 		return this->pt_buttons;
 	}
-	boolean ButtonProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean ButtonProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
-		return ((gamepad.wButtons & this->pt_buttons) == this->pt_buttons);
+		return gamepad.Pushed(this->pt_buttons);
 	}
 	boolean ButtonProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad());
 	}
 	boolean ButtonProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad());
 	}
 
 	// XInputTriggerProcess
@@ -315,16 +315,16 @@ namespace Petal::XInput::MiddleProcess
 	{
 		return this->pt_trigger_dimension;
 	}
-	boolean TriggerProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean TriggerProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
 		switch (this->pt_trigger_dimension)
 		{
 		case Petal::XInput::TriggerDimension::Left:
-			if (gamepad.bLeftTrigger >= this->pt_target_trigger_value) return true;
+			if (gamepad.LeftTrigger() >= this->pt_target_trigger_value) return true;
 			return false;
 			break;
 		case Petal::XInput::TriggerDimension::Right:
-			if (gamepad.bRightTrigger >= this->pt_target_trigger_value) return true;
+			if (gamepad.RightTrigger() >= this->pt_target_trigger_value) return true;
 			return false;
 			break;
 		default:
@@ -334,11 +334,11 @@ namespace Petal::XInput::MiddleProcess
 	}
 	boolean TriggerProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad());
 	}
 	boolean TriggerProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad());
 	}
 
 	// XInputStickProcess
@@ -374,7 +374,7 @@ namespace Petal::XInput::MiddleProcess
 	{
 		return this->pt_direction_dimension;
 	}
-	boolean StickProcess::GamepadPositive(const Gamepad& gamepad) const
+	boolean StickProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
 		switch (this->pt_stick_dimension)
 		{
@@ -382,19 +382,19 @@ namespace Petal::XInput::MiddleProcess
 			switch (this->pt_direction_dimension)
 			{
 			case Petal::XInput::DirectionDimension::Up:
-				if (gamepad.sThumbLY >= this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickY() >= this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Down:
-				if (gamepad.sThumbLY < -this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickY() < -this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Left:
-				if (gamepad.sThumbLX < -this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickX() < -this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Right:
-				if (gamepad.sThumbLX >= this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickX() >= this->pt_target_stick_value) return true;
 				return false;
 				break;
 			default:
@@ -405,19 +405,19 @@ namespace Petal::XInput::MiddleProcess
 			switch (this->pt_direction_dimension)
 			{
 			case Petal::XInput::DirectionDimension::Up:
-				if (gamepad.sThumbRY >= this->pt_target_stick_value) return true;
+				if (gamepad.RightStickY() >= this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Down:
-				if (gamepad.sThumbRY < -this->pt_target_stick_value) return true;
+				if (gamepad.RightStickY() < -this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Left:
-				if (gamepad.sThumbRX < -this->pt_target_stick_value) return true;
+				if (gamepad.RightStickX() < -this->pt_target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Right:
-				if (gamepad.sThumbRX >= this->pt_target_stick_value) return true;
+				if (gamepad.RightStickX() >= this->pt_target_stick_value) return true;
 				return false;
 				break;
 			default:
@@ -431,10 +431,10 @@ namespace Petal::XInput::MiddleProcess
 	}
 	boolean StickProcess::LastPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetLastWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetLastWrappedGamepad());
 	}
 	boolean StickProcess::ThisPositive(const Controller& controller) const
 	{
-		return this->GamepadPositive(controller.GetWrappedGamepad().GetGamepad());
+		return this->GamepadPositive(controller.GetWrappedGamepad());
 	}
 }
