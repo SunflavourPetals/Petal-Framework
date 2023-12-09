@@ -2,94 +2,67 @@
 
 namespace Petal::Keyboard
 {
-	win32short StoredState::Value() const noexcept
+	const State& WrappedState::GetState() const noexcept
 	{
 		return this->pt_state;
 	}
-	boolean StoredState::Pushed() const noexcept
+	void WrappedState::ClearState() noexcept
 	{
-		return this->pt_pushed;
+		this->pt_state = State{ 0 };
 	}
-	void StoredState::Update(win32short new_state) noexcept
+	boolean WrappedState::Pushed(VirtualKey::Type vk_code) const noexcept
 	{
-		this->pt_state = new_state;
-		this->pt_pushed = (new_state & 0x8000) == 0x8000;
+		return this->pt_state[vk_code];
 	}
-	
-	const StoredState& Controller::GetState(VirtualKey::Type vk) const noexcept
+	void WrappedState::Set(VirtualKey::Type vk_code, boolean pushed) noexcept
 	{
-		auto result{ this->FindStoredState(vk) };
-		if (result != this->key_state_container.end())
-		{
-			return result->second.state;
-		}
-		return this->NullState();
+		this->pt_state[vk_code] = pushed;
 	}
-	const StoredState& Controller::GetLastState(VirtualKey::Type vk) const noexcept
+}
+
+namespace Petal::Keyboard
+{
+	void BasicController::ClearState() noexcept
 	{
-		auto result{ this->FindStoredState(vk) };
-		if (result != this->key_state_container.end())
-		{
-			return result->second.last_state;
-		}
-		return this->NullState();
+		this->pt_state = WrappedState{};
 	}
-	StateContainer& Controller::GetStateContainer() noexcept
+	void BasicController::ClearLastState() noexcept
 	{
-		return this->key_state_container;
+		this->pt_last_state = WrappedState{};
 	}
-	const StateContainer& Controller::GetStateContainer() const noexcept
+	const WrappedState& BasicController::GetState() const noexcept
 	{
-		return this->key_state_container;
+		return this->pt_state;
 	}
-	boolean Controller::Register(VirtualKey::Type key) noexcept
+	const WrappedState& BasicController::GetLastState() const noexcept
 	{
-		auto result{ this->FindStoredState(key) };
-		if (result == this->key_state_container.end())
-		{
-			this->key_state_container.insert({ key, {} });
-			return true;
-		}
-		return false;
+		return this->pt_last_state;
 	}
-	boolean Controller::Unregister(VirtualKey::Type key) noexcept
-	{
-		auto result{ this->FindStoredState(key) };
-		if (result != this->key_state_container.end())
-		{
-			this->key_state_container.erase(key);
-			return true;
-		}
-		return false;
-	}
-	StateContainer::const_iterator Controller::FindStoredState(VirtualKey::Type vk) const noexcept
-	{
-		try
-		{
-			auto result{ this->key_state_container.find(vk) };
-			return result;
-		}
-		catch (const ::std::exception&) {}
-		return this->key_state_container.end();
-	}
-	void Controller::QueryState() noexcept
-	{
-		for (auto& kv_pair : this->key_state_container)
-		{
-			kv_pair.second.last_state = kv_pair.second.state;
-			kv_pair.second.state.Update(::GetAsyncKeyState(kv_pair.first));
-		}
-	}
-	const StoredState& Controller::NullState() noexcept
-	{
-		static StoredState state{};
-		return state;
-	}
-	void Controller::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
+	void BasicController::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
 	{
 		if (proc.Check(resource))
 		{
 			proc.Execution(resource);
 		}
+	}
+}
+
+namespace Petal::Keyboard
+{
+	void Controller::QueryState() noexcept
+	{
+		this->pt_last_state = this->pt_state;
+		for (const auto& vk_code : this->pt_registry)
+		{
+			this->pt_state.Set(vk_code, (::GetAsyncKeyState(vk_code) & 0x8000) == 0x8000);
+		}
+	}
+	void Controller::Register(VirtualKey::Type key) noexcept
+	{
+		this->pt_registry.insert(key);
+	}
+	tsize Controller::Unregister(VirtualKey::Type key) noexcept
+	{
+		return this->pt_registry.erase(key);
 	}
 }

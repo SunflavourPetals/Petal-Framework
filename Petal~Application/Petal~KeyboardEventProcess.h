@@ -12,9 +12,9 @@ namespace Petal::Keyboard::MiddleProcess
 	class BasicMiddleProcess : public Abstract::KeyboardEventProcess
 	{
 	protected:
-		virtual boolean KeyPositive(const StoredState& state) const = 0;
-		virtual boolean LastPositive(const Controller& controller) const = 0;
-		virtual boolean ThisPositive(const Controller& controller) const = 0;
+		virtual boolean KeyPositive(const WrappedState& state) const = 0;
+		virtual boolean LastPositive(const BasicController& controller) const = 0;
+		virtual boolean ThisPositive(const BasicController& controller) const = 0;
 	public:
 		BasicMiddleProcess() = default;
 		BasicMiddleProcess(const BasicMiddleProcess&) = default;
@@ -48,9 +48,9 @@ namespace Petal::Keyboard::MiddleProcess
 	class XKeyProcess : virtual public BasicMiddleProcess
 	{
 	protected:
-		virtual boolean KeyPositive(const StoredState& state) const override;
-		virtual boolean LastPositive(const Controller& controller) const override;
-		virtual boolean ThisPositive(const Controller& controller) const override;
+		virtual boolean KeyPositive(const WrappedState& state) const override;
+		virtual boolean LastPositive(const BasicController& controller) const override;
+		virtual boolean ThisPositive(const BasicController& controller) const override;
 	public:
 		virtual void UpdateKey(VirtualKey::Type target_key) noexcept final;
 		virtual VirtualKey::Type Key() const noexcept final;
@@ -98,9 +98,9 @@ namespace Petal::Keyboard
 	class KeyHoldProcess : public MiddleProcess::XKeyProcess, public MiddleProcess::XHoldProcess
 	{
 	protected:
-		virtual boolean KeyPositive(const StoredState& gamepad) const override final;
-		virtual boolean LastPositive(const Controller& controller) const override final;
-		virtual boolean ThisPositive(const Controller& controller) const override final;
+		virtual boolean KeyPositive(const WrappedState& gamepad) const override final;
+		virtual boolean LastPositive(const BasicController& controller) const override final;
+		virtual boolean ThisPositive(const BasicController& controller) const override final;
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:

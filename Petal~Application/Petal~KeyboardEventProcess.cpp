@@ -78,17 +78,17 @@ namespace Petal::Keyboard::MiddleProcess
 	{
 		return this->pt_key;
 	}
-	boolean XKeyProcess::KeyPositive(const StoredState& state) const
+	boolean XKeyProcess::KeyPositive(const WrappedState& state) const
 	{
-		return state.Pushed();
+		return state.Pushed(this->pt_key);
 	}
-	boolean XKeyProcess::LastPositive(const Controller& controller) const
+	boolean XKeyProcess::LastPositive(const BasicController& controller) const
 	{
-		return this->KeyPositive(controller.GetLastState(this->pt_key));
+		return this->KeyPositive(controller.GetLastState());
 	}
-	boolean XKeyProcess::ThisPositive(const Controller& controller) const
+	boolean XKeyProcess::ThisPositive(const BasicController& controller) const
 	{
-		return this->KeyPositive(controller.GetState(this->pt_key));
+		return this->KeyPositive(controller.GetState());
 	}
 }
 
@@ -136,15 +136,15 @@ namespace Petal::Keyboard
 	{
 
 	}
-	boolean KeyHoldProcess::KeyPositive(const StoredState& state) const
+	boolean KeyHoldProcess::KeyPositive(const WrappedState& state) const
 	{
 		return this->XKeyProcess::KeyPositive(state);
 	}
-	boolean KeyHoldProcess::LastPositive(const Controller& controller) const
+	boolean KeyHoldProcess::LastPositive(const BasicController& controller) const
 	{
 		return this->XKeyProcess::LastPositive(controller);
 	}
-	boolean KeyHoldProcess::ThisPositive(const Controller& controller) const
+	boolean KeyHoldProcess::ThisPositive(const BasicController& controller) const
 	{
 		return this->XKeyProcess::ThisPositive(controller);
 	}
