@@ -175,13 +175,9 @@ namespace Petal
 		{
 			this->Destroy();
 		}
-#ifdef Petal_Enable_VSDebugOutput
 		catch (::std::exception& e)
-#else
-		catch (::std::exception&)
-#endif
 		{
-			Petal_VSDbgA(e.what());
+			Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
 		}
 	}
 	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
