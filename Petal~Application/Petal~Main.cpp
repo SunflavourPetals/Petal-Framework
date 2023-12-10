@@ -171,6 +171,7 @@ namespace Petal::UserEntrance
 {
 	extern const fptr<int> pt_user_main;
 	extern const ptrc<TChar> pt_user_main_name;
+	extern const ptrc<DbgChar> pt_user_main_name_dbgc;
 }
 
 #else
@@ -183,21 +184,17 @@ namespace Petal::XMain
 {
 	inline void VSDebugOutput(ptrc<DbgChar> entry_point, ptrc<DbgChar> main_space)
 	{
-		Petal_VSDbgT("[Petal] Entry point: ");
-		Petal_VSDbg(entry_point);
-		Petal_VSDbgT("\r\n");
-
-		Petal_VSDbgT("[Petal] Arguments in Petal::");
-		Petal_VSDbg(main_space);
-		Petal_VSDbgT(" is valid now\r\n");
-
-		Petal_VSDbgT("[Petal] User entrance: ");
+		try
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Entry point: {}\r\n"), entry_point).c_str());
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Arguments in Petal::{} is valid now\r\n"), main_space).c_str());
 #ifndef Petal_Enable_PetalMain
-		Petal_VSDebugOutput(UserEntrance::pt_user_main_name);
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), UserEntrance::pt_user_main_name_dbgc).c_str());
 #else
-		Petal_VSDbgT("PetalMain");
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal_DbgStr("PetalMain")).c_str());
 #endif
-		Petal_VSDbgT("\r\n");
+		}
+		catch (const ::std::exception&) {}
 	}
 }
 

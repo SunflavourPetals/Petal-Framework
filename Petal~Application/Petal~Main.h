@@ -14,6 +14,7 @@ namespace Petal::Main
 	extern const ptrc<ptrc<TChar>>& envp;
 	extern const boolean& valid;
 }
+
 namespace Petal::WinMain
 {
 	extern const win32hins& hins;
@@ -29,6 +30,7 @@ namespace Petal::UserEntrance \
 {   \
 	extern const fptr<int> pt_user_main{ &::MainFunc };  \
 	extern const ptrc<TChar> pt_user_main_name{ Petal_TStr(#MainFunc) };  \
+	extern const ptrc<DbgChar> pt_user_main_name_dbgc{ Petal_DbgStr(#MainFunc) };  \
 }
 #define Petal_SetMainClass(MainClass) Petal_SetMainFunc(MainClass::main)
 #define Petal_SetMainSpace(MainSpace) Petal_SetMainClass(MainSpace)
