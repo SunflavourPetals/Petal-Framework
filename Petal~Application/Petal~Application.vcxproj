@@ -131,7 +131,6 @@
   <ItemGroup>
     <ClInclude Include="Petal~BasicTypes.h" />
     <ClInclude Include="Petal~Bom.h" />
-    <ClInclude Include="Petal~Exception.h" />
     <ClInclude Include="Petal~FrequencyController.h" />
     <ClInclude Include="Petal~KeyboardController.h" />
     <ClInclude Include="Petal~KeyboardEventProcess.h" />
@@ -157,7 +156,6 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Petal~Bom.cpp" />
-    <ClCompile Include="Petal~Exception.cpp" />
     <ClCompile Include="Petal~FrequencyController.cpp" />
     <ClCompile Include="Petal~KeyboardController.cpp" />
     <ClCompile Include="Petal~KeyboardEventProcess.cpp" />

@@ -1,7 +1,6 @@
 #include "Petal~WindowManager.h"
 
 #include "Petal~Main.h"
-#include "Petal~Exception.h"
 #include "Petal~VSDebugOutput.h"
 
 #include <exception>

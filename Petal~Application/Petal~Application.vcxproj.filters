@@ -30,9 +30,6 @@
     <ClInclude Include="Petal~Bom.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Petal~Exception.h">
-      <Filter>PetalFramework\Header</Filter>
-    </ClInclude>
     <ClInclude Include="Petal~FrequencyController.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
@@ -99,9 +96,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Petal~Bom.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Petal~Exception.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
     <ClCompile Include="Petal~FrequencyController.cpp">

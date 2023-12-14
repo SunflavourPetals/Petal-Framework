@@ -1,6 +1,5 @@
 #include "Petal~Window.h"
 
-#include "Petal~Exception.h"
 #include "Petal~VSDebugOutput.h"
 
 namespace Petal
