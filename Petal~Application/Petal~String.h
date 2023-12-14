@@ -74,12 +74,6 @@ namespace Petal
 	using DbgChar = TChar;
 	using DbgString = TString;
 #endif
-
-#if defined(Petal_Enable_ForceExcepDescANSI)
-	using ExcepChar = Char;
-#else
-	using ExcepChar = TChar;
-#endif
 }
 
 namespace Petal::TypeTraits
@@ -113,9 +107,6 @@ namespace Petal::TypeTraits
 
 	template <typename Ty>
 	constexpr bool is_dbg_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, DbgChar> };
-
-	template <typename Ty>
-	constexpr bool is_excep_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, ExcepChar> };
 }
 
 namespace Petal::Concept
@@ -136,9 +127,6 @@ namespace Petal::Concept
 #ifdef Petal_DbgStr
 #undef Petal_DbgStr
 #endif
-#ifdef Petal_ExcepCStr
-#undef Petal_ExcepCStr
-#endif
 
 #if defined(Petal_Enable_Unicode)
 #define Petal_TStr(quote) L##quote
@@ -150,12 +138,6 @@ namespace Petal::Concept
 #define Petal_DbgStr(quote) quote
 #else
 #define Petal_DbgStr(quote) Petal_TStr(quote)
-#endif
-
-#if defined(Petal_Enable_ForceExcepDescANSI)
-#define Petal_ExcepStr(quote) quote
-#else
-#define Petal_ExcepStr(quote) Petal_TStr(quote)
 #endif
 
 #endif // !Petal_Header_String
