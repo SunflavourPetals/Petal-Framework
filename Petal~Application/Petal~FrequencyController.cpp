@@ -8,6 +8,7 @@ namespace Petal
 	FrequencyController::FrequencyController()
 	{
 		this->pt_target_delta_count = this->pt_performance_counter.Frequency() / 60;
+		this->pt_sleep_failure_threshold_count = this->pt_performance_counter.Frequency();
 		this->pt_target_statistics_count = this->pt_performance_counter.Frequency();
 	}
 	FrequencyController::FrequencyController(f64 target_frequency, f64 sleep_failure_second, f64 statistics_interval_second)
@@ -174,8 +175,8 @@ namespace Petal
 	void FrequencyController::Count() noexcept(noexcept_fc_count)
 	{
 		this->pt_performance_counter.Count();
-		this->pt_delta_count += this->pt_performance_counter.DeltaCounts();
-		this->pt_statistics_count += this->pt_performance_counter.DeltaCounts();
+		this->pt_delta_count += this->pt_performance_counter.DeltaCounts(); // 增加间隔时间
+		this->pt_statistics_count += this->pt_performance_counter.DeltaCounts(); // 增加统计间隔时间
 	}
 	boolean FrequencyController::Sleep() noexcept(noexcept_fc_sleep)
 	{

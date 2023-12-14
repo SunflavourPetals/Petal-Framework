@@ -1,9 +1,53 @@
 #include "Petal~Main.h"
-#include "Petal~Window.h"
-#include "Petal~VSDebugOutput.h"
-#include "Petal~FrequencyController.h"
 
-#include <format>
+#include "Petal~RawInputWindow.h"
+
+class MyWin : public Petal::RawInputWindow
+{
+public:
+	void RawMouseEvent(Petal::RawMouseMessage& e) noexcept
+	{
+		const auto& ms{ e.RawInput().data.mouse };
+		Petal::Debug::println("MOUS|   F:{:<4}|  BF:{:<4}|  BD:{:<4}|  RB:{:<4}|  LX:{:<4}|  LY:{:<4}|  EX:{:<4}|",
+			ms.usFlags, ms.usButtonFlags, ms.usButtonData,
+			ms.ulRawButtons, ms.lLastX, ms.lLastY, ms.ulExtraInformation);
+	}
+	void RawKeyboardEvent(Petal::RawKeyboardMessage& e) noexcept
+	{
+		const auto& kb{ e.RawInput().data.keyboard };
+		Petal::Debug::println("KB  |  MC:{:<4}|   F:{:<4}| RSV:{:<4}|  VK:{:<4}| MSG:{:<4}|  EX:{:<4}|",
+			kb.MakeCode, kb.Flags, kb.Reserved, kb.VKey, kb.Message, kb.ExtraInformation);
+	}
+	void RawHidEvent(Petal::RawHidMessage& e) noexcept
+	{
+		Petal::dout + "INPUT-HID" + Petal::ln;
+	}
+	MyWin()
+	{
+		using namespace Petal;
+		this->Create(WindowClassArgs{ Petal_TStr("my window class") }.Register().class_atom);
+
+		constexpr tsize ridev_count{ 2 };
+		::RAWINPUTDEVICE ridev[ridev_count]{};
+
+		ridev[0].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		ridev[0].usUsage = HID_USAGE_GENERIC_KEYBOARD;
+		ridev[0].dwFlags = 0; // RIDEV_NOLEGACY;
+		ridev[0].hwndTarget = 0;
+
+		ridev[1].usUsagePage = HID_USAGE_PAGE_GENERIC;
+		ridev[1].usUsage = HID_USAGE_GENERIC_MOUSE;
+		ridev[1].dwFlags = 0; // RIDEV_NOLEGACY;
+		ridev[1].hwndTarget = 0;
+
+		if (this->RegisterRawInputDevices(ridev) == win32_false)
+		{
+			dout + "FAILED IN REGISTER RAW INPUT" + ln;
+		}
+
+		this->Show();
+	}
+};
 
 class Main
 {
@@ -11,43 +55,10 @@ public:
 	static int main()
 	{
 		using namespace Petal;
-		class MyWindow : public Window
-		{
-			void CreateEvent(CreateMessage& e) noexcept override
-			{
-				dout + std::format("Create: {}", e.continue_creation) + ln;
-			}
-			void PaintEvent(PaintMessage& e) noexcept override
-			{
-				dout + "repaint event" + ln;
-				this->DefaultDraw(e);
-			}
-		} w{};
-		class Proc : public Abstract::Process<>
-		{
-			FrequencyController f;
-			class IProc : public Abstract::Process<typename FrequencyController::ResourceDelta>
-			{
-				Window& w;
-			public:
-				IProc(Window& w_) : w{ w_ } {}
-				void Execution(const FrequencyController::ResourceDelta&) override
-				{
-					dout + "call repaint" + ln;
-					w.Repaint();
-				}
-			} ip;
-		public:
-			Proc(Window& w) : f{}, ip{ w } { f.UpdateFrequency(1.0); }
-			void Execution() override
-			{
-				f.LimitedDo(ip);
-			}
-		} p{ w };
-		w.Create(WindowClassArgs{ Petal_TStr("my window class") }.Register().class_atom);
-		w.Show();
-		return MessageLoop(p);
+		MyWin w;
+		return MessageLoop();
 	}
 };
 
 Petal_SetMainClass(Main);
+
