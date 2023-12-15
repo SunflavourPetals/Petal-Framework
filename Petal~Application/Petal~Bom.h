@@ -33,10 +33,10 @@ namespace Petal::BOM
 	extern const Bom utf_32_le;
 	extern const Bom utf_32_be;
 
-	template <typename CharT, Petal::boolean force_utf_8_with_bom = false>
+	template <typename CharT, boolean force_utf_8_with_bom = false>
 	[[nodiscard]] constexpr const Bom& RecommendBom() noexcept
 	{
-		constexpr Petal::boolean endian_le{ ::std::endian::native == ::std::endian::little };
+		constexpr boolean endian_le{ ::std::endian::native == ::std::endian::little };
 		constexpr u32 utf_8_code{ 0x01u };
 		constexpr u32 utf_16_code{ 0x02u };
 		constexpr u32 utf_32_code{ 0x04u };

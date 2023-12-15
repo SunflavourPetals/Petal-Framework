@@ -8,7 +8,6 @@
 
 namespace Petal::Keyboard::MiddleProcess
 {
-	using Petal::boolean;
 	class BasicMiddleProcess : public Abstract::KeyboardEventProcess
 	{
 	protected:

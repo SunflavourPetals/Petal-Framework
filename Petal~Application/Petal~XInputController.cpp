@@ -4,7 +4,6 @@
 
 namespace Petal::XInput
 {
-	using Petal::boolean;
 	WrappedGamepad::WrappedGamepad(UserIndexValue::Type user_index) :
 		WrappedGamepad()
 	{

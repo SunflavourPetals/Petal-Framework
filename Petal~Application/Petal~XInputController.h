@@ -13,7 +13,6 @@
 
 namespace Petal::XInput
 {
-	using Petal::boolean;
 	class WrappedGamepad;
 	class Controller;
 	struct ResourceOfController

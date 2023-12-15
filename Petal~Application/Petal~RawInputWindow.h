@@ -57,7 +57,7 @@ namespace Petal
 	{
 	public:
 		win32wprm RawInputCode() const noexcept;
-		Petal::boolean IsSink() const noexcept;
+		boolean IsSink() const noexcept;
 		Win32HRawInput HRawInput() const noexcept;
 		win32lres DefaultProcess(win32hwnd window_handle) const noexcept;
 	public:
@@ -74,8 +74,8 @@ namespace Petal
 	public:
 		Win32HRawInput RawInputHandle() const noexcept;
 		win32wprm GIDC() const noexcept;
-		Petal::boolean Arrival() const noexcept;
-		Petal::boolean Removal() const noexcept;
+		boolean Arrival() const noexcept;
+		boolean Removal() const noexcept;
 	public:
 		RawInputDeviceChangeMessage(win32msg msg, win32wprm w, win32lprm l);
 		RawInputDeviceChangeMessage(const RawInputDeviceChangeMessage&) = default;

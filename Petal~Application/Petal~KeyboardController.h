@@ -17,7 +17,6 @@ static_assert(::std::is_same_v<Petal::VirtualKey::Type, Petal::u8>);
 
 namespace Petal::Keyboard
 {
-	using Petal::boolean;
 	constexpr tsize vk_table_size{ 256 };
 	using State = ::std::bitset<vk_table_size>;
 	class BasicController;
@@ -35,7 +34,7 @@ namespace Petal::Abstract
 	public:
 		using Resource = Petal::Keyboard::ResourceOfController;
 	public:
-		virtual Petal::boolean Check(const Resource&) = 0;
+		virtual boolean Check(const Resource&) = 0;
 	public:
 		KeyboardEventProcess() = default;
 		KeyboardEventProcess(const KeyboardEventProcess&) = default;

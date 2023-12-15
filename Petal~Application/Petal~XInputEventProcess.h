@@ -29,7 +29,6 @@ namespace Petal::XInput
 
 namespace Petal::XInput::MiddleProcess
 {
-	using Petal::boolean;
 	class BasicMiddleProcess : public Abstract::XInputEventProcess
 	{
 	protected:

@@ -77,7 +77,7 @@ namespace Petal
 	{
 		return this->pt_raw_input_code;
 	}
-	Petal::boolean RawInputMessage::IsSink() const noexcept
+	boolean RawInputMessage::IsSink() const noexcept
 	{
 		return this->RawInputCode() == RIM_INPUTSINK;
 	}
@@ -106,11 +106,11 @@ namespace Petal
 	{
 		return this->Word();
 	}
-	Petal::boolean RawInputDeviceChangeMessage::Arrival() const noexcept
+	boolean RawInputDeviceChangeMessage::Arrival() const noexcept
 	{
 		return this->GIDC() == GIDC_ARRIVAL;
 	}
-	Petal::boolean RawInputDeviceChangeMessage::Removal() const noexcept
+	boolean RawInputDeviceChangeMessage::Removal() const noexcept
 	{
 		return this->GIDC() == GIDC_REMOVAL;
 	}
