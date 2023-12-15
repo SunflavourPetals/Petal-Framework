@@ -4,8 +4,7 @@
 
 namespace Petal::XInput
 {
-	WrappedGamepad::WrappedGamepad(UserIndexValue::Type user_index) :
-		WrappedGamepad()
+	WrappedGamepad::WrappedGamepad(UserIndexValue::Type user_index)
 	{
 		this->UpdateUserIndex(user_index);
 	}
@@ -157,8 +156,8 @@ namespace Petal::XInput
 		return ::XInputGetKeystroke(this->pt_user_index, 0, &keystroke);
 	}
 	Controller::Controller(UserIndexValue::Type user_index) :
-		pt_gamepad(user_index),
-		pt_last_gamepad()
+		pt_gamepad{ user_index },
+		pt_last_gamepad{ user_index }
 	{
 
 	}

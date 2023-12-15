@@ -4,8 +4,8 @@ namespace Petal::Keyboard::MiddleProcess
 {
 	XHoldProcess::XHoldProcess(Tick target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
-		pt_target_count(target_count),
-		pt_loop_triggering(loop_mode)
+		pt_target_count{ target_count },
+		pt_loop_triggering{ loop_mode }
 	{
 
 	}
@@ -66,7 +66,7 @@ namespace Petal::Keyboard::MiddleProcess
 
 	XKeyProcess::XKeyProcess(VirtualKey::Type target_key) :
 		BasicMiddleProcess(),
-		pt_key(target_key)
+		pt_key{ target_key }
 	{
 
 	}

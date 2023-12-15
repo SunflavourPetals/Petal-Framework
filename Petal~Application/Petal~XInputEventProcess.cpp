@@ -203,8 +203,8 @@ namespace Petal::XInput::MiddleProcess
 	// XInputXHold
 	XHoldProcess::XHoldProcess(Tick target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
-		pt_target_count(target_count),
-		pt_loop_triggering(loop_mode)
+		pt_target_count{ target_count },
+		pt_loop_triggering{ loop_mode }
 	{
 
 	}
@@ -266,7 +266,7 @@ namespace Petal::XInput::MiddleProcess
 	// XInputButtonProcess
 	ButtonProcess::ButtonProcess(Button::Type buttons) :
 		BasicMiddleProcess(),
-		pt_buttons(buttons)
+		pt_buttons{ buttons }
 	{
 
 	}
@@ -294,8 +294,8 @@ namespace Petal::XInput::MiddleProcess
 	// XInputTriggerProcess
 	TriggerProcess::TriggerProcess(XInput::TriggerDimension trigger_dimension, TriggerValue::Type target_value) :
 		BasicMiddleProcess(),
-		pt_trigger_dimension(trigger_dimension),
-		pt_target_trigger_value(target_value)
+		pt_trigger_dimension{ trigger_dimension },
+		pt_target_trigger_value{ target_value }
 	{
 
 	}
@@ -344,9 +344,9 @@ namespace Petal::XInput::MiddleProcess
 	// XInputStickProcess
 	StickProcess::StickProcess(XInput::StickDimension stick_dimension, XInput::DirectionDimension direction_dimension, StickValue::Type target_value) :
 		BasicMiddleProcess(),
-		pt_stick_dimension(stick_dimension),
-		pt_direction_dimension(direction_dimension),
-		pt_target_stick_value(target_value)
+		pt_stick_dimension{ stick_dimension },
+		pt_direction_dimension{ direction_dimension },
+		pt_target_stick_value{ target_value }
 	{
 
 	}

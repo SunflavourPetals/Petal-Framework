@@ -5,12 +5,6 @@
 
 namespace Petal
 {
-	FrequencyController::FrequencyController()
-	{
-		this->pt_target_delta_count = this->pt_performance_counter.Frequency() / 60;
-		this->pt_sleep_failure_threshold_count = this->pt_performance_counter.Frequency();
-		this->pt_target_statistics_count = this->pt_performance_counter.Frequency();
-	}
 	FrequencyController::FrequencyController(f64 target_frequency, f64 sleep_failure_second, f64 statistics_interval_second)
 	{
 		this->UpdateFrequency(target_frequency);

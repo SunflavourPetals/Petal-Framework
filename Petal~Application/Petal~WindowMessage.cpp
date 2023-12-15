@@ -8,9 +8,9 @@
 namespace Petal
 {
 	BasicWindowMessage::BasicWindowMessage(win32msg msg, win32wprm w_prm, win32lprm l_prm) :
-		message(msg),
-		w(w_prm),
-		l(l_prm)
+		message{ msg },
+		w{ w_prm },
+		l{ l_prm }
 	{
 
 	}
@@ -65,7 +65,7 @@ namespace Petal
 {
 	BasicResizeMessage::BasicResizeMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_client_size({ static_cast<i32>(this->LWLong()), static_cast<i32>(this->HWLong()) })
+		pt_client_size{ static_cast<i32>(this->LWLong()), static_cast<i32>(this->HWLong()) }
 	{
 
 	}
@@ -79,8 +79,8 @@ namespace Petal
 {
 	BasicMouseMessage::BasicMouseMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_cursor_pos({ GET_X_LPARAM(l), GET_Y_LPARAM(l) }),
-		pt_key_state(GET_KEYSTATE_WPARAM(w))
+		pt_cursor_pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) },
+		pt_key_state{ GET_KEYSTATE_WPARAM(w) }
 	{
 
 	}
@@ -130,7 +130,7 @@ namespace Petal
 	}
 	BasicMouseWheelMessage::BasicMouseWheelMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicMouseMessage(msg, w, l),
-		pt_wheel_delta(GET_WHEEL_DELTA_WPARAM(w))
+		pt_wheel_delta{ GET_WHEEL_DELTA_WPARAM(w) }
 	{
 
 	}
@@ -224,7 +224,7 @@ namespace Petal
 {
 	ActiveMessage::ActiveMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_clicked(w == WA_CLICKACTIVE)
+		pt_clicked{ w == WA_CLICKACTIVE }
 	{
 
 	}

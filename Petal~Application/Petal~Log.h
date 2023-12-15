@@ -43,7 +43,7 @@ namespace Petal::Log
 		LogStream& operator=(const LogStream&) = delete;
 		virtual ~LogStream();
 	private:
-		FileStream file;
+		FileStream file{};
 		static constexpr auto open_mode_trunc{ ::std::ios_base::out | ::std::ios_base::binary | ::std::ios_base::trunc };
 		static constexpr auto open_mode_append{ ::std::ios_base::out | ::std::ios_base::binary | ::std::ios_base::app };
 	};

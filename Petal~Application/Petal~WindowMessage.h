@@ -41,9 +41,9 @@ namespace Petal
 		BasicWindowMessage(BasicWindowMessage&&) noexcept = default;
 		virtual ~BasicWindowMessage() = default;
 	private:
-		win32msg message;
-		win32wprm w;
-		win32lprm l;
+		win32msg message{};
+		win32wprm w{};
+		win32lprm l{};
 	};
 
 	class BasicSizeMoveMessage : public BasicWindowMessage
@@ -68,7 +68,7 @@ namespace Petal
 		BasicResizeMessage(BasicResizeMessage&&) noexcept = default;
 		virtual ~BasicResizeMessage() = default;
 	private:
-		Size2DI32 pt_client_size;
+		Size2DI32 pt_client_size{};
 	};
 
 	class BasicMouseMessage : public BasicWindowMessage
@@ -100,8 +100,8 @@ namespace Petal
 		BasicMouseMessage(BasicMouseMessage&&) noexcept = default;
 		virtual ~BasicMouseMessage() = default;
 	private:
-		Position2DI32 pt_cursor_pos;
-		word pt_key_state;
+		Position2DI32 pt_cursor_pos{};
+		word pt_key_state{};
 	};
 
 	class BasicMouseWheelMessage : public BasicMouseMessage
@@ -114,7 +114,7 @@ namespace Petal
 		BasicMouseWheelMessage(BasicMouseWheelMessage&&) noexcept = default;
 		virtual ~BasicMouseWheelMessage() = default;
 	private:
-		i16 pt_wheel_delta;
+		i16 pt_wheel_delta{};
 	};
 
 	class BasicKeyMessage : public BasicWindowMessage
@@ -241,7 +241,7 @@ namespace Petal
 		MovedMessage(MovedMessage&&) noexcept = default;
 		virtual ~MovedMessage() = default;
 	private:
-		Position2DI32 pt_pos;
+		Position2DI32 pt_pos{};
 	};
 
 	using PaintMessage = BasicWindowMessage;

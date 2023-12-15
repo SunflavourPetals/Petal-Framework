@@ -311,7 +311,7 @@ namespace Petal
 		WindowSet& operator= (const WindowSet&) = delete;
 		WindowSet& operator= (WindowSet&&) = delete;
 	private:
-		Set set;
+		Set set{};
 		boolean quit_when_empty{ true };
 		friend WindowSet& IWindowSet();
 	};

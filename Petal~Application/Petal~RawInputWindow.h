@@ -17,8 +17,8 @@ namespace Petal
 	using Win32RawInputHeader = ::RAWINPUTHEADER;
 	struct RawInputRef final
 	{
-		ptr<Win32RawInput> raw_input;
-		tsize valid_size;
+		ptr<Win32RawInput> raw_input{ nullptr };
+		tsize valid_size{};
 	};
 
 	class RawInputDataBuffer final
@@ -47,9 +47,9 @@ namespace Petal
 	public:
 		static constexpr tsize min_size{ sizeof(Win32RawInput) };
 	private:
-		ptr<Petal::byte> buffer_ptr{};
+		ptr<Petal::byte> buffer_ptr{ nullptr };
 		tsize buffer_size{};
-		ptr<Petal::byte> raw_input_buffer{};
+		ptr<Petal::byte> raw_input_buffer{ nullptr };
 		tsize raw_input_size{};
 	};
 
@@ -106,7 +106,7 @@ namespace Petal
 		RawInputWindow& operator= (const RawInputWindow&) = delete;
 		RawInputWindow& operator= (RawInputWindow&&) = delete;
 	private:
-		RawInputDataBuffer pt_raw_input_buffer;
+		RawInputDataBuffer pt_raw_input_buffer{};
 	};
 }
 

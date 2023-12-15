@@ -2,10 +2,11 @@
 
 namespace Petal
 {
-	RawInputDataBuffer::RawInputDataBuffer()
+	RawInputDataBuffer::RawInputDataBuffer() :
+		buffer_ptr{ new Petal::byte[this->min_size] },
+		buffer_size{ this->min_size }
 	{
-		this->buffer_ptr = new Petal::byte[this->min_size];
-		this->buffer_size = this->min_size;
+
 	}
 	RawInputDataBuffer::~RawInputDataBuffer()
 	{

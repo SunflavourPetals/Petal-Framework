@@ -127,9 +127,9 @@ namespace Petal::WinMain
 	};
 }
 
-namespace
+namespace Petal::Unnamed
 {
-	namespace PetalUnnamed::EntryPointProtection
+	namespace
 	{
 		class Protection final
 		{
@@ -180,36 +180,39 @@ int PetalMain();
 
 #endif // !Petal_Enable_PetalMain
 
-namespace Petal::XMain
+namespace Petal::Unnamed
 {
-	inline void VSDebugOutput(ptrc<DbgChar> entry_point, ptrc<DbgChar> main_space)
+	namespace
 	{
-		try
+		void VSDebugOutput(ptrc<DbgChar> entry_point, ptrc<DbgChar> main_space)
 		{
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Entry point: {}\r\n"), entry_point).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Arguments in Petal::{} is valid now\r\n"), main_space).c_str());
+			try
+			{
+				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Entry point: {}\r\n"), entry_point).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Arguments in Petal::{} is valid now\r\n"), main_space).c_str());
 #ifndef Petal_Enable_PetalMain
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), UserEntrance::pt_user_main_name_dbgc).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), UserEntrance::pt_user_main_name_dbgc).c_str());
 #else
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal_DbgStr("PetalMain")).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal_DbgStr("PetalMain")).c_str());
 #endif
+			}
+			catch (const ::std::exception&) {}
 		}
-		catch (const ::std::exception&) {}
 	}
 }
 
 #if defined(Petal_Enable_Unicode)
 INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd_line, _In_ INT cmd_show)
 {
-	if (PetalUnnamed::EntryPointProtection::protection)
+	if (Petal::Unnamed::protection)
 	{
-		PetalUnnamed::EntryPointProtection::protection.VSDebugOutputWarning();
+		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
 	}
-	PetalUnnamed::EntryPointProtection::protection.Use();
+	Petal::Unnamed::protection.Use();
 	Petal::Main::arguments.InitAsInvalid();
 	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
-	Petal::XMain::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
+	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -218,15 +221,15 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 }
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
-	if (PetalUnnamed::EntryPointProtection::protection)
+	if (Petal::Unnamed::protection)
 	{
-		PetalUnnamed::EntryPointProtection::protection.VSDebugOutputWarning();
+		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
 	}
-	PetalUnnamed::EntryPointProtection::protection.Use();
+	Petal::Unnamed::protection.Use();
 	Petal::Main::arguments.Init(argc, argv, envp);
 	Petal::WinMain::arguments.InitAsInvalid();
-	Petal::XMain::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
+	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -236,15 +239,15 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 #else
 INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_line, _In_ INT cmd_show)
 {
-	if (PetalUnnamed::EntryPointProtection::protection)
+	if (Petal::Unnamed::protection)
 	{
-		PetalUnnamed::EntryPointProtection::protection.VSDebugOutputWarning();
+		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
 	}
-	PetalUnnamed::EntryPointProtection::protection.Use();
+	Petal::Unnamed::protection.Use();
 	Petal::Main::arguments.InitAsInvalid();
 	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
-	Petal::XMain::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
+	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -253,15 +256,15 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 }
 int main(int argc, char* argv[], char* envp[])
 {
-	if (PetalUnnamed::EntryPointProtection::protection)
+	if (Petal::Unnamed::protection)
 	{
-		PetalUnnamed::EntryPointProtection::protection.VSDebugOutputWarning();
+		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
 	}
-	PetalUnnamed::EntryPointProtection::protection.Use();
+	Petal::Unnamed::protection.Use();
 	Petal::Main::arguments.Init(argc, argv, envp);
 	Petal::WinMain::arguments.InitAsInvalid();
-	Petal::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
+	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else

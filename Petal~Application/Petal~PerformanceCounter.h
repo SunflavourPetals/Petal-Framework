@@ -31,14 +31,14 @@ namespace Petal
 		PerformanceCounter(PerformanceCounter&& rhs) noexcept = default;
 		~PerformanceCounter() noexcept = default;
 	private:
-		Tick pt_frequency; // Frequency of counter(counts number per second)
-		Tick pt_base; // When the performance counter start
-		Tick pt_current; // Now value of performance counter
-		Tick pt_delta; // Duration of this count and last count(pt_current - pt_prev)
-		Tick pt_delta_paused; // Duration of this count and last count in pause state(pt_current - pt_prev)
-		Tick pt_base_paused; // The value of performance counter queried when suspended
-		Tick pt_total_paused; // The total duration of pause
-		boolean pt_state_paused; // Pause state of this performance
+		Tick pt_frequency{}; // Frequency of counter(counts number per second)
+		Tick pt_base{}; // When the performance counter start
+		Tick pt_current{}; // Now value of performance counter
+		Tick pt_delta{}; // Duration of this count and last count(pt_current - pt_prev)
+		Tick pt_delta_paused{}; // Duration of this count and last count in pause state(pt_current - pt_prev)
+		Tick pt_base_paused{}; // The value of performance counter queried when suspended
+		Tick pt_total_paused{}; // The total duration of pause
+		boolean pt_state_paused{ false }; // Pause state of this performance
 	};
 }
 

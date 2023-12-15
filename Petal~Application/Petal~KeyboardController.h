@@ -83,7 +83,7 @@ namespace Petal::Keyboard
 	class BasicController
 	{
 	public:
-		using Resource = Petal::Keyboard::ResourceOfController;
+		using Resource = ResourceOfController;
 	protected:
 		virtual void QueryState() noexcept = 0;
 	public:
@@ -97,8 +97,8 @@ namespace Petal::Keyboard
 		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
 		static void ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource);
 	protected:
-		WrappedState pt_state;
-		WrappedState pt_last_state;
+		WrappedState pt_state{};
+		WrappedState pt_last_state{};
 	};
 }
 
@@ -121,7 +121,7 @@ namespace Petal::Keyboard
 		Controller& operator=(const Controller&) = default;
 		Controller& operator=(Controller&&) noexcept = default;
 	private:
-		Registry pt_registry;
+		Registry pt_registry{};
 	};
 }
 

@@ -154,8 +154,7 @@ namespace Petal::XInput
 		win32dword GetCapabilities(Capabilities& capabilities) const noexcept;
 		win32dword GetKeystroke(Keystroke& keystroke) const noexcept;
 	public:
-		WrappedGamepad() = default;
-		WrappedGamepad(UserIndexValue::Type user_index);
+		WrappedGamepad(UserIndexValue::Type user_index = 0);
 		WrappedGamepad(const WrappedGamepad&) = default;
 		WrappedGamepad(WrappedGamepad&&) noexcept = default;
 		~WrappedGamepad() = default;

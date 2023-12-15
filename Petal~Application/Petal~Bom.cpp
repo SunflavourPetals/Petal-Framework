@@ -11,13 +11,11 @@ namespace Petal
 		const Bom utf_32_le{ 4, 0xFFu, 0xFEu, 0x00u, 0x00u };
 		const Bom utf_32_be{ 4, 0x00u, 0x00u, 0xFEu, 0xFFu };
 
-		Bom::Bom(tsize size, byte b1, byte b2, byte b3, byte b4) noexcept
+		Bom::Bom(tsize size, byte b1, byte b2, byte b3, byte b4) noexcept :
+			data{ b1, b2, b3, b4 },
+			size{ (size > 4) ? 4 : ((size < 0) ? 0 : size) }
 		{
-			this->data[0] = b1;
-			this->data[1] = b2;
-			this->data[2] = b3;
-			this->data[3] = b4;
-			this->size = (size > 4) ? 4 : ((size < 0) ? 0 : size);
+
 		}
 		ptrc<byte> Bom::Data() const noexcept
 		{

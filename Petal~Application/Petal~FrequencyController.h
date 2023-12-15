@@ -74,8 +74,7 @@ namespace Petal
 		void Do(Abstract::Process<ResourceDelta>& process);
 		void Do(fptr<void, ResourceDelta&> process);
 	public:
-		FrequencyController();
-		FrequencyController(f64 target_frequency, f64 sleep_failure_second = 1.0, f64 statistics_interval_second = 1.0);
+		FrequencyController(f64 target_frequency = 1.0, f64 sleep_failure_second = 1.0, f64 statistics_interval_second = 1.0);
 		FrequencyController(const FrequencyController&) = default;
 		FrequencyController(FrequencyController&&) noexcept = default;
 		~FrequencyController() = default;
