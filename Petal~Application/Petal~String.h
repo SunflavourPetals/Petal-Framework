@@ -79,46 +79,10 @@ namespace Petal
 namespace Petal::TypeTraits
 {
 	template <typename Ty>
-	struct IsString : ::std::false_type {};
-
-	template <typename Ty, typename Traits, typename Alloc>
-	struct IsString<::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
-
-	template <typename Ty, typename Traits, typename Alloc>
-	struct IsString<const ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
-
-	template <typename Ty, typename Traits, typename Alloc>
-	struct IsString<volatile ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
-
-	template <typename Ty, typename Traits, typename Alloc>
-	struct IsString<const volatile ::std::basic_string<Ty, Traits, Alloc>> : ::std::true_type { using ElemType = Ty; };
-
-	template <typename Ty>
-	constexpr bool is_char_type{ ::std::is_same_v<::std::remove_cv_t<Ty>, Char> || ::std::is_same_v<::std::remove_cv_t<Ty>, WChar> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU8> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU16> || ::std::is_same_v<::std::remove_cv_t<Ty>, CharU32> };
-
-	template <typename Ty>
-	constexpr bool is_string{ IsString<Ty>::value };
-
-	template <typename Ty>
-	constexpr bool is_string_of_char_type{ is_string<Ty> && is_char_type<typename IsString<Ty>::ElemType> };
-	
-	template <typename Ty>
 	constexpr bool is_tchar{ ::std::is_same_v<::std::remove_cv_t<Ty>, TChar> };
 
 	template <typename Ty>
 	constexpr bool is_dbg_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, DbgChar> };
-}
-
-namespace Petal::Concept
-{
-	template <typename Ty>
-	concept CharType = TypeTraits::is_char_type<Ty>;
-
-	template <typename Ty>
-	concept String = TypeTraits::is_string<Ty>;
-
-	template <typename Ty>
-	concept StringOfCharType = TypeTraits::is_string_of_char_type<Ty>;
 }
 
 #ifdef Petal_TStr

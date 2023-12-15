@@ -42,7 +42,7 @@ namespace Petal::Abstract
 namespace Petal::Concept
 {
 	template <typename Ty>
-	concept XInputEventProcessGeneralIterator = requires
+	concept GenericXInputEventProcessIterator = requires
 	{
 		typename ::std::iterator_traits<Ty>::value_type;
 		requires ::std::is_const_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
@@ -50,7 +50,7 @@ namespace Petal::Concept
 		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type>;
 	};
 	template <typename Ty>
-	concept XInputEventProcessGeneralPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
+	concept GenericXInputEventProcessPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
 }
 
 namespace Petal::XInput
@@ -177,12 +177,12 @@ namespace Petal::XInput
 		void ClearState() noexcept;
 		void ClearLastState() noexcept;
 		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept;
-		win32dword Update(Concept::XInputEventProcessGeneralIterator auto begin, Concept::XInputEventProcessGeneralIterator auto end, i64 delta_count = 0);
+		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, i64 delta_count = 0);
 		const WrappedGamepad& GetWrappedGamepad() const noexcept;
 		const WrappedGamepad& GetLastWrappedGamepad() const noexcept;
 	private:
 		win32dword QueryState() noexcept;
-		static void ExecuteEventProcess(Concept::XInputEventProcessGeneralPointer auto& pointer, Resource& resource);
+		static void ExecuteEventProcess(Concept::GenericXInputEventProcessPointer auto& pointer, Resource& resource);
 		static void ExecuteEventProcess(Abstract::XInputEventProcess& proc, Resource& resource);
 	public:
 		Controller() = default;
@@ -196,7 +196,7 @@ namespace Petal::XInput
 		WrappedGamepad pt_gamepad;
 		WrappedGamepad pt_last_gamepad;
 	};
-	inline win32dword Controller::Update(Concept::XInputEventProcessGeneralIterator auto begin, Concept::XInputEventProcessGeneralIterator auto end, i64 delta_count)
+	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, i64 delta_count)
 	{
 		auto result{ this->QueryState() };
 		Resource resource{ delta_count, *this };
@@ -206,7 +206,7 @@ namespace Petal::XInput
 		}
 		return result;
 	}
-	inline void Controller::ExecuteEventProcess(Concept::XInputEventProcessGeneralPointer auto& pointer, Resource& resource)
+	inline void Controller::ExecuteEventProcess(Concept::GenericXInputEventProcessPointer auto& pointer, Resource& resource)
 	{
 		if (pointer != nullptr)
 		{

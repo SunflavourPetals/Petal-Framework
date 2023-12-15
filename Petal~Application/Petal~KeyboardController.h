@@ -68,7 +68,7 @@ namespace Petal::Keyboard
 namespace Petal::Concept
 {
 	template <typename Ty>
-	concept KeyboardEventProcessGeneralIterator = requires
+	concept GenericKeyboardEventProcessIterator = requires
 	{
 		typename ::std::iterator_traits<Ty>::value_type;
 		requires ::std::is_const_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
@@ -76,7 +76,7 @@ namespace Petal::Concept
 		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type>;
 	};
 	template <typename Ty>
-	concept KeyboardEventProcessGeneralPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
+	concept GenericKeyboardEventProcessPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
 }
 
 namespace Petal::Keyboard
@@ -93,10 +93,10 @@ namespace Petal::Keyboard
 		const WrappedState& GetState() const noexcept;
 		const WrappedState& GetLastState() const noexcept;
 	public:
-		void Update(Concept::KeyboardEventProcessGeneralIterator auto begin, Concept::KeyboardEventProcessGeneralIterator auto end, i64 delta_count = 0);
+		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, i64 delta_count = 0);
 	private:
 		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
-		static void ExecuteEventProcess(Concept::KeyboardEventProcessGeneralPointer auto& pointer, Resource& resource);
+		static void ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource);
 	protected:
 		WrappedState pt_state;
 		WrappedState pt_last_state;
@@ -128,7 +128,7 @@ namespace Petal::Keyboard
 
 namespace Petal::Keyboard
 {
-	inline void BasicController::Update(Concept::KeyboardEventProcessGeneralIterator auto begin, Concept::KeyboardEventProcessGeneralIterator auto end, i64 delta_count)
+	inline void BasicController::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, i64 delta_count)
 	{
 		this->QueryState();
 		Resource resource{ delta_count, *this };
@@ -137,7 +137,7 @@ namespace Petal::Keyboard
 			this->ExecuteEventProcess(*begin, resource);
 		}
 	}
-	inline void BasicController::ExecuteEventProcess(Concept::KeyboardEventProcessGeneralPointer auto& pointer, Resource& resource)
+	inline void BasicController::ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource)
 	{
 		if (pointer != nullptr)
 		{
