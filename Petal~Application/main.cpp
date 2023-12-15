@@ -5,20 +5,20 @@
 class MyWin : public Petal::RawInputWindow
 {
 public:
-	void RawMouseEvent(Petal::RawMouseMessage& e) noexcept
+	void RawMouseEvent(Petal::RawMouseMessage& e, Petal::Win32RawInput& r, Petal::tsize size) noexcept override
 	{
-		const auto& ms{ e.RawInput().data.mouse };
+		const auto& ms{ r.data.mouse };
 		Petal::Debug::println("MOUS|   F:{:<4}|  BF:{:<4}|  BD:{:<4}|  RB:{:<4}|  LX:{:<4}|  LY:{:<4}|  EX:{:<4}|",
 			ms.usFlags, ms.usButtonFlags, ms.usButtonData,
 			ms.ulRawButtons, ms.lLastX, ms.lLastY, ms.ulExtraInformation);
 	}
-	void RawKeyboardEvent(Petal::RawKeyboardMessage& e) noexcept
+	void RawKeyboardEvent(Petal::RawKeyboardMessage& e, Petal::Win32RawInput& r, Petal::tsize size) noexcept override
 	{
-		const auto& kb{ e.RawInput().data.keyboard };
+		const auto& kb{ r.data.keyboard };
 		Petal::Debug::println("KB  |  MC:{:<4}|   F:{:<4}| RSV:{:<4}|  VK:{:<4}| MSG:{:<4}|  EX:{:<4}|",
 			kb.MakeCode, kb.Flags, kb.Reserved, kb.VKey, kb.Message, kb.ExtraInformation);
 	}
-	void RawHidEvent(Petal::RawHidMessage& e) noexcept
+	void RawHidEvent(Petal::RawHidMessage& e, Petal::Win32RawInput& r, Petal::tsize size) noexcept override
 	{
 		Petal::dout + "INPUT-HID" + Petal::ln;
 	}
