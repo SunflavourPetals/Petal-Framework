@@ -27,10 +27,17 @@ namespace Petal
 		void Alloc(tsize size);
 	public:
 		::std::span<Petal::byte> WriteOnlyBuffer(tsize size);
-		// 对 ReadOnlyBuffer 函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
 		::std::span<const Petal::byte> ReadOnlyBuffer() const noexcept;
-		// 对 AsRawInput 函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		tsize BufferSize() const noexcept;
+		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
 		RawInputRef AsRawInput() const noexcept;
+		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		Win32RawInput& AsWin32RawInput() noexcept;
+		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		const Win32RawInput& AsWin32RawInput() const noexcept;
+		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		tsize RawInputSize() const noexcept;
 	public:
 		RawInputDataBuffer();
 		RawInputDataBuffer(const RawInputDataBuffer&) = delete;
@@ -52,16 +59,14 @@ namespace Petal
 		win32wprm RawInputCode() const noexcept;
 		Petal::boolean IsSink() const noexcept;
 		Win32HRawInput HRawInput() const noexcept;
-		const Win32RawInput& RawInput() const noexcept;
-		tsize RawInputSize() const noexcept;
+		win32lres DefaultProcess(win32hwnd window_handle) const noexcept;
 	public:
-		RawInputMessage(win32msg msg, win32wprm w, win32lprm l, RawInputRef input);
+		RawInputMessage(win32msg msg, win32wprm w, win32lprm l);
 		RawInputMessage(const RawInputMessage&) = default;
 		RawInputMessage(RawInputMessage&&) noexcept = default;
 		virtual ~RawInputMessage() = default;
 	private:
 		win32wprm pt_raw_input_code{};
-		RawInputRef raw_input;
 	};
 
 	class RawInputDeviceChangeMessage : public BasicWindowMessage
@@ -85,14 +90,14 @@ namespace Petal
 	class RawInputWindow : public Window
 	{
 	protected:
-		virtual void RawInputEvent(RawInputMessage& e) noexcept;
-		virtual void RawMouseEvent(RawMouseMessage& e) noexcept;
-		virtual void RawKeyboardEvent(RawKeyboardMessage& e) noexcept;
-		virtual void RawHidEvent(RawHidMessage& e) noexcept;
-		virtual void RawINputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
 		virtual Petal::win32lres Process(Petal::win32msg msg, Petal::win32wprm w, Petal::win32lprm l) noexcept override;
+		virtual void RawInputEvent(RawInputMessage& e) noexcept;
+		virtual void RawINputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
+		virtual void RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
+		virtual void RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
+		virtual void RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
 	public:
-		win32bool RegisterRawInputDevices(::std::span<Win32RawInputDevice> devices);
+		static win32bool RegisterRawInputDevices(::std::span<Win32RawInputDevice> devices);
 	public:
 		RawInputWindow() = default;
 		RawInputWindow(const RawInputWindow&) = delete;
