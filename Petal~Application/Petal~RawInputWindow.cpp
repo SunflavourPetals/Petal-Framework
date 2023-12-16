@@ -179,7 +179,7 @@ namespace Petal
 		}
 		return 0;
 	}
-	win32bool RawInputWindow::RegisterRawInputDevices(::std::span<Win32RawInputDevice> devices)
+	win32bool RawInputWindow::RegisterRawInputDevices(::std::span<const Win32RawInputDevice> devices)
 	{
 		return ::RegisterRawInputDevices(devices.data(), static_cast<win32uint>(devices.size()), sizeof(Win32RawInputDevice));
 	}

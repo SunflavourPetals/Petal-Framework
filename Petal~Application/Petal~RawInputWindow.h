@@ -97,7 +97,7 @@ namespace Petal
 		virtual void RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
 		virtual void RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
 	public:
-		static win32bool RegisterRawInputDevices(::std::span<Win32RawInputDevice> devices);
+		static win32bool RegisterRawInputDevices(::std::span<const Win32RawInputDevice> devices);
 	public:
 		RawInputWindow() = default;
 		RawInputWindow(const RawInputWindow&) = delete;
