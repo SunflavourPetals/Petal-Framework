@@ -29,7 +29,7 @@ namespace Petal
 	using win32hbrush = typename ::HBRUSH;
 	using win32hcursor = typename ::HCURSOR;
 	using win32msg = typename ::UINT;
-	using win32int = typename ::INT;
+
 #ifdef Petal_Enable_Unicode
 	using win32tstr = typename ::LPWSTR;
 	using win32ctstr = typename ::LPCWSTR;
