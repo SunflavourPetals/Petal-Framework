@@ -7,20 +7,23 @@
 
 namespace Petal
 {
+	using win32short = typename ::SHORT;
+	using win32ushort = typename ::USHORT;
 	using win32int = typename ::INT;
 	using win32uint = typename ::UINT;
-	using win32word = typename ::WORD;
-	using win32byte = typename ::BYTE;
+	using win32long = typename ::LONG;
+	using win32ulong = typename ::ULONG;
+	using win32lptr = typename ::LONG_PTR;
+	using win32ulptr = typename ::ULONG_PTR;
 	using win32bool = typename ::BOOL;
+	using win32byte = typename ::BYTE;
+	using win32word = typename ::WORD;
 	using win32dword = typename ::DWORD;
-	using win32short = typename ::SHORT;
 	using win32error = decltype(::GetLastError());
 	using win32atom = typename ::ATOM;
 	using win32lres = typename ::LRESULT;
 	using win32lprm = typename ::LPARAM;
 	using win32wprm = typename ::WPARAM;
-	using win32lptr = typename ::LONG_PTR;
-	using win32ulptr = typename ::ULONG_PTR;
 	using win32handle = typename ::HANDLE;
 	using win32hins = typename ::HINSTANCE;
 	using win32hwnd = typename ::HWND;
@@ -31,9 +34,11 @@ namespace Petal
 	using win32msg = typename ::UINT;
 
 #ifdef Petal_Enable_Unicode
+	using win32tchar = typename ::CHAR;
 	using win32tstr = typename ::LPWSTR;
 	using win32ctstr = typename ::LPCWSTR;
 #else
+	using win32tchar = typename ::WCHAR;
 	using win32tstr = typename ::LPSTR;
 	using win32ctstr = typename ::LPCSTR;
 #endif
