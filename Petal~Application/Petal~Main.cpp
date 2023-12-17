@@ -6,125 +6,134 @@
 
 #include <Windows.h>
 
-namespace Petal::Abstract
+namespace Petal::Unnamed::Abstract
 {
-	class EntryPointArguments
+	namespace
 	{
-	protected:
-		constexpr void Enable() noexcept { this->valid = true; }
-		constexpr void SetFlagInit() noexcept { this->initialized = true; }
-		constexpr boolean Initialized() const noexcept { return this->initialized; }
-	public:
-		constexpr const boolean& Valid() const noexcept { return this->valid; }
-	public:
-		virtual ~EntryPointArguments() = default;
-	private:
-		boolean valid{ false };
-		boolean initialized{ false };
-	};
+		class EntryPointArguments
+		{
+		protected:
+			constexpr void Enable() noexcept { this->valid = true; }
+			constexpr void SetFlagInit() noexcept { this->initialized = true; }
+			constexpr boolean Initialized() const noexcept { return this->initialized; }
+		public:
+			constexpr const boolean& Valid() const noexcept { return this->valid; }
+		public:
+			virtual ~EntryPointArguments() = default;
+		private:
+			boolean valid{ false };
+			boolean initialized{ false };
+		};
+	}
 }
 
-namespace Petal::Main
+namespace Petal::Unnamed::Main
 {
-	class Arguments final : public Abstract::EntryPointArguments
+	namespace
 	{
-	public:
-		constexpr const int& Argc() const noexcept
+		class Arguments final : public Abstract::EntryPointArguments
 		{
-			return this->argc;
-		}
-		constexpr const ptrc<ptrc<TChar>>& Argv() const noexcept
-		{
-			return this->argv;
-		}
-		constexpr const ptrc<ptrc<TChar>>& Envp() const noexcept
-		{
-			return this->envp;
-		}
-	public:
-		constexpr Arguments() = default;
-	public:
-		constexpr void Init(int argc, const ptrc<TChar> argv[], const ptrc<TChar> envp[]) noexcept
-		{
-			if (this->Initialized() == true)
+		public:
+			constexpr const int& Argc() const noexcept
 			{
-				Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::Init\r\n");
-				return;
+				return this->argc;
 			}
-			this->argc = argc;
-			this->argv = argv;
-			this->envp = envp;
-			this->Enable();
-			this->SetFlagInit();
-		}
-		constexpr void InitAsInvalid() noexcept
-		{
-			if (this->Initialized() == true)
+			constexpr const ptrc<ptrc<TChar>>& Argv() const noexcept
 			{
-				Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::InitAsInvalid\r\n");
-				return;
+				return this->argv;
 			}
-			this->SetFlagInit();
-		}
-	private:
-		ptrc<ptrc<TChar>> argv{ nullptr };
-		ptrc<ptrc<TChar>> envp{ nullptr };
-		int argc{ 0 };
-	};
+			constexpr const ptrc<ptrc<TChar>>& Envp() const noexcept
+			{
+				return this->envp;
+			}
+		public:
+			constexpr Arguments() = default;
+		public:
+			constexpr void Init(int argc, const ptrc<TChar> argv[], const ptrc<TChar> envp[]) noexcept
+			{
+				if (this->Initialized() == true)
+				{
+					Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::Init\r\n");
+					return;
+				}
+				this->argc = argc;
+				this->argv = argv;
+				this->envp = envp;
+				this->Enable();
+				this->SetFlagInit();
+			}
+			constexpr void InitAsInvalid() noexcept
+			{
+				if (this->Initialized() == true)
+				{
+					Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::InitAsInvalid\r\n");
+					return;
+				}
+				this->SetFlagInit();
+			}
+		private:
+			ptrc<ptrc<TChar>> argv{ nullptr };
+			ptrc<ptrc<TChar>> envp{ nullptr };
+			int argc{ 0 };
+		};
+	}
 }
 
-namespace Petal::WinMain
+namespace Petal::Unnamed::WinMain
 {
-	class Arguments final : public Abstract::EntryPointArguments
+	namespace
 	{
-	public:
-		constexpr const win32hins& HIns() const noexcept
+		class Arguments final : public Abstract::EntryPointArguments
 		{
-			return this->instance;
-		}
-		constexpr const ptrc<TChar>& CmdLine() const noexcept
-		{
-			return this->cmd_line;
-		}
-		constexpr const win32int& CmdShow() const noexcept
-		{
-			return this->cmd_show;
-		}
-	public:
-		constexpr Arguments() = default;
-	public:
-		constexpr void Init(win32hins instance_handle, ptrc<TChar> cmd_line, win32int cmd_show) noexcept
-		{
-			if (this->Initialized() == true)
+		public:
+			constexpr const win32hins& HIns() const noexcept
 			{
-				Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::Init\r\n");
-				return;
+				return this->instance;
 			}
-			this->instance = instance_handle;
-			this->cmd_line = cmd_line;
-			this->cmd_show = cmd_show;
-			this->Enable();
-			this->SetFlagInit();
-		}
-		constexpr void InitAsInvalid() noexcept
-		{
-			if (this->Initialized() == true)
+			constexpr const ptrc<TChar>& CmdLine() const noexcept
 			{
-				Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::InitAsInvalid\r\n");
-				return;
+				return this->cmd_line;
 			}
+			constexpr const win32int& CmdShow() const noexcept
+			{
+				return this->cmd_show;
+			}
+		public:
+			constexpr Arguments() = default;
+		public:
+			constexpr void Init(win32hins instance_handle, ptrc<TChar> cmd_line, win32int cmd_show) noexcept
+			{
+				if (this->Initialized() == true)
+				{
+					Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::Init\r\n");
+					return;
+				}
+				this->instance = instance_handle;
+				this->cmd_line = cmd_line;
+				this->cmd_show = cmd_show;
+				this->Enable();
+				this->SetFlagInit();
+			}
+			constexpr void InitAsInvalid() noexcept
+			{
+				if (this->Initialized() == true)
+				{
+					Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::InitAsInvalid\r\n");
+					return;
+				}
 #ifdef Petal_Enable_Unicode
-			this->instance = ::GetModuleHandleW(nullptr);
+				this->instance = ::GetModuleHandleW(nullptr);
 #else
-			this->instance = ::GetModuleHandleA(nullptr);
+				this->instance = ::GetModuleHandleA(nullptr);
 #endif
-			this->SetFlagInit();
-		}
-	private:
-		win32hins instance{ nullptr };
-		ptrc<TChar> cmd_line{ nullptr };
-		win32int cmd_show{ 0 };
-	};
+				this->SetFlagInit();
+			}
+		private:
+			win32hins instance{ nullptr };
+			ptrc<TChar> cmd_line{ nullptr };
+			win32int cmd_show{ 0 };
+		};
+	}
 }
 
 namespace Petal::Unnamed
@@ -147,22 +156,36 @@ namespace Petal::Unnamed
 	}
 }
 
+namespace Petal::Unnamed::Main
+{
+	namespace
+	{
+		Arguments arguments{};
+	}
+}
+
 namespace Petal::Main
 {
-	Arguments arguments{};
-	const int& argc{ arguments.Argc() };
-	const ptrc<ptrc<TChar>>& argv{ arguments.Argv() };
-	const ptrc<ptrc<TChar>>& envp{ arguments.Envp() };
-	const boolean& valid{ arguments.Valid() };
+	const int& argc{ Petal::Unnamed::Main::arguments.Argc() };
+	const ptrc<ptrc<TChar>>& argv{ Petal::Unnamed::Main::arguments.Argv() };
+	const ptrc<ptrc<TChar>>& envp{ Petal::Unnamed::Main::arguments.Envp() };
+	const boolean& valid{ Petal::Unnamed::Main::arguments.Valid() };
+}
+
+namespace Petal::Unnamed::WinMain
+{
+	namespace
+	{
+		Arguments arguments{};
+	}
 }
 
 namespace Petal::WinMain
 {
-	Arguments arguments{};
-	const win32hins& hins{ arguments.HIns() };
-	const ptrc<TChar>& cmd_line{ arguments.CmdLine() };
-	const win32int& cmd_show{ arguments.CmdShow() };
-	const boolean& valid{ arguments.Valid() };
+	const win32hins& hins{ Petal::Unnamed::WinMain::arguments.HIns() };
+	const ptrc<TChar>& cmd_line{ Petal::Unnamed::WinMain::arguments.CmdLine() };
+	const win32int& cmd_show{ Petal::Unnamed::WinMain::arguments.CmdShow() };
+	const boolean& valid{ Petal::Unnamed::WinMain::arguments.Valid() };
 }
 
 #ifndef Petal_Enable_PetalMain
@@ -210,8 +233,8 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 		return -1;
 	}
 	Petal::Unnamed::protection.Use();
-	Petal::Main::arguments.InitAsInvalid();
-	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
+	Petal::Unnamed::Main::arguments.InitAsInvalid();
+	Petal::Unnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
@@ -227,8 +250,8 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 		return -1;
 	}
 	Petal::Unnamed::protection.Use();
-	Petal::Main::arguments.Init(argc, argv, envp);
-	Petal::WinMain::arguments.InitAsInvalid();
+	Petal::Unnamed::Main::arguments.Init(argc, argv, envp);
+	Petal::Unnamed::WinMain::arguments.InitAsInvalid();
 	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
@@ -245,8 +268,8 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 		return -1;
 	}
 	Petal::Unnamed::protection.Use();
-	Petal::Main::arguments.InitAsInvalid();
-	Petal::WinMain::arguments.Init(instance, cmd_line, cmd_show);
+	Petal::Unnamed::Main::arguments.InitAsInvalid();
+	Petal::Unnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
@@ -262,8 +285,8 @@ int main(int argc, char* argv[], char* envp[])
 		return -1;
 	}
 	Petal::Unnamed::protection.Use();
-	Petal::Main::arguments.Init(argc, argv, envp);
-	Petal::WinMain::arguments.InitAsInvalid();
+	Petal::Unnamed::Main::arguments.Init(argc, argv, envp);
+	Petal::Unnamed::WinMain::arguments.InitAsInvalid();
 	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
