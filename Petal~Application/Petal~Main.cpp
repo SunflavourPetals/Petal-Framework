@@ -216,7 +216,7 @@ namespace Petal::Unnamed
 #ifndef Petal_Enable_PetalMain
 				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), UserEntrance::pt_user_main_name_dbgc).c_str());
 #else
-				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal_DbgStr("PetalMain")).c_str());
+				Petal_VSDbgT("[Petal] User entrance: PetalMain\r\n");
 #endif
 			}
 			catch (const ::std::exception&) {}
