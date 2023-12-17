@@ -102,7 +102,10 @@ namespace Petal::Unnamed::WinMain
 				return this->cmd_show;
 			}
 		public:
-			constexpr Arguments() = default;
+			Arguments()
+			{
+				this->instance = Petal::WinMain::HIns(); // 初始化 instance 属性
+			}
 		public:
 			constexpr void Init(win32hins instance_handle, ptrc<TChar> cmd_line, win32int cmd_show) noexcept // 初始化
 			{
@@ -124,11 +127,6 @@ namespace Petal::Unnamed::WinMain
 					Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::InitAsInvalid\r\n");
 					return;
 				}
-#ifdef Petal_Enable_Unicode
-				this->instance = ::GetModuleHandleW(nullptr); // 初始化 instance 属性
-#else
-				this->instance = ::GetModuleHandleA(nullptr); // 初始化 instance 属性
-#endif
 				this->SetFlagInit(); // 完成初始化，将 initialized 属性设置为 true。
 			}
 		private:
@@ -189,6 +187,14 @@ namespace Petal::WinMain
 	const ptrc<TChar>& cmd_line{ Petal::Unnamed::WinMain::arguments.CmdLine() };
 	const win32int& cmd_show{ Petal::Unnamed::WinMain::arguments.CmdShow() };
 	const boolean& valid{ Petal::Unnamed::WinMain::arguments.Valid() };
+	win32hins HIns() noexcept
+	{
+#ifdef Petal_Enable_Unicode
+		return ::GetModuleHandleW(nullptr); // 初始化 instance 属性
+#else
+		return ::GetModuleHandleA(nullptr); // 初始化 instance 属性
+#endif
+	}
 }
 
 #ifndef Petal_Enable_PetalMain

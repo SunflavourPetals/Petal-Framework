@@ -116,7 +116,7 @@ namespace Petal
 		window_class.lpfnWndProc = this->DefaultWindowProcess();
 		window_class.cbClsExtra = this->class_extra;
 		window_class.cbWndExtra = this->window_extra;
-		window_class.hInstance = WinMain::hins;
+		window_class.hInstance = WinMain::HIns();
 		window_class.hIcon = this->icon;
 		window_class.hCursor = this->cursor;
 		window_class.hbrBackground = this->background_brush;
@@ -829,7 +829,7 @@ namespace
 		}
 		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept
 		{
-			return ::UnregisterClassW(Petal::IWin32::ToWinResource(class_atom), WinMain::hins);
+			return ::UnregisterClassW(Petal::IWin32::ToWinResource(class_atom), WinMain::HIns());
 		}
 		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
 		{
@@ -849,7 +849,7 @@ namespace
 				height,
 				nullptr,
 				args.menu,
-				WinMain::hins,
+				WinMain::HIns(),
 				static_cast<::LPVOID>(&window)
 			);
 		}
@@ -873,7 +873,7 @@ namespace
 		}
 		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept
 		{
-			return ::UnregisterClassA(Petal::IWin32::ToWinResource(class_atom), WinMain::hins);
+			return ::UnregisterClassA(Petal::IWin32::ToWinResource(class_atom), WinMain::HIns());
 		}
 		[[nodiscard]] win32hwnd CreatePetalWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
 		{
@@ -893,7 +893,7 @@ namespace
 				height,
 				nullptr,
 				args.menu,
-				WinMain::hins,
+				WinMain::HIns(),
 				static_cast<::LPVOID>(&window)
 			);
 		}

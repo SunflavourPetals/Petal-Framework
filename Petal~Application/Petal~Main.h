@@ -21,6 +21,7 @@ namespace Petal::WinMain
 	extern const ptrc<TChar>& cmd_line;
 	extern const win32int& cmd_show;
 	extern const boolean& valid;
+	win32hins HIns() noexcept;
 }
 
 #ifndef Petal_Enable_PetalMain
