@@ -106,3 +106,4 @@ template <typename CharT, boolean force_utf_8_with_bom = false>
 | char16_t | std::endian::big | | | utf_16_be |
 | char32_t | std::endian::little | | | utf_32_le |
 | char32_t | std::endian::big | | | utf_32_be |
+| other | | | | no_bom |
