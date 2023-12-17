@@ -1,5 +1,7 @@
 # Petal~XInputController
 
+源代码有更改，这部分文档还未进行修改。  
+
 ## 概述
 
 命名空间 Petal::XInput
