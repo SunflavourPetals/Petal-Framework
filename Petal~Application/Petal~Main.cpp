@@ -10,6 +10,7 @@ namespace Petal::Unnamed::Abstract
 {
 	namespace
 	{
+		// 抽象的 入口函数参数 类
 		class EntryPointArguments
 		{
 		protected:
@@ -17,12 +18,14 @@ namespace Petal::Unnamed::Abstract
 			constexpr void SetFlagInit() noexcept { this->initialized = true; }
 			constexpr boolean Initialized() const noexcept { return this->initialized; }
 		public:
+			// 返回引用是为了使外部能观测到 valid 属性，这样就不需要暴露整个对象了。
+			// 此后派生的 Main::Arguments 的成员属性的获取函数也同样返回 const Ty& 类型。
 			constexpr const boolean& Valid() const noexcept { return this->valid; }
 		public:
 			virtual ~EntryPointArguments() = default;
 		private:
-			boolean valid{ false };
-			boolean initialized{ false };
+			boolean valid{ false }; // 标识是否可用
+			boolean initialized{ false }; // 标识是否已被初始化
 		};
 	}
 }
@@ -49,9 +52,9 @@ namespace Petal::Unnamed::Main
 		public:
 			constexpr Arguments() = default;
 		public:
-			constexpr void Init(int argc, const ptrc<TChar> argv[], const ptrc<TChar> envp[]) noexcept
+			constexpr void Init(int argc, const ptrc<TChar> argv[], const ptrc<TChar> envp[]) noexcept // 初始化
 			{
-				if (this->Initialized() == true)
+				if (this->Initialized() == true) // 初始化仅能作用于未被初始化的对象。
 				{
 					Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::Init\r\n");
 					return;
@@ -59,17 +62,17 @@ namespace Petal::Unnamed::Main
 				this->argc = argc;
 				this->argv = argv;
 				this->envp = envp;
-				this->Enable();
-				this->SetFlagInit();
+				this->Enable(); // 启用，将 valid 属性设置为 true。
+				this->SetFlagInit(); // 完成初始化，将 initialized 属性设置为 true。
 			}
-			constexpr void InitAsInvalid() noexcept
+			constexpr void InitAsInvalid() noexcept // 初始化为无效对象
 			{
-				if (this->Initialized() == true)
+				if (this->Initialized() == true) // 初始化仅能作用于未被初始化的对象。
 				{
 					Petal_VSDbgT("[Petal] Invalid call: Petal::Main::Arguments::InitAsInvalid\r\n");
 					return;
 				}
-				this->SetFlagInit();
+				this->SetFlagInit(); // 完成初始化，将 initialized 属性设置为 true。
 			}
 		private:
 			ptrc<ptrc<TChar>> argv{ nullptr };
@@ -101,9 +104,9 @@ namespace Petal::Unnamed::WinMain
 		public:
 			constexpr Arguments() = default;
 		public:
-			constexpr void Init(win32hins instance_handle, ptrc<TChar> cmd_line, win32int cmd_show) noexcept
+			constexpr void Init(win32hins instance_handle, ptrc<TChar> cmd_line, win32int cmd_show) noexcept // 初始化
 			{
-				if (this->Initialized() == true)
+				if (this->Initialized() == true) // 初始化仅能作用于未被初始化的对象。
 				{
 					Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::Init\r\n");
 					return;
@@ -111,25 +114,25 @@ namespace Petal::Unnamed::WinMain
 				this->instance = instance_handle;
 				this->cmd_line = cmd_line;
 				this->cmd_show = cmd_show;
-				this->Enable();
-				this->SetFlagInit();
+				this->Enable(); // 启用，将 valid 属性设置为 true。
+				this->SetFlagInit(); // 完成初始化，将 initialized 属性设置为 true。
 			}
-			constexpr void InitAsInvalid() noexcept
+			constexpr void InitAsInvalid() noexcept // 初始化为无效对象
 			{
-				if (this->Initialized() == true)
+				if (this->Initialized() == true) // 初始化仅能作用于未被初始化的对象。
 				{
 					Petal_VSDbgT("[Petal] Invalid call: Petal::WinMain::Arguments::InitAsInvalid\r\n");
 					return;
 				}
 #ifdef Petal_Enable_Unicode
-				this->instance = ::GetModuleHandleW(nullptr);
+				this->instance = ::GetModuleHandleW(nullptr); // 初始化 instance 属性
 #else
-				this->instance = ::GetModuleHandleA(nullptr);
+				this->instance = ::GetModuleHandleA(nullptr); // 初始化 instance 属性
 #endif
-				this->SetFlagInit();
+				this->SetFlagInit(); // 完成初始化，将 initialized 属性设置为 true。
 			}
 		private:
-			win32hins instance{ nullptr };
+			win32hins instance{ nullptr }; // 不管是 Init 还是 InitAsInvalid，instance 属性在初始化后始终有效
 			ptrc<TChar> cmd_line{ nullptr };
 			win32int cmd_show{ 0 };
 		};
@@ -140,17 +143,17 @@ namespace Petal::Unnamed
 {
 	namespace
 	{
-		class Protection final
+		class Protection final // 保护入口函数，使其不被递归调用
 		{
 		public:
-			void Use() { this->pt_called = true; }
-			operator bool() { return this->pt_called; }
-			void VSDebugOutputWarning()
+			void Use() { this->pt_called = true; } // 设置程序状态为已进入入口函数
+			bool Used() { return this->pt_called; } // 是否已进入入口函数
+			void VSDebugOutputWarning() // 输出警告
 			{
 				Petal_VSDbgT("[Petal] Warning: calling entry function is invalid\r\n");
 			}
 		private:
-			boolean pt_called{ false };
+			boolean pt_called{ false }; // 标识是否已进入入口函数
 		};
 		Protection protection{};
 	}
@@ -203,7 +206,7 @@ int PetalMain();
 
 #endif // !Petal_Enable_PetalMain
 
-namespace Petal::Unnamed
+namespace Petal::Unnamed::XMain
 {
 	namespace
 	{
@@ -227,7 +230,7 @@ namespace Petal::Unnamed
 #if defined(Petal_Enable_Unicode)
 INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd_line, _In_ INT cmd_show)
 {
-	if (Petal::Unnamed::protection)
+	if (Petal::Unnamed::protection.Used() == true)
 	{
 		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
@@ -235,7 +238,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 	Petal::Unnamed::protection.Use();
 	Petal::Unnamed::Main::arguments.InitAsInvalid();
 	Petal::Unnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
-	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
+	Petal::Unnamed::XMain::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -244,7 +247,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 }
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
-	if (Petal::Unnamed::protection)
+	if (Petal::Unnamed::protection.Used() == true)
 	{
 		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
@@ -252,7 +255,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	Petal::Unnamed::protection.Use();
 	Petal::Unnamed::Main::arguments.Init(argc, argv, envp);
 	Petal::Unnamed::WinMain::arguments.InitAsInvalid();
-	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
+	Petal::Unnamed::XMain::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -262,7 +265,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 #else
 INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_line, _In_ INT cmd_show)
 {
-	if (Petal::Unnamed::protection)
+	if (Petal::Unnamed::protection.Used() == true)
 	{
 		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
@@ -270,7 +273,7 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 	Petal::Unnamed::protection.Use();
 	Petal::Unnamed::Main::arguments.InitAsInvalid();
 	Petal::Unnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
-	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
+	Petal::Unnamed::XMain::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
@@ -279,7 +282,7 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 }
 int main(int argc, char* argv[], char* envp[])
 {
-	if (Petal::Unnamed::protection)
+	if (Petal::Unnamed::protection.Used() == true)
 	{
 		Petal::Unnamed::protection.VSDebugOutputWarning();
 		return -1;
@@ -287,7 +290,7 @@ int main(int argc, char* argv[], char* envp[])
 	Petal::Unnamed::protection.Use();
 	Petal::Unnamed::Main::arguments.Init(argc, argv, envp);
 	Petal::Unnamed::WinMain::arguments.InitAsInvalid();
-	Petal::Unnamed::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
+	Petal::Unnamed::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main();
 #else
