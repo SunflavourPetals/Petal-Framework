@@ -190,9 +190,9 @@ namespace Petal::WinMain
 	win32hins HIns() noexcept
 	{
 #ifdef Petal_Enable_Unicode
-		return ::GetModuleHandleW(nullptr); // 初始化 instance 属性
+		return ::GetModuleHandleW(nullptr);
 #else
-		return ::GetModuleHandleA(nullptr); // 初始化 instance 属性
+		return ::GetModuleHandleA(nullptr);
 #endif
 	}
 }
