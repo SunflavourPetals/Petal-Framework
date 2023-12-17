@@ -106,12 +106,12 @@ template <typename CharT, boolean force_utf_8_with_bom = false>
 根据模板参数 `CharT` 和非类型模板参数 `force_utf_8_with_bom` 和 `std::endian::native` 提供 Bom。  
 对于 `wchar_t`，需要使用 `sizeof` 获取其所占字节大小来推测其可能使用 utf-16 还是 utf-32，在 Win 平台上，它使用 utf-16 le，占两个字节。  
 
-| CharT | std::endian::native | force_utf_8_with_bom | size | Result |
+| CharT | std::endian::native | force_utf_8_with_bom | sizeof(CharT) | result |
 | :---: | :---: | :---: | :---: | :--: |
 | char | | | | no_bom |
 | wchar_t | std::endian::little | | 2 | utf_16_le |
-| wchar_t | std::endian::big | | 2 | utf_16_be |
 | wchar_t | std::endian::little | | 4 | utf_32_le |
+| wchar_t | std::endian::big | | 2 | utf_16_be |
 | wchar_t | std::endian::big | | 4 | utf_32_be |
 | char8_t | | true | | utf_8 |
 | char8_t | | false | | no_bom |
