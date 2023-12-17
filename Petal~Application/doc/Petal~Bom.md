@@ -60,37 +60,37 @@ Bom my_bom{ 3, 0xEFu, 0xBBu, 0xBFu };
 
 得到Bom对象有效的字节数。  
 
-#### 常量 no_bom
+#### 命名空间局部常量 no_bom
 
 `const Bom no_bom{ 0, 0x00u, 0x00u, 0x00u, 0x00u };`  
 
 适用于 ANSI 编码和 utf-8 编码的 bom (对于 utf-8 的 bom，请查阅 Windows 上使用 utf-8 的历史)。  
 
-#### 常量 utf_8
+#### 命名空间局部常量 utf_8
 
 `const Bom utf_8{ 3, 0xEFu, 0xBBu, 0xBFu, 0x00u };`  
 
 适用于 utf-8 编码的 bom (请查阅 Windows 上使用 utf-8 的历史)。  
 
-#### 常量 utf_16_be
+#### 命名空间局部常量 utf_16_be
 
 `const Bom utf_16_be{ 2, 0xFEu, 0xFFu, 0x00u, 0x00u };`
 
 适用于 utf-16 be 编码的 bom。  
 
-#### 常量 utf_16_le
+#### 命名空间局部常量 utf_16_le
 
 `const Bom utf_16_le{ 2, 0xFFu, 0xFEu, 0x00u, 0x00u };`
 
 适用于 utf-16 le 编码的 bom。  
 
-#### 常量 utf_32_be
+#### 命名空间局部常量 utf_32_be
 
 `const Bom utf_32_be{ 4, 0x00u, 0x00u, 0xFEu, 0xFFu };`
 
 适用于 utf-32 be 编码的 bom。  
 
-#### 常量 utf_32_le
+#### 命名空间局部常量 utf_32_le
 
 `const Bom utf_32_le{ 4, 0xFFu, 0xFEu, 0x00u, 0x00u };`
 
