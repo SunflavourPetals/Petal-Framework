@@ -195,6 +195,14 @@ namespace Petal::WinMain
 		return ::GetModuleHandleA(nullptr);
 #endif
 	}
+	ptrc<TChar> CmdLine() noexcept
+	{
+#ifdef Petal_Enable_Unicode
+		return ::GetCommandLineW();
+#else
+		return ::GetCommandLineA();
+#endif
+	}
 }
 
 #ifndef Petal_Enable_PetalMain
