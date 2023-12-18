@@ -113,7 +113,7 @@ void foo()
 {
     int number{ 123 };
     Petal::ptr<int> int_ptr{ &number };
-    // *int_ptr = 321; // 无法直接通过 int_ptr 修改所指向的对象
+    // *int_ptr = 321; // 无法直接通过解引用 int_ptr 修改所指向的对象
     Petal::Debug::println("{}", *int_ptr);
 }
 ```
