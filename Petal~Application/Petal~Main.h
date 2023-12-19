@@ -35,7 +35,7 @@ namespace Petal::UserEntrance \
 	extern const ptrc<DbgChar> pt_user_main_name_dbgc{ Petal_DbgStr(#MainFunc) };  \
 }
 #define Petal_SetMainClass(MainClass) Petal_SetMainFunc(MainClass::main)
-#define Petal_SetMainSpace(MainSpace) Petal_SetMainClass(MainSpace)
+#define Petal_SetMainSpace(MainSpace) Petal_SetMainFunc(MainSpace::main)
 #define Petal_SetDefaultMainClass     Petal_SetMainClass(Main)
 
 #endif // !Petal_Enable_PetalMain
