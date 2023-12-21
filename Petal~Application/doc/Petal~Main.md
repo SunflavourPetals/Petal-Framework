@@ -30,7 +30,7 @@ int main(int argc, char* argv[], char* envp[])
 	// 检查入口函数是否被递归调用
 	if (Petal::Unnamed::protection.Used() == true)
 	{
-	// 函数被递归调用的分支
+		// 函数被递归调用的分支
 		Petal::Unnamed::protection.VSDebugOutputWarning(); // 输出警告信息
 		return -1; // 退出函数
 	}
@@ -91,11 +91,11 @@ namespace Petal::UserEntrance \
 
 namespace MyProgram
 {
-    int my_main()
-    {
-        Petal::Debug::println("Hello world!");
-        return 0;
-    }
+	int my_main()
+	{
+		Petal::Debug::println("Hello world!");
+		return 0;
+	}
 }
 
 Petal_SetMainFunc(MyProgram::my_main); // 入口函数将调用 MyProgram::my_main
@@ -117,15 +117,15 @@ Petal_SetMainFunc(MyProgram::my_main); // 入口函数将调用 MyProgram::my_ma
 
 namespace MyProgram
 {
-    class MyMain
-    {
-    public:
+	class MyMain
+	{
+	public:
 		static int main()
-    	{
-        	Petal::Debug::println("Hello world!");
-        	return 0;
-    	}
-    }
+		{
+			Petal::Debug::println("Hello world!");
+			return 0;
+		}
+	}
 }
 
 Petal_SetMainClass(MyProgram::MyMain); // 入口函数将调用 MyProgram::MyMain::main
@@ -146,11 +146,11 @@ Petal_SetMainClass(MyProgram::MyMain); // 入口函数将调用 MyProgram::MyMai
 
 namespace MyProgram
 {
-    int main()
-    {
-       	Petal::Debug::println("Hello world!");
-       	return 0;
-    }
+	int main()
+	{
+		Petal::Debug::println("Hello world!");
+		return 0;
+	}
 }
 
 Petal_SetMainSpace(MyProgram); // 入口函数将调用 MyProgram::main
