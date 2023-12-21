@@ -27,10 +27,10 @@
 // 示例入口函数
 int main(int argc, char* argv[], char* envp[])
 {
-  // 检查入口函数是否被递归调用
+	// 检查入口函数是否被递归调用
 	if (Petal::Unnamed::protection.Used() == true)
 	{
-    // 函数被递归调用的分支
+	// 函数被递归调用的分支
 		Petal::Unnamed::protection.VSDebugOutputWarning(); // 输出警告信息
 		return -1; // 退出函数
 	}
@@ -46,18 +46,18 @@ int main(int argc, char* argv[], char* envp[])
 }
 ```
 1. 若入口函数为 main / wmain，则下列位于 Petal::Main 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前被赋为有效值(Petal::Main::valid 变为 true)。  
-     * arcg: `int` 
+     * arcg: `int`  
        argv 中的元素个数  
-     * argv: `ptrc<ptrc<TChar>>`
+     * argv: `ptrc<ptrc<TChar>>`  
        main / wmain 接收的参数    
-     * envp: `ptrc<ptrc<TChar>>`
+     * envp: `ptrc<ptrc<TChar>>`  
        环境变量参数  
 2. 若入口函数为 WinMain / wWinMain，则下列位于 Petal::WinMain 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前或进入入口函数前被赋为有效值(Petal::WinMain::valid 变为 true)  
      * hins: `HINSTANCE`  
        当前实例句柄，在入口函数开始前需要使用 `Petal::WinMain::HIns` 获得
-     * cmd_line: `ptrc<TChar>`
+     * cmd_line: `ptrc<TChar>`  
         应用程序的命令行，不包括程序名称。若要检索整个命令行，请使用 `Petal::WinMain::CmdLine` 函数。
-     * cmd_show: `INT`
+     * cmd_show: `INT`  
         控制窗口的显示方式。
 
 然而即使入口函数是 main / wmain，Petal::WinMain::hins 所引用的对象仍会在进入入口函数前被赋为有效值，而 HIns 和 CmdLine 函数作为对 WIN32 API 的封装则始终可用。  
