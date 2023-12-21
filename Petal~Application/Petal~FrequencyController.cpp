@@ -86,6 +86,10 @@ namespace Petal
 	{
 		this->pt_sleep_limitation = sleep_limitation;
 	}
+	void FrequencyController::UpdateSleepFunction(fptr<void> sleep_fn) noexcept
+	{
+		this->pt_sleep_fn = sleep_fn;
+	}
 	f64 FrequencyController::Frequency() const noexcept(noexcept_pc_frequency)
 	{
 		return this->pt_performance_counter.Frequency() / static_cast<f64>(this->pt_target_delta_count);
@@ -117,6 +121,10 @@ namespace Petal
 	i64 FrequencyController::SleepCountLimitation() const noexcept
 	{
 		return this->pt_sleep_limitation;
+	}
+	fptr<void> FrequencyController::SleepFunction() const noexcept
+	{
+		return this->pt_sleep_fn;
 	}
 	boolean FrequencyController::LimitedDo(Abstract::Process<ResourceDelta>& user_process, Abstract::Process<ResourceStatistics>& user_statistics_process)
 	{
@@ -178,7 +186,7 @@ namespace Petal
 		{
 			if ((this->pt_sleep_count > 0) && ((this->pt_target_delta_count - this->pt_delta_count) > this->pt_sleep_failure_threshold_count))
 			{
-				::std::this_thread::sleep_for(::std::chrono::nanoseconds{ 1 });
+				this->pt_sleep_fn();
 				--(this->pt_sleep_count);
 			}
 			return true;
