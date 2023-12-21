@@ -88,7 +88,7 @@ namespace Petal
 	}
 	void FrequencyController::UpdateSleepFunction(fptr<void> sleep_fn) noexcept
 	{
-		this->pt_sleep_fn = sleep_fn;
+		this->pt_sleep_fn = (sleep_fn == nullptr) ? this->pt_default_sleep_fn : sleep_fn;
 	}
 	f64 FrequencyController::Frequency() const noexcept(noexcept_pc_frequency)
 	{

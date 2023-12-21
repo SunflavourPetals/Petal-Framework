@@ -8,6 +8,7 @@
 #include "Petal~Process.h"
 
 #include <thread>
+#include <chrono>
 #include <utility>
 
 namespace Petal
@@ -82,9 +83,10 @@ namespace Petal
 		~FrequencyController() = default;
 	private:
 		static constexpr i64 pt_max_value{ static_cast<i64>((~0LLU) >> 1) };
+		static constexpr fptr<void> pt_default_sleep_fn{ [] { ::std::this_thread::sleep_for(::std::chrono::nanoseconds{ 1 }); } };
 	private:
 		PerformanceCounter pt_performance_counter;
-		fptr<void> pt_sleep_fn{ [] { ::std::this_thread::sleep_for(::std::chrono::nanoseconds{ 1 }); } };
+		fptr<void> pt_sleep_fn{ pt_default_sleep_fn };
 		i64 pt_frame_count{}; // 帧数: 实际间隔时间内执行的次数
 		i64 pt_sleep_failure_threshold_count{ pt_max_value }; // 睡眠失效阈值，当距离 actual_delta_count 的 tick 数不足此值时，不进行睡眠，但是成员 Sleep 函数依旧返回 false
 		i64 pt_sleep_count{}; // 间隔时间内剩余的睡眠次数，每个间隔会重置
