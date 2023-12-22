@@ -50,9 +50,9 @@ namespace Petal::Log
 
 	using LogA = LogStream<Char>;
 	using LogW = LogStream<WChar>;
-	using LogU8 = LogStream<CharU8>;
-	using LogU16 = LogStream<CharU16>;
-	using LogU32 = LogStream<CharU32>;
+	using LogU8 = LogStream<U8Char>;
+	using LogU16 = LogStream<U16Char>;
+	using LogU32 = LogStream<U32Char>;
 }
 
 namespace Petal::Log

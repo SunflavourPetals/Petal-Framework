@@ -12,19 +12,19 @@ namespace Petal
 {
 	using Char = achar;
 	using WChar = wchar;
-	using CharU8 = u8char;
-	using CharU16 = u16char;
-	using CharU32 = u32char;
+	using U8Char = u8char;
+	using U16Char = u16char;
+	using U32Char = u32char;
 	using String = typename ::std::basic_string<Char>;
 	using WString = typename ::std::basic_string<WChar>;
-	using U8String = typename ::std::basic_string<CharU8>;
-	using U16String = typename ::std::basic_string<CharU16>;
-	using U32String = typename ::std::basic_string<CharU32>;
+	using U8String = typename ::std::basic_string<U8Char>;
+	using U16String = typename ::std::basic_string<U16Char>;
+	using U32String = typename ::std::basic_string<U32Char>;
 	using StringView = typename ::std::basic_string_view<Char>;
 	using WStringView = typename ::std::basic_string_view<WChar>;
-	using U8StringView = typename ::std::basic_string_view<CharU8>;
-	using U16StringView = typename ::std::basic_string_view<CharU16>;
-	using U32StringView = typename ::std::basic_string_view<CharU32>;
+	using U8StringView = typename ::std::basic_string_view<U8Char>;
+	using U16StringView = typename ::std::basic_string_view<U16Char>;
+	using U32StringView = typename ::std::basic_string_view<U32Char>;
 
 #if defined(Petal_Enable_Unicode)
 	using TChar = WChar;
