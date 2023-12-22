@@ -70,9 +70,11 @@ namespace Petal
 #if defined(Petal_Enable_ForceDbgANSI)
 	using DbgChar = Char;
 	using DbgString = String;
+	using DbgStringView = StringView;
 #else
 	using DbgChar = TChar;
 	using DbgString = TString;
+	using DbgStringView = TStringView;
 #endif
 }
 
