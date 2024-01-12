@@ -46,8 +46,10 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
 	{
-		print(fmt, ::std::forward<Args>(args)...);
-		println();
+		StringView fmt_fmt{ "{}{}" };
+		StringView ln{ GetLn<Char>(dout.line_break_mode) };
+		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_format_args(fmt, ln));
+		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename... Args>
 	inline void wprint(WStringView fmt, Args&&... args)
@@ -61,8 +63,10 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
-		wprint(fmt, ::std::forward<Args>(args)...);
-		wprintln();
+		WStringView fmt_fmt{ L"{}{}" };
+		WStringView ln{ GetLn<WChar>(dowt.line_break_mode) };
+		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_wformat_args(fmt, ln));
+		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 }
 

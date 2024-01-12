@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_IWindowSetImplByHashMap</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -88,7 +88,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_IWindowSetImplByHashMap</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
     </ClCompile>
     <Link>
@@ -102,7 +102,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_ExceptionDescription;Petal_Enable_ForceExcepDescANSI</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_IWindowSetImplByHashMap</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -117,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgANSI;Petal_Enable_IWindowSetImplByHashMap</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_IWindowSetImplByHashMap</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
