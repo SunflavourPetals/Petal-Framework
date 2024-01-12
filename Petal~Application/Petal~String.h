@@ -64,6 +64,7 @@ namespace Petal
 				++index;
 			}
 		}
+		c_str.erase(c_str.begin() + index, c_str.end());
 		return c_str;
 	}
 
@@ -76,6 +77,112 @@ namespace Petal
 	using DbgString = TString;
 	using DbgStringView = TStringView;
 #endif
+
+	template <typename Ty>
+	class BasicCStringRef final
+	{
+	public:
+		constexpr tsize size() const noexcept
+		{
+			return this->str_length;
+		}
+		constexpr tsize length() const noexcept
+		{
+			return this->str_length;
+		}
+		constexpr ptrc<Ty> data() const noexcept
+		{
+			return this->str_ptr;
+		}
+		constexpr ptrc<Ty> c_str() const noexcept
+		{
+			return this->str_ptr;
+		}
+
+		constexpr BasicCStringRef() = default;
+		constexpr BasicCStringRef(ptrc<Ty> str, tsize length)
+		{
+			if (str[length] != 0)
+			{
+				throw ::std::exception{ "[Petal] std::expection: str is not c style string in Petal::BasicCStringRef<Ty>(ptrc<Ty>, tsize)" };
+			}
+			this->str_ptr = str;
+			this->str_length = length;
+		}
+		constexpr BasicCStringRef(const ::std::basic_string<Ty>& ref_str)
+		{
+			this->str_ptr = ref_str.c_str();
+			this->str_length = ref_str.length();
+		}
+
+		constexpr const BasicCStringRef& operator= (const BasicCStringRef str)
+		{
+			this->str_ptr = str.c_str();
+			this->str_length = str.length();
+			return *this;
+		}
+		template <typename Traits, typename Alloc>
+		constexpr const BasicCStringRef& operator= (const ::std::basic_string<Ty, Traits, Alloc>& ref_str)
+		{
+			this->str_ptr = ref_str.c_str();
+			this->str_length = ref_str.length();
+			return *this;
+		}
+
+		constexpr const BasicCStringRef& operator= (::std::nullptr_t)
+		{
+			this->str_ptr = nullptr;
+			this->str_length = 0;
+			return *this;
+		}
+
+		operator bool()
+		{
+			return this->str_ptr;
+		}
+
+		operator ::std::basic_string_view<Ty>()
+		{
+			return { c_str(), length() };
+		}
+	private:
+		ptrc<Ty> str_ptr{ nullptr };
+		tsize str_length{};
+	};
+
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+	inline constexpr [[nodiscard]] BasicCStringRef<CharT>
+		MakeCStringRef(const ::std::basic_string<CharT, Traits, Alloc>& ref_str)
+	{
+		return BasicCStringRef<CharT>{ ref_str.c_str(), ref_str.length() };
+	}
+
+	using CStringRef = BasicCStringRef<Char>;
+	using WCStringRef = BasicCStringRef<WChar>;
+	using U8CStringRef = BasicCStringRef<U8Char>;
+	using U16CStringRef = BasicCStringRef<U16Char>;
+	using U32CStringRef = BasicCStringRef<U32Char>;
+
+	inline constexpr CStringRef operator""_csr(const Char* str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr WCStringRef operator""_csr(const WChar* str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U8CStringRef operator""_csr(const U8Char* str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U16CStringRef operator""_csr(const U16Char* str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U32CStringRef operator""_csr(const U32Char* str, ::std::size_t length)
+	{
+		return { str, length };
+	}
 }
 
 namespace Petal::TypeTraits
