@@ -130,18 +130,8 @@ namespace Petal
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size - 1 });
 	}
 
-#if defined(Petal_Enable_ForceDbgANSI)
-	using DbgChar = Char;
-	using DbgString = String;
-	using DbgStringView = StringView;
-#else
-	using DbgChar = TChar;
-	using DbgString = TString;
-	using DbgStringView = TStringView;
-#endif
-
 	template <typename Ty>
-	class BasicCStringRef final
+	class BasicCStringRef
 	{
 	public:
 		constexpr tsize size() const noexcept
@@ -191,19 +181,20 @@ namespace Petal
 			this->str_length = ref_str.length();
 			return *this;
 		}
-
 		constexpr BasicCStringRef& operator= (::std::nullptr_t)
 		{
 			this->str_ptr = nullptr;
 			this->str_length = 0;
 			return *this;
 		}
-
 		operator bool()
 		{
 			return this->str_ptr;
 		}
-
+		operator const Ty*()
+		{
+			return this->str_ptr;
+		}
 		operator BasicStringView<Ty>()
 		{
 			return { this->c_str(), this->length() };
@@ -258,6 +249,24 @@ namespace Petal
 	{
 		return { str, length };
 	}
+
+#if defined(Petal_Enable_Unicode)
+	using TCStringRef = WCStringRef;
+#else
+	using TCStringRef = CStringRef;
+#endif
+
+#if defined(Petal_Enable_ForceDbgANSI)
+	using DbgChar = Char;
+	using DbgString = String;
+	using DbgStringView = StringView;
+	using DbgCStringRef = CStringRef;
+#else
+	using DbgChar = TChar;
+	using DbgString = TString;
+	using DbgStringView = TStringView;
+	using DbgCStringRef = TCStringRef;
+#endif
 }
 
 template<typename CharT>

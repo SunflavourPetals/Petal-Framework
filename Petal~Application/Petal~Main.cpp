@@ -6,6 +6,8 @@
 
 #include <Windows.h>
 
+#include <vector>
+
 namespace Petal::Unnamed::Abstract
 {
 	namespace
@@ -195,13 +197,18 @@ namespace Petal::WinMain
 		return ::GetModuleHandleA(nullptr);
 #endif
 	}
-	ptrc<TChar> CmdLine() noexcept
+	TCStringRef CmdLine() noexcept
 	{
+		static ptrc<TChar> cmd_line
+		{
 #ifdef Petal_Enable_Unicode
-		return ::GetCommandLineW();
+				::GetCommandLineW()
 #else
-		return ::GetCommandLineA();
+				::GetCommandLineA()
 #endif
+		};
+		static tsize length{ ::std::char_traits<TChar>::length(cmd_line) };
+		return { cmd_line, length };
 	}
 }
 

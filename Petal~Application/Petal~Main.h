@@ -7,6 +7,8 @@
 #include "Petal~String.h"
 #include "Petal~WinTypes.h"
 
+#include <span>
+
 namespace Petal::Main
 {
 	extern const int& argc;
@@ -22,7 +24,7 @@ namespace Petal::WinMain
 	extern const win32int& cmd_show;
 	extern const boolean& valid;
 	win32hins HIns() noexcept;
-	ptrc<TChar> CmdLine() noexcept;
+	TCStringRef CmdLine() noexcept;
 }
 
 #ifndef Petal_Enable_PetalMain
