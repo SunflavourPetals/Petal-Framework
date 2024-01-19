@@ -160,7 +160,7 @@ namespace Petal
 		{
 			return this->str_ptr;
 		}
-
+	public:
 		constexpr BasicCStringRef() = default;
 		constexpr BasicCStringRef(ptrc<Ty> str, tsize length)
 		{
@@ -176,22 +176,23 @@ namespace Petal
 			this->str_ptr = ref_str.c_str();
 			this->str_length = ref_str.length();
 		}
-
-		constexpr const BasicCStringRef& operator= (const BasicCStringRef str)
+		constexpr BasicCStringRef(const BasicCStringRef&) = default;
+		constexpr ~BasicCStringRef() = default;
+		constexpr BasicCStringRef& operator= (const BasicCStringRef str)
 		{
 			this->str_ptr = str.c_str();
 			this->str_length = str.length();
 			return *this;
 		}
 		template <typename Traits, typename Alloc>
-		constexpr const BasicCStringRef& operator= (const BasicString<Ty, Traits, Alloc>& ref_str)
+		constexpr BasicCStringRef& operator= (const BasicString<Ty, Traits, Alloc>& ref_str)
 		{
 			this->str_ptr = ref_str.c_str();
 			this->str_length = ref_str.length();
 			return *this;
 		}
 
-		constexpr const BasicCStringRef& operator= (::std::nullptr_t)
+		constexpr BasicCStringRef& operator= (::std::nullptr_t)
 		{
 			this->str_ptr = nullptr;
 			this->str_length = 0;

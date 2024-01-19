@@ -19,7 +19,7 @@ namespace Petal::Debug
 		using InnerStringView = typename Abstract::OutputA::InnerStringView;
 	public:
 		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str) final;
+		virtual void OutputCStr(ptrc<InnerChar> c_str);
 	};
 
 	class VSDebugOutputW : public Abstract::OutputW, public Abstract::COutputW
@@ -30,7 +30,7 @@ namespace Petal::Debug
 		using InnerStringView = typename Abstract::OutputW::InnerStringView;
 	public:
 		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str) final;
+		virtual void OutputCStr(ptrc<InnerChar> c_str);
 	};
 }
 

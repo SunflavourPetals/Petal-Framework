@@ -85,12 +85,12 @@ namespace Petal
 	inline constexpr BasicCStringRef<CharT> GetLn(LineBreakMode mode) noexcept
 	{
 		using InnerChar = CharT;
-		constexpr InnerChar cr{ static_cast<InnerChar>(EnumChar::cr) };
-		constexpr InnerChar lf{ static_cast<InnerChar>(EnumChar::lf) };
-		constexpr InnerChar nul{ static_cast<InnerChar>(EnumChar::null) };
-		static constexpr const InnerChar CRLF[4]{ cr, lf, nul, nul };
-		static constexpr const InnerChar LF[2]{ lf, nul };
-		static constexpr const InnerChar CR[2]{ cr, nul };
+		constexpr InnerChar cr{ InnerChar{ EnumChar::cr } };
+		constexpr InnerChar lf{ InnerChar{ EnumChar::lf } };
+		constexpr InnerChar nul{ InnerChar{ EnumChar::null } };
+		static const InnerChar CRLF[4]{ cr, lf, nul, nul };
+		static const InnerChar LF[2]{ lf, nul };
+		static const InnerChar CR[2]{ cr, nul };
 		static constexpr tsize LEN_CRLF{ 2 };
 		static constexpr tsize LEN_LF{ 1 };
 		static constexpr tsize LEN_CR{ 1 };
