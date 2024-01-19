@@ -4,7 +4,7 @@
 
 1. 提供入口函数的参数，但在进入用户入口函数后才可能有效。  
 2. 提供封装后的模块实例句柄获取函数 `::HINSTANCE Petal::WinMain::HIns() noexcept`。  
-3. 提供封装后的命令行获取函数 `Petal::ptrc<Petal::TChar> Petal::WinMain::CmdLine() noexcept`。  
+3. 提供封装后的命令行参数获取函数 `Petal::TCStringRef Petal::WinMain::CmdLine() noexcept`。  
 4. 未定义宏 `Petal_Enable_PetalMain` 情况下提供设置用户入口函数的宏：  
    * Petal_SetMainFunc
    * Petal_SetMainSpace
@@ -36,7 +36,7 @@ int main(int argc, char* argv[], char* envp[])
 	}
 	Petal::Unnamed::protection.Use(); // 记录入口函数已被调用
 	Petal::Unnamed::Main::arguments.Init(argc, argv, envp); // 将 Petal::Main 中对象绑定到的值赋为有效值
-	Petal::Unnamed::WinMain::arguments.InitAsInvalid(); // 不将 Petal::WinMain 中对象绑定到的值赋为有效值，Petal::WinMain::hins 依然有效
+	Petal::Unnamed::WinMain::arguments.InitAsInvalid(); // 不将 Petal::WinMain 中对象绑定到的值赋为有效值
 	Petal::Unnamed::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main")); // [可选] 输出相关信息
 #ifndef Petal_Enable_PetalMain
 	return Petal::UserEntrance::pt_user_main(); // 进入用户入口函数
@@ -60,7 +60,7 @@ int main(int argc, char* argv[], char* envp[])
      * cmd_show: `INT`  
         控制窗口的显示方式。
 
-然而即使入口函数是 main / wmain，Petal::WinMain::hins 所引用的对象仍会在进入入口函数前被赋为有效值，而 HIns 和 CmdLine 函数作为对 WIN32 API 的封装则始终可用。  
+然而即使入口函数是 main / wmain，Petal::WinMain::hins 所引用的对象仍会在进入入口函数前被赋为有效值(但是不可在进入入口函数之前使用它们)，而 HIns 和 CmdLine 函数作为对 WIN32 API 的封装则始终可用。  
     
 ## 参考
 
@@ -196,7 +196,7 @@ Petal_SetMainSpace(MyProgram); // 入口函数将调用 MyProgram::main
 
 #### 函数 CmdLine
 
-`ptrc<TChar> CmdLine() noexcept;`  
+`TCStringRef CmdLine() noexcept;`  
 
 对 WIN32 API `GetCommandLineA/W` 的封装，使用 A 版本或 W 版本视情况而定(是否定义宏 Petal_Enable_Unicode)。  
 
