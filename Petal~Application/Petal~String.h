@@ -130,38 +130,90 @@ namespace Petal
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size - 1 });
 	}
 
-	template <typename Ty>
+	template <typename CharT>
 	class BasicCStringRef
 	{
 	public:
-		constexpr tsize size() const noexcept
+		using value_type = CharT;
+		using pointer = typename ptr<CharT>;
+		using const_pointer = typename ptrc<CharT>;
+		using reference = CharT&;
+		using const_reference = const CharT&;
+		using const_iterator = const_pointer;
+		using iterator = const_iterator;
+		using const_reverse_iterator = typename ::std::reverse_iterator<const_iterator>;
+		using reverse_iterator = const_reverse_iterator;
+		using size_type = typename ::std::size_t;
+		using difference_type = typename ::std::ptrdiff_t;
+	public:
+		[[nodiscard]] constexpr tsize size() const noexcept
 		{
 			return this->str_length;
 		}
-		constexpr tsize length() const noexcept
+		[[nodiscard]] constexpr tsize length() const noexcept
 		{
 			return this->str_length;
 		}
-		constexpr ptrc<Ty> data() const noexcept
+		[[nodiscard]] constexpr ptrc<CharT> data() const noexcept
 		{
 			return this->str_ptr;
 		}
-		constexpr ptrc<Ty> c_str() const noexcept
+		[[nodiscard]] constexpr ptrc<CharT> c_str() const noexcept
 		{
 			return this->str_ptr;
+		}
+		[[nodiscard]] constexpr bool empty() const noexcept
+		{
+			return this->size() == 0;
+		}
+		[[nodiscard]] constexpr BasicStringView<CharT> view() const noexcept
+		{
+			return { this->data(), this->size() };
+		}
+		[[nodiscard]] constexpr const_iterator begin() const noexcept
+		{
+			return { this->data() };
+		}
+		[[nodiscard]] constexpr const_iterator end() const noexcept
+		{
+			return { this->data() + this->size() };
+		}
+		[[nodiscard]] constexpr const_iterator cbegin() const noexcept
+		{
+			return begin();
+		}
+		[[nodiscard]] constexpr const_iterator cend() const noexcept
+		{
+			return end();
+		}
+		[[nodiscard]] constexpr const_reverse_iterator rbegin() const noexcept
+		{
+			return const_reverse_iterator{ end() };
+		}
+		[[nodiscard]] constexpr const_reverse_iterator rend() const noexcept
+		{
+			return const_reverse_iterator{ begin() };
+		}
+		[[nodiscard]] constexpr const_reverse_iterator crbegin() const noexcept
+		{
+			return rbegin();
+		}
+		[[nodiscard]] constexpr const_reverse_iterator crend() const noexcept
+		{
+			return rend();
 		}
 	public:
 		constexpr BasicCStringRef() = default;
-		constexpr BasicCStringRef(ptrc<Ty> str, tsize length)
+		constexpr BasicCStringRef(ptrc<CharT> str, tsize length)
 		{
 			if (str[length] != 0)
 			{
-				throw ::std::exception{ "[Petal] expection: str is not c style string in Petal::BasicCStringRef<Ty>(ptrc<Ty>, tsize)" };
+				throw ::std::exception{ "[Petal] expection: str is not c style string in Petal::BasicCStringRef<CharT>(ptrc<CharT>, tsize)" };
 			}
 			this->str_ptr = str;
 			this->str_length = length;
 		}
-		constexpr BasicCStringRef(const BasicString<Ty>& ref_str)
+		constexpr BasicCStringRef(const BasicString<CharT>& ref_str)
 		{
 			this->str_ptr = ref_str.c_str();
 			this->str_length = ref_str.length();
@@ -175,7 +227,7 @@ namespace Petal
 			return *this;
 		}
 		template <typename Traits, typename Alloc>
-		constexpr BasicCStringRef& operator= (const BasicString<Ty, Traits, Alloc>& ref_str)
+		constexpr BasicCStringRef& operator= (const BasicString<CharT, Traits, Alloc>& ref_str)
 		{
 			this->str_ptr = ref_str.c_str();
 			this->str_length = ref_str.length();
@@ -191,18 +243,32 @@ namespace Petal
 		{
 			return this->str_ptr;
 		}
-		operator const Ty*()
+		operator const CharT*()
 		{
 			return this->str_ptr;
 		}
-		operator BasicStringView<Ty>()
+		operator BasicStringView<CharT>()
 		{
-			return { this->c_str(), this->length() };
+			return this->view();
 		}
 	private:
-		ptrc<Ty> str_ptr{ nullptr };
+		ptrc<CharT> str_ptr{ nullptr };
 		tsize str_length{};
 	};
+
+	template <typename CharT>
+	[[nodiscard]] constexpr bool operator== (const BasicCStringRef<CharT> lhs, const BasicCStringRef<CharT> rhs)
+		noexcept(noexcept(lhs.view() == rhs.view()))
+	{
+		return lhs.view() == rhs.view();
+	}
+
+	template <typename CharT>
+	[[nodiscard]] constexpr auto operator<=> (const BasicCStringRef<CharT> lhs, const BasicCStringRef<CharT> rhs)
+		noexcept(noexcept(lhs.view() <=> rhs.view()))
+	{
+		return lhs.view() <=> rhs.view();
+	}
 
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline constexpr [[nodiscard]] BasicCStringRef<CharT>
@@ -269,9 +335,21 @@ namespace Petal
 #endif
 }
 
-template<typename CharT>
-struct std::formatter<::Petal::BasicCStringRef<CharT>, CharT> :
-	std::formatter<::std::basic_string_view<CharT>, CharT> { };
+template <typename CharT>
+struct ::std::formatter<::Petal::BasicCStringRef<CharT>, CharT> :
+	::std::formatter<::std::basic_string_view<CharT>, CharT> { };
+
+template <typename CharT>
+struct ::std::hash<::Petal::BasicCStringRef<CharT>>
+{
+	using KeyTy = ::Petal::BasicCStringRef<CharT>;
+	using ResultTy = ::std::size_t;
+	[[nodiscard]] ResultTy operator()(const KeyTy& key_val) const
+		noexcept(noexcept(::std::declval<::std::hash<::std::basic_string_view<CharT>>>()({})))
+	{
+		return ::std::hash<::std::basic_string_view<CharT>>{}(key_val.view());
+	}
+};
 
 namespace Petal::TypeTraits
 {
