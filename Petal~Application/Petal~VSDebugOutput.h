@@ -17,6 +17,7 @@ namespace Petal::Debug
 		using InnerChar = typename Abstract::OutputA::InnerChar;
 		using InnerString = typename Abstract::OutputA::InnerString;
 		using InnerStringView = typename Abstract::OutputA::InnerStringView;
+		using InnerCStringRef = typename Abstract::OutputA::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str);
 		virtual void OutputCStr(ptrc<InnerChar> c_str);
@@ -28,6 +29,7 @@ namespace Petal::Debug
 		using InnerChar = typename Abstract::OutputW::InnerChar;
 		using InnerString = typename Abstract::OutputW::InnerString;
 		using InnerStringView = typename Abstract::OutputW::InnerStringView;
+		using InnerCStringRef = typename Abstract::OutputW::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str);
 		virtual void OutputCStr(ptrc<InnerChar> c_str);
@@ -65,7 +67,7 @@ namespace Petal::Debug
 	inline void println(StringView fmt, Args&&... args)
 	{
 		StringView fmt_fmt{ "{}{}" };
-		StringView ln{ static_cast<StringView>(GetLn<Char>(dout.line_break_mode)) };
+		auto ln = GetLn<Char>(dout.line_break_mode);
 		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_format_args(fmt, ln));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
@@ -103,7 +105,7 @@ namespace Petal::Debug
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
 		WStringView fmt_fmt{ L"{}{}" };
-		WStringView ln{ static_cast<WStringView>(GetLn<WChar>(dowt.line_break_mode)) };
+		auto ln = GetLn<WChar>(dowt.line_break_mode);
 		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_wformat_args(fmt, ln));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
@@ -221,9 +223,6 @@ namespace Petal
 #ifdef Petal_VSDbgT
 #undef Petal_VSDbgT
 #endif
-#ifdef Petal_VSDbgExcep
-#undef Petal_VSDbgExcep
-#endif
 
 #if defined(Petal_Enable_VSDebugOutput)
 #define Petal_VSDebugOutputA(x) ::Petal::dout.OutputCStr( x )
@@ -258,12 +257,6 @@ namespace Petal
 #else
 #define Petal_VSDbg(x) Petal_VSDebugOutput(x)
 #define Petal_VSDbgT(x) Petal_VSDebugOutputT(x)
-#endif
-
-#if defined(Petal_Enable_ForceExcepDescANSI)
-#define Petal_VSDbgExcep(x) Petal_VSDebugOutputA(x)
-#else
-#define Petal_VSDbgExcep(x) Petal_VSDebugOutput(x)
 #endif
 
 #endif // !Petal_Header_VSDebugOutput

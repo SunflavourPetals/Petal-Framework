@@ -20,6 +20,7 @@ namespace Petal::Log
 		using InnerChar = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerChar;
 		using InnerString = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerString;
 		using InnerStringView = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerStringView;
+		using InnerCStringRef = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerCStringRef;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());

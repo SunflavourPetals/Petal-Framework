@@ -32,6 +32,7 @@ namespace Petal::Abstract
 		using InnerChar = CharT;
 		using InnerString = BasicString<InnerChar, Traits, Alloc>;
 		using InnerStringView = BasicStringView<InnerChar, Traits>;
+		using InnerCStringRef = BasicCStringRef<InnerChar>;
 	public:
 		virtual void Output(InnerStringView str) = 0;
 	public:
@@ -59,6 +60,7 @@ namespace Petal::Abstract
 	{
 	public:
 		using InnerChar = CharT;
+		using InnerCStringRef = BasicCStringRef<InnerChar>;
 	public:
 		virtual void OutputCStr(ptrc<InnerChar> c_str) = 0;
 		inline virtual BasicCOutput& operator-(ptrc<InnerChar> c_str)
@@ -88,12 +90,13 @@ namespace Petal
 		constexpr InnerChar cr{ InnerChar{ EnumChar::cr } };
 		constexpr InnerChar lf{ InnerChar{ EnumChar::lf } };
 		constexpr InnerChar nul{ InnerChar{ EnumChar::null } };
+		constexpr tsize LEN_CRLF{ 2 };
+		constexpr tsize LEN_LF{ 1 };
+		constexpr tsize LEN_CR{ 1 };
+
 		static const InnerChar CRLF[4]{ cr, lf, nul, nul };
 		static const InnerChar LF[2]{ lf, nul };
 		static const InnerChar CR[2]{ cr, nul };
-		static constexpr tsize LEN_CRLF{ 2 };
-		static constexpr tsize LEN_LF{ 1 };
-		static constexpr tsize LEN_CR{ 1 };
 
 		switch (mode)
 		{
@@ -109,7 +112,11 @@ namespace Petal
 		default:
 			break;
 		}
-		return { CRLF + LEN_CRLF, 0 };
+#ifdef WIN32
+		return { CRLF, LEN_CRLF };
+#else
+		return { LF, LEN_LF };
+#endif
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline void ln(Abstract::BasicOutput<CharT, Traits, Alloc>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.Output({})))
