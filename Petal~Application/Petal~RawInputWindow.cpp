@@ -1,4 +1,5 @@
 #include "Petal~RawInputWindow.h"
+#include "Petal~VSDebugOutput.h"
 
 namespace Petal
 {

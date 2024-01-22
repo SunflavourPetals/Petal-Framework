@@ -42,7 +42,7 @@ namespace Petal
 	extern Debug::VSDebugOutputW dowt;
 }
 
-namespace Petal::Debug
+namespace Petal::Debug // : if msvc support "if consteval" then maybe better impl there.
 {
 	template <typename... Args>
 	inline void print(StringView fmt, Args&&... args)
@@ -52,12 +52,12 @@ namespace Petal::Debug
 	template <tsize char_arr_size, typename... Args>
 	inline void print(const Char (&fmt)[char_arr_size], Args&&... args)
 	{
-		print(StringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void print(Char (&fmt)[char_arr_size], Args&&... args)
 	{
-		print(StringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	inline void println()
 	{
@@ -66,20 +66,18 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
 	{
-		StringView fmt_fmt{ "{}{}" };
-		auto ln = GetLn<Char>(dout.line_break_mode);
-		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_format_args(fmt, ln));
+		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<Char>(dout.line_break_mode));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void println(const Char (&fmt)[char_arr_size], Args&&... args)
 	{
-		println(StringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void println(Char (&fmt)[char_arr_size], Args&&... args)
 	{
-		println(StringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 
 	template <typename... Args>
@@ -90,12 +88,12 @@ namespace Petal::Debug
 	template <tsize char_arr_size, typename... Args>
 	inline void wprint(const WChar (&fmt)[char_arr_size], Args&&... args)
 	{
-		wprint(WStringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void wprint(WChar (&fmt)[char_arr_size], Args&&... args)
 	{
-		wprint(WStringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	inline void wprintln()
 	{
@@ -104,20 +102,18 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
-		WStringView fmt_fmt{ L"{}{}" };
-		auto ln = GetLn<WChar>(dowt.line_break_mode);
-		auto fmt_ln = ::std::vformat(fmt_fmt, ::std::make_wformat_args(fmt, ln));
+		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<WChar>(dowt.line_break_mode));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void wprintln(const WChar (&fmt)[char_arr_size], Args&&... args)
 	{
-		wprintln(WStringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 	template <tsize char_arr_size, typename... Args>
 	inline void wprintln(WChar (&fmt)[char_arr_size], Args&&... args)
 	{
-		wprintln(WStringView{ fmt, char_arr_size - 1 }, ::std::forward<Args>(args)...);
+		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
 }
 

@@ -8,6 +8,7 @@
 #include <format>
 #include <xstring>
 #include <type_traits>
+#include <iostream>
 
 namespace Petal
 {
@@ -239,17 +240,21 @@ namespace Petal
 			this->str_length = 0;
 			return *this;
 		}
-		operator bool()
+		constexpr operator bool()
 		{
 			return this->str_ptr;
 		}
-		operator const CharT*()
+		constexpr operator const CharT*()
 		{
 			return this->str_ptr;
 		}
-		operator BasicStringView<CharT>()
+		constexpr operator BasicStringView<CharT>()
 		{
 			return this->view();
+		}
+		constexpr operator BasicString<CharT>()
+		{
+			return { this->view() };
 		}
 	private:
 		ptrc<CharT> str_ptr{ nullptr };
@@ -314,6 +319,12 @@ namespace Petal
 	inline constexpr U32CStringRef operator""_csr(const U32Char* str, ::std::size_t length)
 	{
 		return { str, length };
+	}
+
+	template <typename CharT>
+	::std::ostream& operator<<(::std::ostream& out, const BasicCStringRef<CharT>& csr)
+	{
+		return out << csr.view();
 	}
 
 #if defined(Petal_Enable_Unicode)

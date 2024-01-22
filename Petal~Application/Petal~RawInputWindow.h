@@ -4,7 +4,6 @@
 #define Petal_Header_RawInputWindow
 
 #include "Petal~Window.h"
-#include "Petal~VSDebugOutput.h"
 
 #include <span>
 #include <hidusage.h>
