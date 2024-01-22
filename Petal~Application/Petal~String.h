@@ -8,7 +8,7 @@
 #include <format>
 #include <xstring>
 #include <type_traits>
-#include <iostream>
+#include <iosfwd>
 
 namespace Petal
 {
@@ -147,19 +147,19 @@ namespace Petal
 		using size_type = typename ::std::size_t;
 		using difference_type = typename ::std::ptrdiff_t;
 	public:
-		[[nodiscard]] constexpr tsize size() const noexcept
+		[[nodiscard]] constexpr size_type size() const noexcept
 		{
 			return this->str_length;
 		}
-		[[nodiscard]] constexpr tsize length() const noexcept
+		[[nodiscard]] constexpr size_type length() const noexcept
 		{
 			return this->str_length;
 		}
-		[[nodiscard]] constexpr ptrc<CharT> data() const noexcept
+		[[nodiscard]] constexpr const_pointer data() const noexcept
 		{
 			return this->str_ptr;
 		}
-		[[nodiscard]] constexpr ptrc<CharT> c_str() const noexcept
+		[[nodiscard]] constexpr const_pointer c_str() const noexcept
 		{
 			return this->str_ptr;
 		}
@@ -167,9 +167,15 @@ namespace Petal
 		{
 			return this->size() == 0;
 		}
-		[[nodiscard]] constexpr BasicStringView<CharT> view() const noexcept
+		template <typename Traits = ::std::char_traits<CharT>>
+		[[nodiscard]] constexpr BasicStringView<CharT, Traits> view() const noexcept
 		{
 			return { this->data(), this->size() };
+		}
+		template <typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+		[[nodiscard]] constexpr BasicString<CharT, Traits, Alloc> to_string() const noexcept
+		{
+			return { this->view() };
 		}
 		[[nodiscard]] constexpr const_iterator begin() const noexcept
 		{
@@ -205,11 +211,11 @@ namespace Petal
 		}
 	public:
 		constexpr BasicCStringRef() = default;
-		constexpr BasicCStringRef(ptrc<CharT> str, tsize length)
+		constexpr BasicCStringRef(const_pointer str, size_type length)
 		{
 			if (str[length] != 0)
 			{
-				throw ::std::exception{ "[Petal] expection: str is not c style string in Petal::BasicCStringRef<CharT>(ptrc<CharT>, tsize)" };
+				throw ::std::exception{ "[Petal] expection: str is not c style string in Petal::BasicCStringRef<CharT>(const_pointer, size_type)" };
 			}
 			this->str_ptr = str;
 			this->str_length = length;
@@ -254,11 +260,11 @@ namespace Petal
 		}
 		constexpr operator BasicString<CharT>()
 		{
-			return { this->view() };
+			return this->to_string();
 		}
 	private:
-		ptrc<CharT> str_ptr{ nullptr };
-		tsize str_length{};
+		const_pointer str_ptr{ nullptr };
+		size_type str_length{};
 	};
 
 	template <typename CharT>
@@ -322,7 +328,7 @@ namespace Petal
 	}
 
 	template <typename CharT>
-	::std::ostream& operator<<(::std::ostream& out, const BasicCStringRef<CharT>& csr)
+	::std::basic_ostream<CharT>& operator<<(::std::basic_ostream<CharT>& out, const BasicCStringRef<CharT>& csr)
 	{
 		return out << csr.view();
 	}
