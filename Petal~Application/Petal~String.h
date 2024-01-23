@@ -146,6 +146,21 @@ namespace Petal
 		using reverse_iterator = const_reverse_iterator;
 		using size_type = typename ::std::size_t;
 		using difference_type = typename ::std::ptrdiff_t;
+		struct Hash
+		{
+			using KeyTy = BasicCStringRef;
+			using ResultTy = ::std::size_t;
+			[[nodiscard]] ResultTy operator()(const KeyTy& key_val) const
+				noexcept(noexcept(HashValue({})))
+			{
+				return HashValue(key_val);
+			}
+			[[nodiscard]] static constexpr ResultTy HashValue(const KeyTy& key_val)
+				noexcept(noexcept(::std::declval<::std::hash<::std::basic_string_view<CharT>>>()({})))
+			{
+				return ::std::hash<::std::basic_string_view<CharT>>{}(key_val.view());
+			}
+		};
 	public:
 		[[nodiscard]] constexpr size_type size() const noexcept
 		{
@@ -209,8 +224,23 @@ namespace Petal
 		{
 			return rend();
 		}
+		[[nodiscard]] constexpr const CharT& at(size_type pos) const
+		{
+			if (pos >= this->size())
+			{
+				throw ::std::out_of_range{ "[Petal] expection: invalid CStringRef position" };
+			}
+			return this->c_str()[pos];
+		}
 	public:
 		constexpr BasicCStringRef() = default;
+		template <typename Traits, typename Alloc>
+		constexpr BasicCStringRef(const BasicString<CharT, Traits, Alloc>& ref_str) :
+			str_ptr{ ref_str.c_str() },
+			str_length{ ref_str.length() }
+		{
+
+		}
 		constexpr BasicCStringRef(const_pointer str, size_type length)
 		{
 			if (str[length] != 0)
@@ -220,13 +250,12 @@ namespace Petal
 			this->str_ptr = str;
 			this->str_length = length;
 		}
-		constexpr BasicCStringRef(const BasicString<CharT>& ref_str)
-		{
-			this->str_ptr = ref_str.c_str();
-			this->str_length = ref_str.length();
-		}
 		constexpr BasicCStringRef(const BasicCStringRef&) = default;
 		constexpr ~BasicCStringRef() = default;
+		constexpr const CharT& operator[](size_type pos)
+		{
+			return this->c_str()[pos];
+		}
 		constexpr BasicCStringRef& operator= (const BasicCStringRef str)
 		{
 			this->str_ptr = str.c_str();
@@ -279,25 +308,6 @@ namespace Petal
 		noexcept(noexcept(lhs.view() <=> rhs.view()))
 	{
 		return lhs.view() <=> rhs.view();
-	}
-
-	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline constexpr [[nodiscard]] BasicCStringRef<CharT>
-		MakeCStringRef(const BasicString<CharT, Traits, Alloc>& ref_str)
-	{
-		return BasicCStringRef<CharT>{ ref_str.c_str(), ref_str.length() };
-	}
-	template <typename CharT, tsize char_arr_size>
-	inline constexpr [[nodiscard]] BasicCStringRef<CharT>
-		MakeCStringRef(const CharT (&ref_str)[char_arr_size])
-	{
-		return BasicCStringRef<CharT>{ ref_str, char_arr_size - 1 };
-	}
-	template <typename CharT, tsize char_arr_size>
-	inline constexpr [[nodiscard]] BasicCStringRef<CharT>
-		MakeCStringRef(CharT (&ref_str)[char_arr_size])
-	{
-		return BasicCStringRef<CharT>{ ref_str, char_arr_size - 1 };
 	}
 
 	using CStringRef = BasicCStringRef<Char>;
@@ -355,18 +365,6 @@ namespace Petal
 template <typename CharT>
 struct ::std::formatter<::Petal::BasicCStringRef<CharT>, CharT> :
 	::std::formatter<::std::basic_string_view<CharT>, CharT> { };
-
-template <typename CharT>
-struct ::std::hash<::Petal::BasicCStringRef<CharT>>
-{
-	using KeyTy = ::Petal::BasicCStringRef<CharT>;
-	using ResultTy = ::std::size_t;
-	[[nodiscard]] ResultTy operator()(const KeyTy& key_val) const
-		noexcept(noexcept(::std::declval<::std::hash<::std::basic_string_view<CharT>>>()({})))
-	{
-		return ::std::hash<::std::basic_string_view<CharT>>{}(key_val.view());
-	}
-};
 
 namespace Petal::TypeTraits
 {
