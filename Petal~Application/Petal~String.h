@@ -5,10 +5,10 @@
 
 #include "Petal~BasicTypes.h"
 
+#include <iosfwd>
 #include <format>
 #include <xstring>
 #include <type_traits>
-#include <iosfwd>
 
 namespace Petal
 {
@@ -123,12 +123,12 @@ namespace Petal
 	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(const CharT (&in_str)[char_arr_size])
 	{
-		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size - 1 });
+		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
 	}
 	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(CharT (&in_str)[char_arr_size])
 	{
-		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size - 1 });
+		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
 	}
 
 	template <typename CharT>
