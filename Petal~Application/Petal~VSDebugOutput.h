@@ -49,13 +49,9 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	{
 		dout + ::std::vformat(fmt, ::std::make_format_args(::std::forward<Args>(args)...));
 	}
-	template <tsize char_arr_size, typename... Args>
-	inline void print(const Char (&fmt)[char_arr_size], Args&&... args)
-	{
-		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-	template <tsize char_arr_size, typename... Args>
-	inline void print(Char (&fmt)[char_arr_size], Args&&... args)
+	template <typename CharT, tsize char_arr_size, typename... Args>
+		requires std::is_same_v<Char, std::remove_cv_t<CharT>>
+	inline void print(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
@@ -69,13 +65,9 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<Char>(dout.line_break_mode));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
-	template <tsize char_arr_size, typename... Args>
-	inline void println(const Char (&fmt)[char_arr_size], Args&&... args)
-	{
-		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-	template <tsize char_arr_size, typename... Args>
-	inline void println(Char (&fmt)[char_arr_size], Args&&... args)
+	template <typename CharT, tsize char_arr_size, typename... Args>
+		requires std::is_same_v<Char, std::remove_cv_t<CharT>>
+	inline void println(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
@@ -85,13 +77,9 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	{
 		dowt + ::std::vformat(fmt, ::std::make_wformat_args(::std::forward<Args>(args)...));
 	}
-	template <tsize char_arr_size, typename... Args>
-	inline void wprint(const WChar (&fmt)[char_arr_size], Args&&... args)
-	{
-		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-	template <tsize char_arr_size, typename... Args>
-	inline void wprint(WChar (&fmt)[char_arr_size], Args&&... args)
+	template <typename CharT, tsize char_arr_size, typename... Args>
+		requires std::is_same_v<WChar, std::remove_cv_t<CharT>>
+	inline void wprint(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
@@ -105,13 +93,9 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<WChar>(dowt.line_break_mode));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
-	template <tsize char_arr_size, typename... Args>
-	inline void wprintln(const WChar (&fmt)[char_arr_size], Args&&... args)
-	{
-		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-	template <tsize char_arr_size, typename... Args>
-	inline void wprintln(WChar (&fmt)[char_arr_size], Args&&... args)
+	template <typename CharT, tsize char_arr_size, typename... Args>
+		requires std::is_same_v<WChar, std::remove_cv_t<CharT>>
+	inline void wprintln(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}

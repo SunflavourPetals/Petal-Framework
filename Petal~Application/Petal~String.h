@@ -116,17 +116,20 @@ namespace Petal
 		return c_str;
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(const BasicString<CharT, Traits, Alloc>& in_str)
+	[[nodiscard]] inline auto StringToCStyleString(const BasicString<CharT, Traits, Alloc>& in_str)
+		-> BasicString<CharT, Traits, Alloc>
 	{
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str });
 	}
 	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(const CharT (&in_str)[char_arr_size])
+	[[nodiscard]] inline auto StringToCStyleString(const CharT (&in_str)[char_arr_size])
+		-> BasicString<CharT, Traits, Alloc>
 	{
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
 	}
 	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(CharT (&in_str)[char_arr_size])
+	[[nodiscard]] inline auto StringToCStyleString(CharT (&in_str)[char_arr_size])
+		-> BasicString<CharT, Traits, Alloc>
 	{
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
 	}
