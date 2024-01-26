@@ -10,6 +10,17 @@
 #include <xstring>
 #include <type_traits>
 
+namespace Petal::EnumChar
+{
+	inline constexpr char cr{ '\r' };   // CR : Carriage Return
+	inline constexpr char lf{ '\n' };   // LF : Line Feed
+	inline constexpr char tab{ '\t' };  // HT : Horizontal Tab
+	inline constexpr char vtab{ '\v' }; // VT : Vertical Tab
+	inline constexpr char space{ ' ' }; // Space
+	inline constexpr char null{ '\0' }; // NUL : Null Character
+	inline constexpr char bell{ '\a' }; // BEL : Bell/Alert/Alarm
+}
+
 namespace Petal
 {
 	using Char = achar;
@@ -31,69 +42,6 @@ namespace Petal
 	using U8StringView = BasicStringView<U8Char>;
 	using U16StringView = BasicStringView<U16Char>;
 	using U32StringView = BasicStringView<U32Char>;
-
-	inline constexpr String operator""_s(const Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr WString operator""_s(const WChar* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U8String operator""_s(const U8Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16String operator""_s(const U16Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32String operator""_s(const U32Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-
-	inline constexpr StringView operator""_sv(const Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr WStringView operator""_sv(const WChar* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U8StringView operator""_sv(const U8Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16StringView operator""_sv(const U16Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32StringView operator""_sv(const U32Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-
-#if defined(Petal_Enable_Unicode)
-	using TChar = WChar;
-	using TString = WString;
-	using TStringView = WStringView;
-#else
-	using TChar = Char;
-	using TString = String;
-	using TStringView = StringView;
-#endif
-
-	namespace EnumChar
-	{
-		inline constexpr Char cr{ '\r' };   // CR : Carriage Return
-		inline constexpr Char lf{ '\n' };   // LF : Line Feed
-		inline constexpr Char tab{ '\t' };  // HT : Horizontal Tab
-		inline constexpr Char vtab{ '\v' }; // VT : Vertical Tab
-		inline constexpr Char space{ ' ' }; // Space
-		inline constexpr Char null{ '\0' }; // NUL : Null Character
-		inline constexpr Char bell{ '\a' }; // BEL : Bell/Alert/Alarm
-	}
 
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(BasicStringView<CharT, Traits> in_str)
@@ -319,27 +267,6 @@ namespace Petal
 	using U16CStringRef = BasicCStringRef<U16Char>;
 	using U32CStringRef = BasicCStringRef<U32Char>;
 
-	inline constexpr CStringRef operator""_csr(const Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr WCStringRef operator""_csr(const WChar* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U8CStringRef operator""_csr(const U8Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16CStringRef operator""_csr(const U16Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32CStringRef operator""_csr(const U32Char* str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-
 	template <typename CharT>
 	::std::basic_ostream<CharT>& operator<<(::std::basic_ostream<CharT>& out, const BasicCStringRef<CharT>& csr)
 	{
@@ -347,8 +274,14 @@ namespace Petal
 	}
 
 #if defined(Petal_Enable_Unicode)
+	using TChar = WChar;
+	using TString = WString;
+	using TStringView = WStringView;
 	using TCStringRef = WCStringRef;
 #else
+	using TChar = Char;
+	using TString = String;
+	using TStringView = StringView;
 	using TCStringRef = CStringRef;
 #endif
 
@@ -376,6 +309,73 @@ namespace Petal::TypeTraits
 
 	template <typename Ty>
 	constexpr bool is_dbg_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, DbgChar> };
+}
+
+namespace Petal::StringLiterals
+{
+	inline constexpr String operator""_s(const Char * str, ::std::size_t length)
+	{
+		using namespace std::string_literals;
+		return { str, length };
+	}
+	inline constexpr WString operator""_s(const WChar * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U8String operator""_s(const U8Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U16String operator""_s(const U16Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U32String operator""_s(const U32Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+
+	inline constexpr StringView operator""_sv(const Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr WStringView operator""_sv(const WChar * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U8StringView operator""_sv(const U8Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U16StringView operator""_sv(const U16Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U32StringView operator""_sv(const U32Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+
+	inline constexpr CStringRef operator""_csr(const Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr WCStringRef operator""_csr(const WChar * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U8CStringRef operator""_csr(const U8Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U16CStringRef operator""_csr(const U16Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
+	inline constexpr U32CStringRef operator""_csr(const U32Char * str, ::std::size_t length)
+	{
+		return { str, length };
+	}
 }
 
 #ifdef Petal_TStr
