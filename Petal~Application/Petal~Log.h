@@ -32,7 +32,8 @@ namespace Petal::Log
 		void Close();
 		void ByteWrite(ptrc<byte> data, tsize size);
 		void WriteBom(const BOM::Bom& bom);
-		virtual void Output(InnerStringView str);
+		virtual void Output(InnerStringView str) override;
+		virtual LineBreakMode LnMode() noexcept override;
 	public:
 		LogStream() = default;
 		LogStream(const ::std::string& file_name, const BOM::Bom& bom);
@@ -45,6 +46,7 @@ namespace Petal::Log
 		virtual ~LogStream();
 	private:
 		FileStream file{};
+		LineBreakMode line_break_mode{};
 		static constexpr auto open_mode_trunc{ ::std::ios_base::out | ::std::ios_base::binary | ::std::ios_base::trunc };
 		static constexpr auto open_mode_append{ ::std::ios_base::out | ::std::ios_base::binary | ::std::ios_base::app };
 	};
@@ -141,6 +143,11 @@ namespace Petal::Log
 	inline void LogStream<CharT, Traits, Alloc>::Output(InnerStringView str)
 	{
 		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename InnerStringView::value_type) * str.size());
+	}
+	template <typename CharT, typename Traits, typename Alloc>
+	inline LineBreakMode LogStream<CharT, Traits, Alloc>::LnMode() noexcept
+	{
+		return this->line_break_mode;
 	}
 }
 

@@ -16,6 +16,15 @@ namespace Petal::Debug
 	{
 		::OutputDebugStringA(c_str);
 	}
+	LineBreakMode VSDebugOutputA::LnMode() noexcept
+	{
+		return this->line_break_mode;
+	}
+	LineBreakMode VSDebugOutputA::LnModeCStr() noexcept
+	{
+		return this->line_break_mode;
+	}
+
 	void VSDebugOutputW::Output(InnerStringView str)
 	{
 		InnerString c_str{ str.data(), str.size() };
@@ -29,10 +38,18 @@ namespace Petal::Debug
 	{
 		::OutputDebugStringW(c_str);
 	}
+	LineBreakMode VSDebugOutputW::LnMode() noexcept
+	{
+		return this->line_break_mode;
+	}
+	LineBreakMode VSDebugOutputW::LnModeCStr() noexcept
+	{
+		return this->line_break_mode;
+	}
 }
 
 namespace Petal
 {
-	Debug::VSDebugOutputA dout{};
-	Debug::VSDebugOutputW dowt{};
+	constinit Debug::VSDebugOutputA dout{};
+	constinit Debug::VSDebugOutputW dowt{};
 }

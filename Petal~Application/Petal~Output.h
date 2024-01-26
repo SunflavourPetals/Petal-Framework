@@ -8,7 +8,7 @@
 
 namespace Petal
 {
-	enum class LineBreakMode : i32
+	enum class LineBreakMode
 	{
 		CRLF = 1,
 		CR = 2,
@@ -19,14 +19,8 @@ namespace Petal
 
 namespace Petal::Abstract
 {
-	class OutputLineBreakMode
-	{
-	public:
-		LineBreakMode line_break_mode{ LineBreakMode::Default };
-	};
-
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	class BasicOutput : virtual public OutputLineBreakMode
+	class BasicOutput
 	{
 	public:
 		using InnerChar = CharT;
@@ -35,6 +29,7 @@ namespace Petal::Abstract
 		using InnerCStringRef = BasicCStringRef<InnerChar>;
 	public:
 		virtual void Output(InnerStringView str) = 0;
+		virtual LineBreakMode LnMode() noexcept = 0;
 	public:
 		inline virtual BasicOutput& operator+(InnerStringView str)
 		{
@@ -47,7 +42,8 @@ namespace Petal::Abstract
 			return *this;
 		}
 	public:
-		inline virtual ~BasicOutput() = default;
+		constexpr BasicOutput() = default;
+		virtual ~BasicOutput() = default;
 	};
 	using OutputA = BasicOutput<Char>;
 	using OutputW = BasicOutput<WChar>;
@@ -56,13 +52,15 @@ namespace Petal::Abstract
 	using OutputU32 = BasicOutput<U32Char>;
 
 	template <typename CharT>
-	class BasicCOutput : virtual public OutputLineBreakMode
+	class BasicCOutput
 	{
 	public:
 		using InnerChar = CharT;
 		using InnerCStringRef = BasicCStringRef<InnerChar>;
 	public:
 		virtual void OutputCStr(ptrc<InnerChar> c_str) = 0;
+		virtual LineBreakMode LnModeCStr() noexcept = 0;
+	public:
 		inline virtual BasicCOutput& operator-(ptrc<InnerChar> c_str)
 		{
 			this->OutputCStr(c_str);
@@ -73,6 +71,9 @@ namespace Petal::Abstract
 			pfn(*this);
 			return *this;
 		}
+	public:
+		constexpr BasicCOutput() = default;
+		virtual ~BasicCOutput() = default;
 	};
 	using COutputA = BasicCOutput<Char>;
 	using COutputW = BasicCOutput<WChar>;
@@ -121,12 +122,12 @@ namespace Petal
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	inline void ln(Abstract::BasicOutput<CharT, Traits, Alloc>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.Output({})))
 	{
-		output.Output(static_cast<BasicStringView<CharT, Traits>>(GetLn<CharT>(output.line_break_mode)));
+		output.Output(static_cast<BasicStringView<CharT, Traits>>(GetLn<CharT>(output.LnMode())));
 	};
 	template <typename CharT>
 	inline void ln(Abstract::BasicCOutput<CharT>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.OutputCStr({})))
 	{
-		output.OutputCStr(GetLn<CharT>(output.line_break_mode).c_str());
+		output.OutputCStr(GetLn<CharT>(output.LnModeCStr()).c_str());
 	};
 }
 

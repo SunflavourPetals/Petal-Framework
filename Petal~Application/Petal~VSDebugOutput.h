@@ -8,6 +8,7 @@
 #include "Petal~Output.h"
 
 #include <format>
+#include <optional>
 
 namespace Petal::Debug
 {
@@ -19,8 +20,14 @@ namespace Petal::Debug
 		using InnerStringView = typename Abstract::OutputA::InnerStringView;
 		using InnerCStringRef = typename Abstract::OutputA::InnerCStringRef;
 	public:
-		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str);
+		virtual void Output(InnerStringView str) override;
+		virtual void OutputCStr(ptrc<InnerChar> c_str) override;
+		virtual LineBreakMode LnMode() noexcept override;
+		virtual LineBreakMode LnModeCStr() noexcept override;
+	public:
+		constexpr VSDebugOutputA() = default;
+	public:
+		LineBreakMode line_break_mode{};
 	};
 
 	class VSDebugOutputW : public Abstract::OutputW, public Abstract::COutputW
@@ -33,13 +40,19 @@ namespace Petal::Debug
 	public:
 		virtual void Output(InnerStringView str);
 		virtual void OutputCStr(ptrc<InnerChar> c_str);
+		virtual LineBreakMode LnMode() noexcept override;
+		virtual LineBreakMode LnModeCStr() noexcept override;
+	public:
+		constexpr VSDebugOutputW() = default;
+	public:
+		LineBreakMode line_break_mode{};
 	};
 }
 
 namespace Petal
 {
-	extern Debug::VSDebugOutputA dout;
-	extern Debug::VSDebugOutputW dowt;
+	extern constinit Debug::VSDebugOutputA dout;
+	extern constinit Debug::VSDebugOutputW dowt;
 }
 
 namespace Petal::Debug // : if msvc support "if consteval" then maybe better impl there.
@@ -62,7 +75,7 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<Char>(dout.line_break_mode));
+		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<Char>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -90,7 +103,7 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<WChar>(dowt.line_break_mode));
+		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<WChar>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -101,73 +114,69 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	}
 }
 
-namespace Petal::Debug
+namespace Petal::DebugLiterals
 {
-	class VSLiteralFmtDbgOutA
+	class LiteralDbgOutA
 	{
 	public:
 		StringView fmt{};
 	public:
-		constexpr VSLiteralFmtDbgOutA(StringView format) : fmt{ format } {}
+		constexpr LiteralDbgOutA(StringView format) : fmt{ format } {}
 		template <typename... Args>
 		constexpr void operator()(Args&&... args)
 		{
-			print(fmt, ::std::forward<Args>(args)...);
+			Debug::print(fmt, ::std::forward<Args>(args)...);
 		}
 	};
-	class VSLiteralFmtDbgOutLnA
+	class LiteralDbgOutLnA
 	{
 	public:
 		StringView fmt{};
 	public:
-		constexpr VSLiteralFmtDbgOutLnA(StringView format) : fmt{ format } {}
+		constexpr LiteralDbgOutLnA(StringView format) : fmt{ format } {}
 		template <typename... Args>
 		constexpr void operator()(Args&&... args)
 		{
-			println(fmt, ::std::forward<Args>(args)...);
+			Debug::println(fmt, ::std::forward<Args>(args)...);
 		}
 	};
-	class VSLiteralFmtDbgOutW
+	class LiteralDbgOutW
 	{
 	public:
 		WStringView fmt{};
 	public:
-		constexpr VSLiteralFmtDbgOutW(WStringView format) : fmt{ format } {}
+		constexpr LiteralDbgOutW(WStringView format) : fmt{ format } {}
 		template <typename... Args>
 		constexpr void operator()(Args&&... args)
 		{
-			wprint(fmt, ::std::forward<Args>(args)...);
+			Debug::wprint(fmt, ::std::forward<Args>(args)...);
 		}
 	};
-	class VSLiteralFmtDbgOutLnW
+	class LiteralDbgOutLnW
 	{
 	public:
 		WStringView fmt{};
 	public:
-		constexpr VSLiteralFmtDbgOutLnW(WStringView format) : fmt{ format } {}
+		constexpr LiteralDbgOutLnW(WStringView format) : fmt{ format } {}
 		template <typename... Args>
 		constexpr void operator()(Args&&... args)
 		{
-			wprintln(fmt, ::std::forward<Args>(args)...);
+			Debug::wprintln(fmt, ::std::forward<Args>(args)...);
 		}
 	};
-}
-
-namespace Petal
-{
-	inline constexpr Debug::VSLiteralFmtDbgOutA operator""_dout(const Char * str, ::std::size_t length)
+	[[nodiscard]] inline consteval LiteralDbgOutA operator""_dout(const Char * str, ::std::size_t length)
 	{
 		return { { str, length } };
 	}
-	inline constexpr Debug::VSLiteralFmtDbgOutLnA operator""_doutln(const Char * str, ::std::size_t length)
+	[[nodiscard]] inline constexpr LiteralDbgOutLnA operator""_doutln(const Char * str, ::std::size_t length)
 	{
 		return { { str, length } };
 	}
-	inline constexpr Debug::VSLiteralFmtDbgOutW operator""_dout(const WChar * str, ::std::size_t length)
+	[[nodiscard]] inline constexpr LiteralDbgOutW operator""_dout(const WChar * str, ::std::size_t length)
 	{
 		return { { str, length } };
 	}
-	inline constexpr Debug::VSLiteralFmtDbgOutLnW operator""_doutln(const WChar * str, ::std::size_t length)
+	[[nodiscard]] inline constexpr LiteralDbgOutLnW operator""_doutln(const WChar * str, ::std::size_t length)
 	{
 		return { { str, length } };
 	}
