@@ -267,8 +267,8 @@ namespace Petal
 	using U16CStringRef = BasicCStringRef<U16Char>;
 	using U32CStringRef = BasicCStringRef<U32Char>;
 
-	template <typename CharT>
-	::std::basic_ostream<CharT>& operator<<(::std::basic_ostream<CharT>& out, const BasicCStringRef<CharT>& csr)
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
+	::std::basic_ostream<CharT, Traits>& operator<<(::std::basic_ostream<CharT, Traits>& out, const BasicCStringRef<CharT>& csr)
 	{
 		return out << csr.view();
 	}
