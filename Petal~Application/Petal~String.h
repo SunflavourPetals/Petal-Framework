@@ -7,7 +7,8 @@
 
 #include <iosfwd>
 #include <format>
-#include <xstring>
+#include <string>
+#include <compare>
 #include <type_traits>
 
 namespace Petal::EnumChar
@@ -82,36 +83,259 @@ namespace Petal
 		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
 	}
 
+#if _ITERATOR_DEBUG_LEVEL >= 1
+#ifndef Petal_Debug_CStringRefIterator
+#define Petal_Debug_CStringRefIterator
+#endif
+#endif
+
+	template <typename CharT>
+	class BasicCStringRef;
+	template <typename CharT>
+	class CStringRefHash;
+	template <class CharT>
+	class CStringRefIterator;
+
+	template <class CharT>
+	class CStringRefIterator {
+	public:
+#ifdef __cpp_lib_concepts
+		using iterator_concept = typename ::std::contiguous_iterator_tag;
+#endif
+		using iterator_category = typename ::std::random_access_iterator_tag;
+		using value_type = CharT;
+		using difference_type = typename ::std::ptrdiff_t;
+		using pointer = const value_type*;
+		using reference = const value_type&;
+
+		constexpr CStringRefIterator() noexcept = default;
+		constexpr CStringRefIterator(const CStringRefIterator&) noexcept = default;
+		constexpr CStringRefIterator& operator= (const CStringRefIterator&)noexcept = default;
+		constexpr ~CStringRefIterator() noexcept = default;
+
+	private:
+		friend BasicCStringRef<value_type>;
+
+#ifdef Petal_Debug_CStringRefIterator
+		constexpr CStringRefIterator(pointer ref_data, tsize ref_size, tsize ref_off) noexcept :
+			data{ ref_data },
+			size{ ref_size },
+			offset{ ref_off } {}
+#else
+		constexpr explicit CStringRefIterator(pointer elem_ptr) noexcept :
+			ptr{ elem_ptr } {}
+#endif
+
+	public:
+		[[nodiscard]] constexpr reference operator*() const noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(this->data,
+				"[Petal] Cannot dereference value-initialized BasicCStringRef iterator");
+			_STL_VERIFY(this->offset < this->size,
+				"[Petal] Cannot dereference end BasicCStringRef iterator");
+			return this->data[this->offset];
+#else
+			return *(this->ptr);
+#endif
+		}
+
+		[[nodiscard]] constexpr pointer operator->() const noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(this->data,
+				"[Petal] Cannot dereference value-initialized BasicCStringRef iterator");
+			_STL_VERIFY(this->offset < this->size,
+				"[Petal] Cannot dereference end BasicCStringRef iterator");
+			return this->data + this->offset;
+#else
+			return this->ptr;
+#endif
+		}
+
+		constexpr CStringRefIterator& operator++() noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(this->data,
+				"[Petal] Cannot increment value-initialized BasicCStringRef iterator");
+			_STL_VERIFY(this->offset < this->size,
+				"[Petal] Cannot increment BasicCStringRef iterator past end");
+			++(this->offset);
+#else
+			++(this->ptr);
+#endif
+			return *this;
+		}
+
+		constexpr CStringRefIterator operator++(int) noexcept
+		{
+			auto temp = *this;
+			++(*this);
+			return temp;
+		}
+
+		constexpr CStringRefIterator& operator--() noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(this->data,
+				"[Petal] Cannot decrement value-initialized BasicCStringRef iterator");
+			_STL_VERIFY(this->offset != 0,
+				"[Petal] Cannot decrement BasicCStringRef iterator before begin");
+			--(this->offset);
+#else
+			--(this->ptr);
+#endif
+			return *this;
+		}
+
+		constexpr CStringRefIterator operator--(int) noexcept
+		{
+			auto temp = *this;
+			--(*this);
+			return temp;
+		}
+
+		constexpr CStringRefIterator& operator+=(difference_type off) noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			if (off != 0)
+			{
+				_STL_VERIFY(this->data,
+					"[Petal] Cannot seek value-initialized BasicCStringRef iterator");
+			}
+			if (off < 0)
+			{
+				_STL_VERIFY(this->offset >= tsize{ 0 } - static_cast<tsize>(off),
+					"[Petal] Cannot seek BasicCStringRef iterator before begin");
+			}
+			if (off > 0)
+			{
+				_STL_VERIFY(this->size - this->offset >= static_cast<tsize>(off),
+					"[Petal] cannot seek BasicCStringRef iterator after end");
+			}
+			this->offset += static_cast<tsize>(off);
+#else
+			this->ptr += off;
+#endif
+			return *this;
+		}
+
+		[[nodiscard]] friend constexpr CStringRefIterator operator+
+			(CStringRefIterator left, difference_type off) noexcept
+		{
+			left += off;
+			return left;
+		}
+
+		[[nodiscard]] friend constexpr CStringRefIterator operator+
+			(difference_type off, CStringRefIterator right) noexcept
+		{
+			right += off;
+			return right;
+		}
+
+		constexpr CStringRefIterator& operator-=(difference_type off) noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			if (off != 0)
+			{
+				_STL_VERIFY(this->data,
+					"[Petal] Cannot seek value-initialized BasicCStringRef iterator");
+			}
+			if (off > 0)
+			{
+				_STL_VERIFY(this->offset >= static_cast<size_t>(off),
+					"[Petal] Cannot seek BasicCStringRef iterator before begin");
+			}
+			if (off < 0)
+			{
+				_STL_VERIFY(this->size - this->offset >= size_t{ 0 } - static_cast<size_t>(off),
+					"[Petal] Cannot seek BasicCStringRef iterator after end");
+			}
+			this->offset -= static_cast<size_t>(off);
+#else
+			this->ptr -= off;
+#endif
+			return *this;
+		}
+
+		[[nodiscard]] constexpr CStringRefIterator operator-(difference_type off) const noexcept
+		{
+			auto temp = *this;
+			temp -= off;
+			return temp;
+		}
+
+		[[nodiscard]] constexpr difference_type operator-(const CStringRefIterator& right) const noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(this->data == right.data && this->size == right.size,
+				"[Petal] Cannot subtract incompatible BasicCStringRef iterators");
+			return static_cast<difference_type>(this->offset - right.offset);
+#else
+			return this->ptr - right.ptr;
+#endif
+		}
+
+		[[nodiscard]] constexpr reference operator[](difference_type off) const noexcept
+		{
+			return *((*this) + off);
+		}
+
+		[[nodiscard]] friend constexpr bool operator==
+			(const CStringRefIterator& left, const CStringRefIterator& right) noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			_STL_VERIFY(left.data == right.data && left.size == right.size,
+				"[Petal] Cannot compare incompatible BasicCStringRef iterators for equality");
+			return left.offset == right.offset;
+#else
+			return left.ptr == right.ptr;
+#endif
+		}
+
+		[[nodiscard]] friend constexpr ::std::strong_ordering operator<=>
+			(const CStringRefIterator& left, const CStringRefIterator& right) noexcept
+		{
+#ifdef Petal_Debug_CStringRefIterator
+			if (left.data && right.data)
+			{
+				_STL_VERIFY(left.data == right.data && left.size == right.size,
+					"[Petal] Cannot compare incompatible BasicCStringRef iterators for equality");
+			}
+			return left.offset <=> right.offset;
+#else
+			return left.ptr <=> right.ptr;
+#endif
+		}
+
+	private:
+#ifdef Petal_Debug_CStringRefIterator
+		pointer data{};
+		tsize size{};
+		tsize offset{};
+#else
+		pointer ptr{};
+#endif
+	};
 	template <typename CharT>
 	class BasicCStringRef
 	{
+	public:
+		using Hash = typename CStringRefHash<CharT>;
 	public:
 		using value_type = CharT;
 		using pointer = typename ptr<CharT>;
 		using const_pointer = typename ptrc<CharT>;
 		using reference = CharT&;
 		using const_reference = const CharT&;
-		using const_iterator = const_pointer;
+		using const_iterator = CStringRefIterator<value_type>;
 		using iterator = const_iterator;
 		using const_reverse_iterator = typename ::std::reverse_iterator<const_iterator>;
 		using reverse_iterator = const_reverse_iterator;
 		using size_type = typename ::std::size_t;
 		using difference_type = typename ::std::ptrdiff_t;
-		struct Hash
-		{
-			using KeyTy = BasicCStringRef;
-			using ResultTy = ::std::size_t;
-			[[nodiscard]] ResultTy operator()(const KeyTy& key_val) const
-				noexcept(noexcept(HashValue({})))
-			{
-				return HashValue(key_val);
-			}
-			[[nodiscard]] static constexpr ResultTy HashValue(const KeyTy& key_val)
-				noexcept(noexcept(::std::declval<::std::hash<::std::basic_string_view<CharT>>>()({})))
-			{
-				return ::std::hash<::std::basic_string_view<CharT>>{}(key_val.view());
-			}
-		};
+		using hasher = Hash;
 	public:
 		[[nodiscard]] constexpr size_type size() const noexcept
 		{
@@ -145,11 +369,19 @@ namespace Petal
 		}
 		[[nodiscard]] constexpr const_iterator begin() const noexcept
 		{
-			return { this->data() };
+#ifdef Petal_Debug_CStringRefIterator
+			return { this->data(), this->size(), 0 };
+#else
+			return const_iterator{ this->data() };
+#endif
 		}
 		[[nodiscard]] constexpr const_iterator end() const noexcept
 		{
-			return { this->data() + this->size() };
+#ifdef Petal_Debug_CStringRefIterator
+			return { this->data(), this->size(), this->size() };
+#else
+			return const_iterator{ this->data() + this->size() };
+#endif
 		}
 		[[nodiscard]] constexpr const_iterator cbegin() const noexcept
 		{
@@ -266,6 +498,24 @@ namespace Petal
 	using U8CStringRef = BasicCStringRef<U8Char>;
 	using U16CStringRef = BasicCStringRef<U16Char>;
 	using U32CStringRef = BasicCStringRef<U32Char>;
+
+	template <typename CharT>
+	class CStringRefHash
+	{
+	public:
+		using KeyTy = BasicCStringRef<CharT>;
+		using ResultTy = ::std::size_t;
+		[[nodiscard]] ResultTy operator()(const KeyTy& key_val) const
+			noexcept(noexcept(HashValue({})))
+		{
+			return HashValue(key_val);
+		}
+		[[nodiscard]] static constexpr ResultTy HashValue(const KeyTy& key_val)
+			noexcept(noexcept(::std::declval<::std::hash<::std::basic_string_view<CharT>>>()({})))
+		{
+			return ::std::hash<::std::basic_string_view<CharT>>{}(key_val.view());
+		}
+	};
 
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
 	::std::basic_ostream<CharT, Traits>& operator<<(::std::basic_ostream<CharT, Traits>& out, const BasicCStringRef<CharT>& csr)
