@@ -12,7 +12,7 @@ namespace Petal::Debug
 		this->OutputCStr(c_str.c_str());
 #endif
 	}
-	void VSDebugOutputA::OutputCStr(ptrc<InnerChar> c_str)
+	void VSDebugOutputA::OutputCStr(ptrc<InnerChar> c_str) noexcept
 	{
 		::OutputDebugStringA(c_str);
 	}
@@ -34,7 +34,7 @@ namespace Petal::Debug
 		this->OutputCStr(c_str.c_str());
 #endif
 	}
-	void VSDebugOutputW::OutputCStr(ptrc<InnerChar> c_str)
+	void VSDebugOutputW::OutputCStr(ptrc<InnerChar> c_str) noexcept
 	{
 		::OutputDebugStringW(c_str);
 	}

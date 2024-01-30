@@ -21,7 +21,7 @@ namespace Petal::Debug
 		using InnerCStringRef = typename Abstract::OutputA::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str) override;
-		virtual void OutputCStr(ptrc<InnerChar> c_str) override;
+		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
 		virtual LineBreakMode LnMode() noexcept override;
 		virtual LineBreakMode LnModeCStr() noexcept override;
 	public:
@@ -38,8 +38,8 @@ namespace Petal::Debug
 		using InnerStringView = typename Abstract::OutputW::InnerStringView;
 		using InnerCStringRef = typename Abstract::OutputW::InnerCStringRef;
 	public:
-		virtual void Output(InnerStringView str);
-		virtual void OutputCStr(ptrc<InnerChar> c_str);
+		virtual void Output(InnerStringView str) override;
+		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
 		virtual LineBreakMode LnMode() noexcept override;
 		virtual LineBreakMode LnModeCStr() noexcept override;
 	public:
