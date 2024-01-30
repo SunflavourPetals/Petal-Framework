@@ -38,13 +38,23 @@ namespace Petal::Framework::Impl
 
 namespace Petal::Abstract
 {
-	Window::~Window()
+	Window::~Window() noexcept
 	{
 		if (this->WindowHandle() != nullptr)
 		{
-			this->Destroy();
+			auto result = this->Destroy(); // noexcept
+			if (result.return_value != win32_true) try
+			{
+				// try to save result
+				IWindowSet().auto_destroy_failed_record.push_back(result);
+			}
+			catch (...)
+			{
+				Petal_VSDbgT("[Petal] Failed to save destroying result when Window::~Window failed");
+			}
 		}
 	}
+
 	[[nodiscard]] win32hwnd Window::WindowHandle() const noexcept
 	{
 		return this->window_handle;
@@ -57,7 +67,7 @@ namespace Petal::Abstract
 	{
 		return IWindowSet().Create(*this, class_atom, args);
 	}
-	Window::DestroyResult Window::Destroy() noexcept(false)
+	Window::DestroyResult Window::Destroy() noexcept
 	{
 		return IWindowSet().Destroy(*this);
 	}
@@ -154,7 +164,7 @@ namespace Petal
 	}
 	void WindowClassArgs::EnableDoubleClickMessage(boolean enable) noexcept
 	{
-		if (enable == true)
+		if (enable)
 		{
 			this->style |= CS_DBLCLKS;
 		}
@@ -164,7 +174,7 @@ namespace Petal
 			this->style &= (full ^ CS_DBLCLKS);
 		}
 	}
-	WindowClassArgs::RegisterResult WindowClassArgs::Register() noexcept(false)
+	WindowClassArgs::RegisterResult WindowClassArgs::Register() const noexcept(false)
 	{
 		return IWindowClassSet().Register(*this);
 	}
@@ -498,7 +508,7 @@ namespace Petal
 
 		return result;
 	}
-	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept(false)
+	[[nodiscard]] WindowSet::DestroyResult WindowSet::Destroy(Abstract::Window& window) noexcept
 	{
 		DestroyResult result{};
 
@@ -524,6 +534,9 @@ namespace Petal
 						case WindowSet::DestroyResult::Error::CannotFindWindowFromIWindowSet:
 							Petal_VSDbgT("\t\tPetal: cannot find window from IWindowSet()\r\n");
 							break;
+						case WindowSet::DestroyResult::Error::FailedWhenEraseFromIWindowSet:
+							Petal_VSDbgT("\t\tPetal: failed when erase record from IWindowSet()\r\n");
+							break;
 						default:
 							Petal_VSDbg(::std::format(Petal_DbgStr("\t\tPetal: error code {}\r\n"), static_cast<i16>(result.framework_error)).c_str());
 							break;
@@ -534,7 +547,7 @@ namespace Petal
 						break;
 					}
 				}
-				catch (const ::std::exception&) {}
+				catch (...) {}
 			}
 		};
 
@@ -556,12 +569,12 @@ namespace Petal
 
 			goto return_label;
 		}
-		result.return_value = ::DestroyWindow(window.WindowHandle());
-
+		result.return_value = ::DestroyWindow(window.WindowHandle()); // noexcept // must WINAPI, cannot use window.Destory()
+		
 		if (result.return_value == win32_false)
 		{
 			result.condition = DestroyResult::Condition::Win32;
-			result.win32_error = ::GetLastError();
+			result.win32_error = ::GetLastError(); // noexcept
 			debug_output(window, result);
 
 			goto return_label;
@@ -569,33 +582,39 @@ namespace Petal
 
 		decltype(this->set.erase(window.WindowHandle())) erase_count;
 
-		if constexpr (noexcept(this->set.erase(window.WindowHandle())) == false)
+		if constexpr (noexcept(this->set.erase(window.WindowHandle()))) // maybe throw
+		{
+			erase_count = this->set.erase(window.WindowHandle());
+		}
+		else
 		{
 			try
 			{
 				erase_count = this->set.erase(window.WindowHandle());
 			}
-			catch (const ::std::exception&)
+			catch (...)
 			{
 				erase_count = 0;
 			}
 		}
-		else
+
+		if (erase_count == 0)
 		{
-			erase_count = this->set.erase(window.WindowHandle());
+			result.return_value = win32_false;
+			result.condition = DestroyResult::Condition::PetalFramework;
+			result.framework_error = DestroyResult::Error::FailedWhenEraseFromIWindowSet;
+			debug_output(window, result);
+
+			goto return_label;
 		}
 
-		try
-		{
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), static_cast<void*>(window.WindowHandle())).c_str());
-		}
-		catch (const ::std::exception&) {}
+		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), static_cast<void*>(window.WindowHandle())).c_str());
 
-		Framework::Impl::WindowAccessor::Assign(window, nullptr);
+		Framework::Impl::WindowAccessor::Assign(window, nullptr); // noexcept
 
 		return_label:
 
-		if (IWindowSet().ShouldQuit() == true) { ExitMessageLoop(); }
+		if (IWindowSet().ShouldQuit() == true) { ExitMessageLoop(); } // noexcept
 
 		return result;
 	}

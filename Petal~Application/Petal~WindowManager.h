@@ -13,6 +13,7 @@
 #endif
 #include <unordered_map>
 #include <unordered_set>
+#include <list>
 #include <memory>
 
 namespace Petal
@@ -76,6 +77,7 @@ namespace Petal
 		{
 			Unknown = 0,
 			CannotFindWindowFromIWindowSet,
+			FailedWhenEraseFromIWindowSet,
 		};
 		Condition condition{ Condition::Success };
 		Error framework_error{ Error::Unknown };
@@ -125,7 +127,7 @@ namespace Petal
 		void UsingMenuName(const TString& menu_name) noexcept(noexcept(::std::declval<WindowClassArgs>().UpdateMenuName(menu_name)));
 		void UsingMenuName(word menu_resource) noexcept;
 		void EnableDoubleClickMessage(boolean enable = true) noexcept;
-		RegisterResult Register() noexcept(false);
+		RegisterResult Register() const noexcept(false);
 	public:
 		WindowClassArgs() = default;
 		WindowClassArgs(const TString& class_name, win32hicon icon = default_icon, win32hcursor cursor = default_cursor, win32hbrush background_brush = default_background_brush, win32hicon icon_sm = default_icon_sm, dword style = default_style, i32 class_extra = default_class_extra, i32 window_extra = default_window_extra);
@@ -208,7 +210,7 @@ namespace Petal::Abstract
 		[[nodiscard]] win32hwnd WindowHandle() const noexcept;
 		[[nodiscard]] boolean Valid() const noexcept;
 		CreateResult Create(win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
-		DestroyResult Destroy() noexcept(false);
+		DestroyResult Destroy() noexcept;
 	protected:
 		[[nodiscard]] dword WindowStyle() const noexcept;
 		[[nodiscard]] dword WindowExStyle() const noexcept;
@@ -216,7 +218,7 @@ namespace Petal::Abstract
 		Window() = default;
 		Window(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
-		virtual ~Window();
+		virtual ~Window() noexcept;
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
 	private:
@@ -289,9 +291,10 @@ namespace Petal
 #else
 		using Set = ::std::map<win32hwnd, ptr<Abstract::Window>>;
 #endif
+		using AutoDestroyFailedRecordList = ::std::list<DestroyResult>;
 	public:
 		[[nodiscard]] CreateResult Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
-		[[nodiscard]] DestroyResult Destroy(Abstract::Window& window) noexcept(false);
+		[[nodiscard]] DestroyResult Destroy(Abstract::Window& window) noexcept;
 		tsize DestroyAll() noexcept(false);
 		[[nodiscard]] boolean Check(const Abstract::Window& window) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
@@ -310,6 +313,8 @@ namespace Petal
 		WindowSet(WindowSet&&) noexcept = delete;
 		WindowSet& operator= (const WindowSet&) = delete;
 		WindowSet& operator= (WindowSet&&) = delete;
+	public:
+		AutoDestroyFailedRecordList auto_destroy_failed_record{};
 	private:
 		Set set{};
 		boolean quit_when_empty{ true };
