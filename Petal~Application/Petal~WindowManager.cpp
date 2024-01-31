@@ -287,7 +287,7 @@ namespace Petal
 						break;
 					}
 				}
-				catch (const ::std::exception&) {}
+				catch (...) {}
 			}
 		};
 
@@ -339,7 +339,11 @@ namespace Petal
 			return result;
 		}
 
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), class_atom).c_str());
+		try
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), class_atom).c_str());
+		}
+		catch (...) {}
 
 		return result;
 	}
@@ -347,8 +351,7 @@ namespace Petal
 	{
 		for (auto it = this->set.atom_to_data.begin(); it != this->set.atom_to_data.end(); )
 		{
-			auto target = it++;
-			auto result{ this->Unregister(target->first) };
+			auto result{ this->Unregister((it++)->first) };
 		}
 		return this->set.atom_to_data.size();
 	}
@@ -589,7 +592,7 @@ namespace Petal
 		{
 			window_pair = this->set.find(window.WindowHandle());
 		}
-		catch (const ::std::exception&)
+		catch (...)
 		{
 			window_pair = this->set.end();
 		}
@@ -641,7 +644,11 @@ namespace Petal
 			goto return_label;
 		}
 
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), static_cast<void*>(window.WindowHandle())).c_str());
+		try
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), static_cast<void*>(window.WindowHandle())).c_str());
+		}
+		catch (...) {}
 
 		Framework::Impl::WindowAccessor::Assign(window, nullptr); // noexcept
 
@@ -655,8 +662,7 @@ namespace Petal
 	{
 		for (auto it = this->set.begin(); it != this->set.end(); )
 		{
-			auto target = it++;
-			auto result{ this->Destroy(*(target->second)) };
+			auto result{ this->Destroy(*((it++)->second))};
 		}
 		return this->set.size();
 	}
@@ -847,7 +853,7 @@ namespace
 			try
 			{
 				ptr<Abstract::Window> window{ IWindowSet()[window_handle] };
-				if (window != nullptr)
+				if (window)
 				{
 					return window->Process(message, w, l);
 				}
@@ -856,7 +862,7 @@ namespace
 					if (message == WM_CREATE)
 					{
 						ptrc<Win32CreateStruct> create_struct_ptr{ reinterpret_cast<ptr<Win32CreateStruct>>(l) };
-						if (create_struct_ptr != nullptr && create_struct_ptr->lpCreateParams != nullptr)
+						if (create_struct_ptr && create_struct_ptr->lpCreateParams)
 						{
 							Abstract::Window& window{ *reinterpret_cast<ptr<Abstract::Window>>(create_struct_ptr->lpCreateParams) };
 							Framework::Impl::WindowAccessor::Assign(window, window_handle);
