@@ -248,7 +248,7 @@ namespace Petal
 
 		return result;
 	}
-	[[nodiscard]] WindowClassSet::UnregisterResult WindowClassSet::Unregister(Pair::Atom class_atom) noexcept(false)
+	[[nodiscard]] WindowClassSet::UnregisterResult WindowClassSet::Unregister(Pair::Atom class_atom) noexcept
 	{
 		UnregisterResult result{};
 
@@ -274,6 +274,9 @@ namespace Petal
 						case WindowClassSet::UnregisterResult::Error::CannotFindPair:
 							Petal_VSDbgT("\t\tPetal: cannot find atom in IWindowClassSet()\r\n");
 							break;
+						case WindowClassSet::UnregisterResult::Error::FailedWhenEraseFromIWindowClassSet:
+							Petal_VSDbgT("\t\tPetal: failed when erase record from IWindowClassSet()\r\n");
+							break;
 						default:
 							Petal_VSDbg(::std::format(Petal_DbgStr("\t\tPetal: error code {}\r\n"), static_cast<i16>(result.framework_error)).c_str());
 							break;
@@ -288,42 +291,64 @@ namespace Petal
 			}
 		};
 
-		auto data{ this->set.Find(class_atom) };
+		decltype(this->set.Find(class_atom)) data{};
+		try
+		{
+			data = this->set.Find(class_atom);
+		}
+		catch (...)
+		{
+			data = nullptr;
+		}
+		
 		if (data == nullptr)
 		{
 			result.condition = UnregisterResult::Condition::PetalFramework;
 			result.framework_error = UnregisterResult::Error::CannotFindPair;
-			result.value = FALSE;
+			result.value = win32_false;
 			debug_output(class_atom, result);
 			return result;
 		}
 
 		result.value = PetalUnnamed::IWin32::UnregisterPetalWindowClass(class_atom);
 
-		if (result.value == FALSE)
+		if (result.value == win32_false)
 		{
 			result.condition = UnregisterResult::Condition::Win32;
-			result.win32_error = ::GetLastError();
+			result.win32_error = ::GetLastError(); // noexcept
 			debug_output(class_atom, result);
 			return result;
 		}
 
-		this->set.Erase(class_atom);
+		decltype(this->set.Erase(class_atom)) erase_count{};
+		try
+		{
+			erase_count = this->set.Erase(class_atom);
+		}
+		catch (...)
+		{
+			erase_count = 0;
+		}
+
+		if (erase_count == 0)
+		{
+			result.condition = UnregisterResult::Condition::PetalFramework;
+			result.framework_error = UnregisterResult::Error::FailedWhenEraseFromIWindowClassSet;
+			result.value = win32_false;
+			debug_output(class_atom, result);
+			return result;
+		}
 
 		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), class_atom).c_str());
 
 		return result;
 	}
-	tsize WindowClassSet::UnregisterAll() noexcept(false)
+	tsize WindowClassSet::UnregisterAll() noexcept
 	{
-		::std::vector<win32atom> atom_set;
-		for (const auto& e : this->set.atom_to_data)
+		for (auto it = this->set.atom_to_data.begin(); it != this->set.atom_to_data.end(); )
 		{
-			atom_set.push_back(e.first);
-		}
-		for (auto&& e : atom_set)
-		{
-			auto result{ this->Unregister(e) };
+			auto target = it++;
+			auto result{ this->Unregister(target->first) };
 		}
 		return this->set.atom_to_data.size();
 	}
@@ -340,7 +365,11 @@ namespace Petal
 		}
 		catch (const ::std::exception& e)
 		{
-			Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
+			try
+			{
+				Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
+			}
+			catch (const ::std::exception&) {}
 			return false;
 		}
 	}
@@ -380,7 +409,11 @@ namespace Petal
 		}
 		catch (const ::std::exception& e)
 		{
-			Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
+			try
+			{
+				Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
+			}
+			catch (const ::std::exception&) {}
 			return 0;
 		}
 		return 0;
@@ -618,16 +651,12 @@ namespace Petal
 
 		return result;
 	}
-	tsize WindowSet::DestroyAll() noexcept(false)
+	tsize WindowSet::DestroyAll() noexcept
 	{
-		::std::vector<ptr<Abstract::Window>> win_ptr_set;
-		for (const auto& e : this->set)
+		for (auto it = this->set.begin(); it != this->set.end(); )
 		{
-			win_ptr_set.push_back(e.second);
-		}
-		for (auto& e : win_ptr_set)
-		{
-			auto result{ this->Destroy(*e) };
+			auto target = it++;
+			auto result{ this->Destroy(*(target->second)) };
 		}
 		return this->set.size();
 	}

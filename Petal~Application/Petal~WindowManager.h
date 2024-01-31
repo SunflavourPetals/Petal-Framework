@@ -50,6 +50,7 @@ namespace Petal
 		{
 			Unknown = 0,
 			CannotFindPair,
+			FailedWhenEraseFromIWindowClassSet,
 		};
 		Condition condition{ Condition::Success };
 		Error framework_error{ Error::Unknown };
@@ -255,8 +256,8 @@ namespace Petal
 		};
 	public:
 		[[nodiscard]] RegisterResult Register(const WindowClassArgs& wrapped_window_class) noexcept(false);
-		[[nodiscard]] UnregisterResult Unregister(Pair::Atom class_atom) noexcept(false);
-		tsize UnregisterAll() noexcept(false);
+		[[nodiscard]] UnregisterResult Unregister(Pair::Atom class_atom) noexcept;
+		tsize UnregisterAll() noexcept;
 		[[nodiscard]] boolean Check(Pair::Atom class_atom) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] const Pair::Name& operator[](Pair::Atom class_atom) const noexcept;
@@ -295,7 +296,7 @@ namespace Petal
 	public:
 		[[nodiscard]] CreateResult Create(Abstract::Window& target_window, win32atom class_atom, const WindowCreatingArgs& args = {}) noexcept(false);
 		[[nodiscard]] DestroyResult Destroy(Abstract::Window& window) noexcept;
-		tsize DestroyAll() noexcept(false);
+		tsize DestroyAll() noexcept;
 		[[nodiscard]] boolean Check(const Abstract::Window& window) const noexcept;
 		[[nodiscard]] boolean Empty() const noexcept;
 		[[nodiscard]] ptr<Abstract::Window> operator[] (win32hwnd index) const noexcept;
