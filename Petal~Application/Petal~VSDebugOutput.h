@@ -54,7 +54,7 @@ namespace Petal
 	extern constinit Debug::VSDebugOutputW dowt;
 }
 
-namespace Petal::Debug // : if msvc support "if consteval" then maybe better impl there.
+namespace Petal::Debug::V
 {
 	template <typename... Args>
 	inline void print(StringView fmt, Args&&... args)
@@ -113,71 +113,38 @@ namespace Petal::Debug // : if msvc support "if consteval" then maybe better imp
 	}
 }
 
-namespace Petal::DebugLiterals
+namespace Petal::Debug
 {
-	class LiteralDbgOutA
+	template <typename... Args>
+	inline void print(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
-	public:
-		StringView fmt{};
-	public:
-		constexpr LiteralDbgOutA(StringView format) : fmt{ format } {}
-		template <typename... Args>
-		constexpr void operator()(Args&&... args)
-		{
-			Debug::print(fmt, ::std::forward<Args>(args)...);
-		}
-	};
-	class LiteralDbgOutLnA
-	{
-	public:
-		StringView fmt{};
-	public:
-		constexpr LiteralDbgOutLnA(StringView format) : fmt{ format } {}
-		template <typename... Args>
-		constexpr void operator()(Args&&... args)
-		{
-			Debug::println(fmt, ::std::forward<Args>(args)...);
-		}
-	};
-	class LiteralDbgOutW
-	{
-	public:
-		WStringView fmt{};
-	public:
-		constexpr LiteralDbgOutW(WStringView format) : fmt{ format } {}
-		template <typename... Args>
-		constexpr void operator()(Args&&... args)
-		{
-			Debug::wprint(fmt, ::std::forward<Args>(args)...);
-		}
-	};
-	class LiteralDbgOutLnW
-	{
-	public:
-		WStringView fmt{};
-	public:
-		constexpr LiteralDbgOutLnW(WStringView format) : fmt{ format } {}
-		template <typename... Args>
-		constexpr void operator()(Args&&... args)
-		{
-			Debug::wprintln(fmt, ::std::forward<Args>(args)...);
-		}
-	};
-	[[nodiscard]] inline consteval LiteralDbgOutA operator""_dout(const Char * str, ::std::size_t length)
-	{
-		return { { str, length } };
+		dout + ::std::vformat(fmt.get(), ::std::make_format_args(::std::forward<Args>(args)...));
 	}
-	[[nodiscard]] inline constexpr LiteralDbgOutLnA operator""_doutln(const Char * str, ::std::size_t length)
+	inline void println()
 	{
-		return { { str, length } };
+		dout + ln;
 	}
-	[[nodiscard]] inline constexpr LiteralDbgOutW operator""_dout(const WChar * str, ::std::size_t length)
+	template <typename... Args>
+	inline void println(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
-		return { { str, length } };
+		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(::std::forward<Args>(args)...));
+		print("{}{}", str, GetLn<Char>(dout.LnMode()));
 	}
-	[[nodiscard]] inline constexpr LiteralDbgOutLnW operator""_doutln(const WChar * str, ::std::size_t length)
+
+	template <typename... Args>
+	inline void wprint(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
-		return { { str, length } };
+		dowt + ::std::vformat(fmt.get(), ::std::make_wformat_args(::std::forward<Args>(args)...));
+	}
+	inline void wprintln()
+	{
+		dowt + ln;
+	}
+	template <typename... Args>
+	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
+	{
+		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(::std::forward<Args>(args)...));
+		wprint(L"{}{}", str, GetLn<WChar>(dowt.LnMode()));
 	}
 }
 
