@@ -3,7 +3,23 @@
 #ifndef Petal_Header_WinTypes
 #define Petal_Header_WinTypes
 
+#ifndef NOMINMAX
+#define NOMINMAX
+#define Petal_Temp_NOMINMAX
+#endif
+#ifndef WIN32_LEAN_AND_MEAN
+#define WIN32_LEAN_AND_MEAN
+#define Petal_Temp_WIN32_LEAN_AND_MEAN
+#endif
 #include <Windows.h>
+#ifdef Petal_Temp_NOMINMAX
+#undef Petal_Temp_NOMINMAX
+#undef NOMINMAX
+#endif
+#ifdef Petal_Temp_WIN32_LEAN_AND_MEAN
+#undef Petal_Temp_WIN32_LEAN_AND_MEAN
+#undef WIN32_LEAN_AND_MEAN
+#endif
 
 namespace Petal
 {

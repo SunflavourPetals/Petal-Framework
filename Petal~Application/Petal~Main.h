@@ -7,8 +7,6 @@
 #include "Petal~String.h"
 #include "Petal~WinTypes.h"
 
-#include <span>
-
 namespace Petal::Main
 {
 	extern const int& argc;

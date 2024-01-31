@@ -1,4 +1,5 @@
 #include "Petal~VSDebugOutput.h"
+
 #include <Windows.h>
 
 namespace Petal::Debug

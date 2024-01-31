@@ -9,7 +9,6 @@
 #include "Petal~String.h"
 
 #include <optional>
-#include <Windows.h>
 
 #ifdef CreateEvent
 #undef CreateEvent

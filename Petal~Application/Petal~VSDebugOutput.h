@@ -8,7 +8,6 @@
 #include "Petal~Output.h"
 
 #include <format>
-#include <optional>
 
 namespace Petal::Debug
 {
