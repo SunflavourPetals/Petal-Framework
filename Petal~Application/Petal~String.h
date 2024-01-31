@@ -360,13 +360,13 @@ namespace Petal
 		template <typename Traits = ::std::char_traits<CharT>>
 		[[nodiscard]] constexpr BasicStringView<CharT, Traits> view() const noexcept
 		{
-			return { this->data(), this->size() };
+			return BasicStringView<CharT, Traits>{ this->data(), this->size() };
 		}
 		template <typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 		[[nodiscard]] constexpr BasicString<CharT, Traits, Alloc> to_string() const
 			noexcept(noexcept(BasicString<CharT, Traits, Alloc>(::std::declval<BasicCStringRef>().view())))
 		{
-			return { this->view() };
+			return BasicString<CharT, Traits, Alloc>{ this->view<Traits>() };
 		}
 		[[nodiscard]] constexpr const_iterator begin() const noexcept
 		{
@@ -467,7 +467,8 @@ namespace Petal
 		{
 			return this->str_ptr;
 		}
-		constexpr operator BasicStringView<CharT>() const noexcept
+		constexpr operator BasicStringView<CharT>() const
+			noexcept(noexcept(::std::declval<BasicCStringRef>().view()))
 		{
 			return this->view();
 		}
