@@ -363,7 +363,8 @@ namespace Petal
 			return { this->data(), this->size() };
 		}
 		template <typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-		[[nodiscard]] constexpr BasicString<CharT, Traits, Alloc> to_string() const noexcept
+		[[nodiscard]] constexpr BasicString<CharT, Traits, Alloc> to_string() const
+			noexcept(noexcept(BasicString<CharT, Traits, Alloc>(::std::declval<BasicCStringRef>().view())))
 		{
 			return { this->view() };
 		}
@@ -411,7 +412,7 @@ namespace Petal
 		{
 			if (pos >= this->size())
 			{
-				throw ::std::out_of_range{ "[Petal] expection: invalid CStringRef position" };
+				throw ::std::out_of_range{ "[Petal] exception: invalid CStringRef position" };
 			}
 			return this->c_str()[pos];
 		}
@@ -428,49 +429,50 @@ namespace Petal
 		{
 			if (str[length] != 0)
 			{
-				throw ::std::exception{ "[Petal] expection: str is not c style string in Petal::BasicCStringRef<CharT>(const_pointer, size_type)" };
+				throw ::std::exception{ "[Petal] exception: str is not c style string in Petal::BasicCStringRef<CharT>(const_pointer, size_type)" };
 			}
 			this->str_ptr = str;
 			this->str_length = length;
 		}
 		constexpr BasicCStringRef(const BasicCStringRef&) = default;
 		constexpr ~BasicCStringRef() = default;
-		constexpr const CharT& operator[](size_type pos)
+		constexpr const CharT& operator[](size_type pos) const noexcept
 		{
 			return this->c_str()[pos];
 		}
-		constexpr BasicCStringRef& operator= (const BasicCStringRef str)
+		constexpr BasicCStringRef& operator= (const BasicCStringRef str) noexcept
 		{
 			this->str_ptr = str.c_str();
 			this->str_length = str.length();
 			return *this;
 		}
 		template <typename Traits, typename Alloc>
-		constexpr BasicCStringRef& operator= (const BasicString<CharT, Traits, Alloc>& ref_str)
+		constexpr BasicCStringRef& operator= (const BasicString<CharT, Traits, Alloc>& ref_str) noexcept
 		{
 			this->str_ptr = ref_str.c_str();
 			this->str_length = ref_str.length();
 			return *this;
 		}
-		constexpr BasicCStringRef& operator= (::std::nullptr_t)
+		constexpr BasicCStringRef& operator= (::std::nullptr_t) noexcept
 		{
 			this->str_ptr = nullptr;
 			this->str_length = 0;
 			return *this;
 		}
-		constexpr operator bool()
+		constexpr operator bool() const noexcept
 		{
 			return this->str_ptr;
 		}
-		constexpr operator const CharT*()
+		constexpr operator const CharT*() const noexcept
 		{
 			return this->str_ptr;
 		}
-		constexpr operator BasicStringView<CharT>()
+		constexpr operator BasicStringView<CharT>() const noexcept
 		{
 			return this->view();
 		}
-		constexpr operator BasicString<CharT>()
+		constexpr operator BasicString<CharT>() const
+			noexcept(noexcept(::std::declval<BasicCStringRef>().to_string()))
 		{
 			return this->to_string();
 		}
