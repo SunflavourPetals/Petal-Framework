@@ -27,14 +27,14 @@ namespace Petal
 	class BasicWindowMessage
 	{
 	public:
-		virtual win32msg Message() const noexcept final;
+		win32msg Message() const noexcept;
 	protected:
-		virtual win32wprm Word() const noexcept final;
-		virtual win32lprm Long() const noexcept final;
-		virtual word HWLong() const noexcept final;
-		virtual word LWLong() const noexcept final;
-		virtual word HWWord() const noexcept final;
-		virtual word LWWord() const noexcept final;
+		win32wprm Word() const noexcept;
+		win32lprm Long() const noexcept;
+		word HWLong() const noexcept;
+		word LWLong() const noexcept;
+		word HWWord() const noexcept;
+		word LWWord() const noexcept;
 	public:
 		BasicWindowMessage(win32msg msg, win32wprm w, win32lprm l);
 		BasicWindowMessage(const BasicWindowMessage&) = default;
@@ -199,6 +199,8 @@ namespace Petal
 		InactiveMessage(InactiveMessage&&) noexcept = default;
 		virtual ~InactiveMessage() = default;
 	};
+
+	using DestroyMessage = BasicWindowMessage;
 
 	using EnterSizeMessage = BasicWindowMessage;
 

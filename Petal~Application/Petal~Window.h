@@ -3,8 +3,8 @@
 #ifndef Petal_Header_Window
 #define Petal_Header_Window
 
-#include "Petal~WindowManager.h"
 #include "Petal~WindowMessage.h"
+#include "Petal~WindowBase.h"
 #include "Petal~Types.h"
 #include "Petal~String.h"
 
@@ -44,8 +44,6 @@ namespace Petal
 		win32bool ShowNoBorder(boolean no_border_mode = true) noexcept;
 		win32bool Repaint(win32uint flags = RDW_INTERNALPAINT || RDW_UPDATENOW || RDW_ALLCHILDREN) noexcept;
 		win32bool UpdateWindow() noexcept;
-		boolean MainWindowState() const noexcept;
-		void UpdateMainWindowState(boolean new_state) noexcept;
 
 		const Size2DI32& MinimumSize() const noexcept;
 		void UpdateMinimumSize(const Size2DI32& new_size) noexcept;
@@ -63,8 +61,9 @@ namespace Petal
 		win32bool Resize(const Size2DI32& new_size) noexcept;
 		win32bool MoveTo(i32 x, i32 y) noexcept;
 		win32bool MoveTo(const Position2DI32& new_pos) noexcept;
+	public:
+		virtual win32lres Process(win32msg message, win32wprm w_param, win32lprm l_param) noexcept override;
 	protected:
-		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
 		virtual void CreateEvent(CreateMessage& e) noexcept;
 		virtual void ActiveEvent(ActiveMessage& e) noexcept;
 		virtual void InactiveEvent(InactiveMessage& e) noexcept;
@@ -80,6 +79,7 @@ namespace Petal
 		virtual void MovedEvent(MovedMessage& e) noexcept;
 		virtual void CloseEvent(CloseMessage& e) noexcept;
 		virtual void PaintEvent(PaintMessage& e) noexcept;
+		virtual void DestroyEvent(DestroyMessage& e) noexcept;
 		virtual void MouseMoveEvent(MouseMoveMessage& e) noexcept;
 		virtual void MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept;
 		virtual void MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept;
@@ -118,7 +118,6 @@ namespace Petal
 		Size2DI32 pt_limit_client_size{ 120, 90 };
 	private:
 		dword pt_former_style{};
-		boolean pt_main_window{ false };
 		boolean pt_enter_size{ false };
 		boolean pt_enter_move{ false };
 		boolean pt_no_border_mode{ false };

@@ -63,14 +63,6 @@ namespace Petal
 	{
 		return ::UpdateWindow(this->WindowHandle());
 	}
-	boolean Window::MainWindowState() const noexcept
-	{
-		return this->pt_main_window;
-	}
-	void Window::UpdateMainWindowState(boolean new_state) noexcept
-	{
-		this->pt_main_window = new_state;
-	}
 	const Size2DI32& Window::MinimumSize() const noexcept
 	{
 		return this->pt_limit_client_size;
@@ -168,18 +160,9 @@ namespace Petal
 	void Window::MaximizedEvent(MaximizedMessage& e) noexcept {}
 	void Window::MinimizedEvent(MinimizedMessage& e) noexcept {}
 	void Window::MovedEvent(MovedMessage& e) noexcept {}
-	void Window::CloseEvent(CloseMessage& e) noexcept
-	{
-		try
-		{
-			this->Destroy();
-		}
-		catch (::std::exception& e)
-		{
-			Petal_VSDbgA(::std::format("[Petal] std::exception: {}\r\n", e.what()).c_str()); e;
-		}
-	}
+	void Window::CloseEvent(CloseMessage& e) noexcept { this->Destroy(); ExitMessageLoop(); }
 	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
+	void Window::DestroyEvent(DestroyMessage& e) noexcept {}
 	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
 	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
 	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept {}
@@ -243,7 +226,7 @@ namespace Petal
 			}
 			break;
 			default:
-				return IWin32::DefaultWindowProcess(this->WindowHandle(), msg, w, l);
+				return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
 				break;
 			}
 			return 0;
@@ -320,7 +303,7 @@ namespace Petal
 			case SIZE_MAXSHOW:
 			case SIZE_MAXHIDE:
 			default:
-				return IWin32::DefaultWindowProcess(this->WindowHandle(), msg, w, l);
+				return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
 				break;
 			}
 			return 0;
@@ -350,11 +333,11 @@ namespace Petal
 		}
 		break;
 		case WM_DESTROY:
-			if (this->MainWindowState() == true)
-			{
-				ExitMessageLoop();
-				return 0;
-			}
+		{
+			DestroyMessage wrapped_msg{ msg, w, l };
+			this->DestroyEvent(wrapped_msg);
+			return 0;
+		}
 			break;
 		case WM_PAINT:
 		{
@@ -567,10 +550,10 @@ namespace Petal
 		default:
 			break;
 		}
-		return IWin32::DefaultWindowProcess(this->WindowHandle(), msg, w, l);
+		return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
 	}
 	win32lres Window::DefaultDraw(PaintMessage& e) noexcept
 	{
-		return IWin32::DefaultWindowProcess(this->WindowHandle(), e.Message(), 0, 0);
+		return IWindow::DefaultSysWndProc(this->WindowHandle(), e.Message(), 0, 0);
 	}
 }

@@ -60,7 +60,7 @@
     <ClInclude Include="Petal~Window.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
-    <ClInclude Include="Petal~WindowManager.h">
+    <ClInclude Include="Petal~WindowBase.h">
       <Filter>PetalFramework\Header</Filter>
     </ClInclude>
     <ClInclude Include="Petal~WindowMessage.h">
@@ -113,7 +113,7 @@
     <ClCompile Include="Petal~Window.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~WindowManager.cpp">
+    <ClCompile Include="Petal~WindowBase.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
     <ClCompile Include="Petal~WindowMessage.cpp">
