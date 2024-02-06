@@ -224,6 +224,12 @@ namespace Petal::Abstract
 
 namespace Petal
 {
+	win32lres CommonWindowProcess(ptr<Abstract::Window> target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
+	win32lres CommonWindowProcess(Abstract::Window& target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
+}
+
+namespace Petal
+{
 	class WindowClassSet final
 	{
 	public:
@@ -272,62 +278,6 @@ namespace Petal
 		boolean unregister_all_when_deconstruction{ true };
 		friend WindowClassSet& IWindowClassSet();
 	};
-}
-
-namespace Petal
-{
-	template <typename Callable>
-		requires requires (Callable callable, win32hwnd window_handle)
-	{
-		{ callable(window_handle) } -> std::convertible_to<ptr<Abstract::Window>>;
-	}
-	win32lres CommonWindowProcess(Callable callable, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
-	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		win = callable(window_handle);
-		if (win && window_handle == win->WindowHandle()) return win->Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
-	}
-	template <typename Callable>
-		requires requires (Callable callable, win32hwnd window_handle)
-	{
-		{ callable(window_handle) } -> std::convertible_to<Abstract::Window&>;
-	}
-	win32lres CommonWindowProcess(Callable callable, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
-	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		Abstract::Window& user_win = callable(window_handle);
-		if (window_handle == user_win.WindowHandle()) return user_win.Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
-	}
-	template <typename Callable>
-		requires requires (Callable callable)
-	{
-		{ callable() } -> std::convertible_to<ptr<Abstract::Window>>;
-	}
-	win32lres CommonWindowProcess(Callable callable, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
-	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		win = callable();
-		if (win && window_handle == win->WindowHandle()) return win->Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
-	}
-	template <typename Callable>
-		requires requires (Callable callable)
-	{
-		{ callable() } -> std::convertible_to<Abstract::Window&>;
-	}
-	win32lres CommonWindowProcess(Callable callable, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
-	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		Abstract::Window& user_win = callable();
-		if (window_handle == user_win.WindowHandle()) return user_win.Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
-	}
 }
 
 #endif // !Petal_Header_WindowManger

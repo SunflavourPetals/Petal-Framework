@@ -9,43 +9,27 @@ namespace App
 	public:
 		AppWindow() : Window()
 		{
-
+			instance = this;
+			this->Create(Petal::WindowClassArgs{ Petal_TStr("My app wnd class"), &my_app_proc }.Register().class_atom);
+			this->UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
+			this->Show();
 			Petal::Debug::println("Hello Visual Studio 2022 Community Preview");
 		}
-		~AppWindow()
+		static inline AppWindow* instance{ nullptr };
+		static Petal_Decl_WndProc(my_app_proc)
 		{
-			if (WindowHandle())
-				Destroy();
+			return Petal::CommonWindowProcess(instance, window_handle, message, w_param, l_param);
 		}
 	};
-	AppWindow& MyWindow()
-	{
-		static AppWindow my_window{};
-		return my_window;
-	}
-//	Petal_Decl_CommonWndProcessVRef(my_win_proc, MyWindow, false);
-	Petal_Decl_WndProc(my_win_proc_old)
-	{
-		return Petal::CommonWindowProcess(MyWindow, window_handle, message, w_param, l_param);
-	}
+
 	int main() try
 	{
-		auto& app = MyWindow();
-
-		app.Create(Petal::WindowClassArgs{ Petal_TStr("My app wnd class"), &my_win_proc_old }.Register().class_atom);
-		
-		app.UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
-
-		app.Show();
-
-		Petal::MessageLoop();
-		
-		return 0;
+		AppWindow app{};
+		return Petal::MessageLoop();
 	}
-	catch (...)
+	catch (const std::exception& e)
 	{
-		Petal::Debug::println("exception!");
-		
+		Petal::Debug::println("[Exception] {}", e.what());
 		return -1;
 	}
 }

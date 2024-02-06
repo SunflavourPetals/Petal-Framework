@@ -28,6 +28,24 @@ namespace
 	}
 }
 
+namespace Petal
+{
+	win32lres CommonWindowProcess(ptr<Abstract::Window> target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
+	{
+		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
+		if (win) win->Bind(window_handle);
+		if (target_window && window_handle == target_window->WindowHandle()) return target_window->Process(message, w_param, l_param);
+		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
+	}
+	win32lres CommonWindowProcess(Abstract::Window& target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
+	{
+		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
+		if (win) win->Bind(window_handle);
+		if (window_handle == target_window.WindowHandle()) return target_window.Process(message, w_param, l_param);
+		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
+	}
+}
+
 namespace Petal::Abstract
 {
 	void Window::Bind(win32hwnd window_handle)
