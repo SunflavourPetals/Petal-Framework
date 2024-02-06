@@ -50,13 +50,13 @@ namespace Petal::Abstract
 {
 	void Window::Bind(win32hwnd window_handle)
 	{
+		if (this->Valid())
+		{
+			throw ::std::exception{ "[Petal] Cannot bind new handle to (Petal::Abstract::Window)object that already have a valid handle" };
+		}
 		if (!window_handle)
 		{
 			throw ::std::exception{ "[Petal] Cannot bind NULL to (Petal::Abstract::Window) object" };
-		}
-		if (this->WindowHandle())
-		{
-			throw ::std::exception{ "[Petal] Cannot bind new handle to (Petal::Abstract::Window)object that already have a valid handle" };
 		}
 		this->window_handle = window_handle;
 	}

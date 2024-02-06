@@ -162,7 +162,7 @@ namespace Petal
 	void Window::MovedEvent(MovedMessage& e) noexcept {}
 	void Window::CloseEvent(CloseMessage& e) noexcept { this->Destroy(); ExitMessageLoop(); }
 	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
-	void Window::DestroyEvent(DestroyMessage& e) noexcept {}
+	void Window::DestroyEvent(DestroyMessage& e) noexcept { Unbind(); }
 	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
 	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
 	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept {}

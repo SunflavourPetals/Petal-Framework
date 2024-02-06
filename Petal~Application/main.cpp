@@ -11,17 +11,19 @@ namespace App
 		{
 			instance = this;
 		}
+		~AppWindow()
+		{
+			if (Valid()) this->Destroy();
+			instance = nullptr;
+		}
 		void Init()
 		{
 			this->Create(Petal::WindowClassArgs{ Petal_TStr("My app wnd class"), my_app_proc }.Register().class_atom);
 			this->UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
 			this->Show();
+			throw std::exception{ "test" };
 			this->UpdateWindow();
 			Petal::Debug::println("Hello Visual Studio 2022 Community Preview");
-		}
-		~AppWindow()
-		{
-			instance = nullptr;
 		}
 		static inline AppWindow* instance{ nullptr };
 		static Petal_Decl_WndProc(my_app_proc)
