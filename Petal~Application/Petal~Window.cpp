@@ -188,7 +188,7 @@ namespace Petal
 	void Window::CharEvent(CharMessage& e) noexcept {}
 	void Window::DeadCharEvent(DeadCharMessage& e) noexcept {}
 	void Window::SysDeadCharEvent(SysDeadCharMessage& e) noexcept {}
-	win32lres Window::Window::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
+	win32lres Window::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
 	{
 		switch (msg)
 		{
