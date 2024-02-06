@@ -88,7 +88,7 @@ namespace Petal
 
 namespace Petal::IWindow
 {
-	win32lres CALLBACK DefaultSysWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept;
+	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept;
 	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept;
 	[[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept;
 	[[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept;
@@ -124,17 +124,17 @@ namespace Petal
 		RegisterResult Register() const noexcept(false);
 	public:
 		WindowClassArgs() = default;
-		WindowClassArgs(TStringView class_name, win32wndproc window_process = nullptr);
+		WindowClassArgs(TStringView class_name, win32wndproc window_process = default_window_process);
 		WindowClassArgs(const WindowClassArgs&) = default;
 		WindowClassArgs(WindowClassArgs&&) noexcept = default;
 		~WindowClassArgs() = default;
 	public:
+		static constexpr win32wndproc default_window_process{ &IWindow::SystemDefWndProc };
 		static constexpr dword default_style{ CS_HREDRAW | CS_VREDRAW };
 		static constexpr i32 default_class_extra{ 0 };
 		static constexpr i32 default_window_extra{ 0 };
 		static constexpr win32hbrush default_background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
 		static constexpr win32hicon default_icon_sm{ nullptr };
-		static constexpr win32wndproc default_window_process{ &IWindow::DefaultSysWndProc };
 		static inline const win32hicon default_icon{ IWindow::LoadDefaultWinAppIcon() };
 		static inline const win32hcursor default_cursor{ IWindow::LoadDefaultWinAppCursor() };
 	private:

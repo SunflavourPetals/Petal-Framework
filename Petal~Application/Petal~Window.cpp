@@ -226,7 +226,7 @@ namespace Petal
 			}
 			break;
 			default:
-				return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
+				return IWindow::SystemDefWndProc(this->WindowHandle(), msg, w, l);
 				break;
 			}
 			return 0;
@@ -303,7 +303,7 @@ namespace Petal
 			case SIZE_MAXSHOW:
 			case SIZE_MAXHIDE:
 			default:
-				return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
+				return IWindow::SystemDefWndProc(this->WindowHandle(), msg, w, l);
 				break;
 			}
 			return 0;
@@ -550,10 +550,10 @@ namespace Petal
 		default:
 			break;
 		}
-		return IWindow::DefaultSysWndProc(this->WindowHandle(), msg, w, l);
+		return IWindow::SystemDefWndProc(this->WindowHandle(), msg, w, l);
 	}
 	win32lres Window::DefaultDraw(PaintMessage& e) noexcept
 	{
-		return IWindow::DefaultSysWndProc(this->WindowHandle(), e.Message(), 0, 0);
+		return IWindow::SystemDefWndProc(this->WindowHandle(), e.Message(), 0, 0);
 	}
 }

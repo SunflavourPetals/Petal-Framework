@@ -35,14 +35,14 @@ namespace Petal
 		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
 		if (win) win->Bind(window_handle);
 		if (target_window && window_handle == target_window->WindowHandle()) return target_window->Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
+		return IWindow::SystemDefWndProc(window_handle, message, w_param, l_param);
 	}
 	win32lres CommonWindowProcess(Abstract::Window& target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
 	{
 		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
 		if (win) win->Bind(window_handle);
 		if (window_handle == target_window.WindowHandle()) return target_window.Process(message, w_param, l_param);
-		return IWindow::DefaultSysWndProc(window_handle, message, w_param, l_param);
+		return IWindow::SystemDefWndProc(window_handle, message, w_param, l_param);
 	}
 }
 
@@ -594,7 +594,7 @@ namespace Petal::IWindow
 		return nullptr;
 	}
 #ifdef Petal_Enable_Unicode
-	win32lres CALLBACK DefaultSysWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
+	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
 	{
 		return ::DefWindowProcW(window_handle, message, w_param, l_param);
 	}
@@ -611,7 +611,7 @@ namespace Petal::IWindow
 		return ::GetWindowLongPtrW(hwnd, index);
 	}
 #else
-	win32lres CALLBACK DefaultSysWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
+	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
 	{
 		return ::DefWindowProcA(window_handle, message, w_param, l_param);
 	}

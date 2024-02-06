@@ -89,7 +89,7 @@ namespace Petal
 	}
 	win32lres RawInputMessage::DefaultProcess(win32hwnd window_handle) const noexcept
 	{
-		return IWindow::DefaultSysWndProc(window_handle, this->Message(), this->Word(), this->Long());
+		return IWindow::SystemDefWndProc(window_handle, this->Message(), this->Word(), this->Long());
 	}
 }
 
