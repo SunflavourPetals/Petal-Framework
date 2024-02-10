@@ -62,7 +62,7 @@ namespace Petal::Debug::V
 		dout + ::std::vformat(fmt, ::std::make_format_args(::std::forward<Args>(args)...));
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<Char, std::remove_cv_t<CharT>>
+		requires std::is_same_v<Char, std::remove_const_t<CharT>>
 	inline void print(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
@@ -78,7 +78,7 @@ namespace Petal::Debug::V
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<Char, std::remove_cv_t<CharT>>
+		requires std::is_same_v<Char, std::remove_const_t<CharT>>
 	inline void println(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
@@ -90,7 +90,7 @@ namespace Petal::Debug::V
 		dowt + ::std::vformat(fmt, ::std::make_wformat_args(::std::forward<Args>(args)...));
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<WChar, std::remove_cv_t<CharT>>
+		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
 	inline void wprint(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
@@ -106,7 +106,7 @@ namespace Petal::Debug::V
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<WChar, std::remove_cv_t<CharT>>
+		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
 	inline void wprintln(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);

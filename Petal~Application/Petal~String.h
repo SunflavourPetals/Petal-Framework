@@ -21,7 +21,7 @@ namespace Petal::EnumChar
 	inline constexpr char null{ '\0' }; // NUL : Null Character
 	inline constexpr char bell{ '\a' }; // BEL : Bell/Alert/Alarm
 }
-
+#include <Windows.h>
 namespace Petal
 {
 	using Char = achar;
@@ -45,42 +45,38 @@ namespace Petal
 	using U32StringView = BasicStringView<U32Char>;
 
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	inline BasicString<CharT, Traits, Alloc> [[nodiscard]] StringToCStyleString(BasicStringView<CharT, Traits> in_str)
+	[[nodiscard]] inline BasicString<CharT, Traits, Alloc> StringToCStyleString(BasicStringView<CharT, Traits> in_str)
 	{
 		using InnerChar = CharT;
 		using InnerString = BasicString<CharT, Traits, Alloc>;
 		constexpr InnerChar null_char = InnerChar(EnumChar::null);
 		InnerString c_str;
 		c_str.resize(in_str.size(), null_char);
-		tsize index{ 0 };
+		auto it_c = c_str.begin();
 		for (const auto& e : in_str)
 		{
 			if (e != null_char)
 			{
-				c_str[index] = e;
-				++index;
+				(*it_c) = e;
+				++it_c;
 			}
 		}
-		c_str.erase(c_str.begin() + index, c_str.end());
+		c_str.erase(it_c, c_str.end());
 		return c_str;
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
 	[[nodiscard]] inline auto StringToCStyleString(const BasicString<CharT, Traits, Alloc>& in_str)
 		-> BasicString<CharT, Traits, Alloc>
 	{
-		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str });
+		return StringToCStyleString<CharT, Traits, Alloc>(BasicStringView<CharT, Traits>{ in_str });
 	}
-	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	[[nodiscard]] inline auto StringToCStyleString(const CharT (&in_str)[char_arr_size])
+	template <tsize char_arr_size, typename InCharT,
+		typename CharT = ::std::remove_const_t<InCharT>, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+		requires ::std::is_same_v<CharT, ::std::remove_cv_t<CharT>>
+	[[nodiscard]] inline auto StringToCStyleString(InCharT (&in_str)[char_arr_size])
 		-> BasicString<CharT, Traits, Alloc>
 	{
-		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
-	}
-	template <tsize char_arr_size, typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	[[nodiscard]] inline auto StringToCStyleString(CharT (&in_str)[char_arr_size])
-		-> BasicString<CharT, Traits, Alloc>
-	{
-		return StringToCStyleString(BasicStringView<CharT, Traits>{ in_str, char_arr_size });
+		return StringToCStyleString<CharT, Traits, Alloc>(BasicStringView<CharT, Traits>{ &in_str[0], char_arr_size });
 	}
 
 #if _ITERATOR_DEBUG_LEVEL >= 1
