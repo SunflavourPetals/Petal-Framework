@@ -21,7 +21,7 @@ namespace Petal::EnumChar
 	inline constexpr char null{ '\0' }; // NUL : Null Character
 	inline constexpr char bell{ '\a' }; // BEL : Bell/Alert/Alarm
 }
-#include <Windows.h>
+
 namespace Petal
 {
 	using Char = achar;
