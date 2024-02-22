@@ -74,7 +74,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<Char>(dout.LnMode()));
+		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::InnerChar>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -102,7 +102,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<WChar>(dowt.LnMode()));
+		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::InnerChar>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -128,7 +128,7 @@ namespace Petal::Debug
 	inline void println(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(::std::forward<Args>(args)...));
-		print("{}{}", str, GetLn<Char>(dout.LnMode()));
+		print("{}{}", str, GetLn<decltype(dout)::InnerChar>(dout.LnMode()));
 	}
 
 	template <typename... Args>
@@ -144,7 +144,7 @@ namespace Petal::Debug
 	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(::std::forward<Args>(args)...));
-		wprint(L"{}{}", str, GetLn<WChar>(dowt.LnMode()));
+		wprint(L"{}{}", str, GetLn<decltype(dowt)::InnerChar>(dowt.LnMode()));
 	}
 }
 

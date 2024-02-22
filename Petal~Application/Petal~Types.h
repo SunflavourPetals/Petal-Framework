@@ -12,6 +12,7 @@ namespace Petal
 	{
 		Ty width{};
 		Ty height{};
+		friend bool operator==(const Size2D&, const Size2D&) noexcept = default;
 	};
 	using Size2DT = Size2D<tsize>;
 	using Size2DI32 = Size2D<i32>;
@@ -23,6 +24,7 @@ namespace Petal
 	{
 		Ty x{};
 		Ty y{};
+		friend bool operator==(const Position2D&, const Position2D&) noexcept = default;
 	};
 	using Position2DI32 = Position2D<i32>;
 	using Position2DU32 = Position2D<u32>;
@@ -34,6 +36,7 @@ namespace Petal
 		Ty x{};
 		Ty y{};
 		Ty z{};
+		friend bool operator==(const Position3D&, const Position3D&) noexcept = default;
 	};
 	using Position3DI32 = Position3D<i32>;
 	using Position3DU32 = Position3D<u32>;
@@ -44,6 +47,7 @@ namespace Petal
 	{
 		Position2D<Ty> left_top;
 		Position2D<Ty> right_bottom;
+		friend bool operator==(const Rectangle&, const Rectangle&) noexcept = default;
 	};
 	using RectangleI32 = Rectangle<i32>;
 	using RectangleU32 = Rectangle<u32>;

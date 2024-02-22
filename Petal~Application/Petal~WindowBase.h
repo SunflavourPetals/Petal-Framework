@@ -13,15 +13,6 @@
 #include <list>
 #include <memory>
 
-#define Petal_Decl_WndProc(Fn_name) \
-	::Petal::win32lres \
-		CALLBACK \
-		Fn_name( \
-	::Petal::win32hwnd window_handle, \
-	::Petal::win32msg  message, \
-	::Petal::win32wprm w_param, \
-	::Petal::win32lprm l_param)
-
 namespace Petal
 {
 	class WindowClassArgs;
@@ -80,6 +71,7 @@ namespace Petal::Abstract
 
 namespace Petal
 {
+	win32lres CALLBACK CommonWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
 	WindowClassSet& IWindowClassSet();
 	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	i32 MessageLoop(Abstract::Process<>& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
@@ -89,6 +81,7 @@ namespace Petal
 namespace Petal::IWindow
 {
 	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept;
+	win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept;
 	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept;
 	[[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept;
 	[[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept;
@@ -119,23 +112,23 @@ namespace Petal
 		void UpdateClassName(TStringView class_name) noexcept(noexcept(StringToCStyleString(class_name)));
 		void UpdateMenuName(TStringView menu_name) noexcept(noexcept(StringToCStyleString(menu_name)));
 		void UsingMenuName(TStringView menu_name) noexcept(noexcept(::std::declval<WindowClassArgs>().UpdateMenuName(menu_name)));
-		void UsingMenuResource(word menu_resource) noexcept;
+		void UsingMenuResource(win32word menu_resource) noexcept;
 		void EnableDoubleClickMessage(boolean enable = true) noexcept;
 		RegisterResult Register() const noexcept(false);
 	public:
-		WindowClassArgs() = default;
-		WindowClassArgs(TStringView class_name, win32wndproc window_process = default_window_process);
+		WindowClassArgs();
+		WindowClassArgs(TStringView class_name);
 		WindowClassArgs(const WindowClassArgs&) = default;
 		WindowClassArgs(WindowClassArgs&&) noexcept = default;
 		~WindowClassArgs() = default;
 	public:
-		static constexpr win32wndproc default_window_process{ &IWindow::SystemDefWndProc };
-		static constexpr dword default_style{ CS_HREDRAW | CS_VREDRAW };
-		static constexpr i32 default_class_extra{ 0 };
-		static constexpr i32 default_window_extra{ 0 };
-		static constexpr win32hbrush default_background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
-		static constexpr win32hicon default_icon_sm{ nullptr };
-		static inline const win32hicon default_icon{ IWindow::LoadDefaultWinAppIcon() };
+		static constexpr win32wndproc    default_window_process{ &CommonWindowProcess };
+		static constexpr win32uint       default_style{ CS_HREDRAW | CS_VREDRAW };
+		static constexpr int             default_class_extra{ 0 };
+		static constexpr int             default_window_extra{ 0 };
+		static constexpr win32hbrush     default_background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
+		static constexpr win32hicon      default_icon_sm{ nullptr };
+		static inline const win32hicon   default_icon{ IWindow::LoadDefaultWinAppIcon() };
 		static inline const win32hcursor default_cursor{ IWindow::LoadDefaultWinAppCursor() };
 	private:
 		// WIN32-RegisterClassEx requires that string WindowClass::lpszClassName not be nullptr and not equal to null_tstr.
@@ -147,16 +140,18 @@ namespace Petal
 		TString menu_name;
 	public:
 		win32wndproc window_process{ default_window_process };
-		dword        style{ default_style };
-		i32          class_extra{ default_class_extra };
-		i32          window_extra{ default_window_extra };
+		win32uint    style{ default_style };
+		int          class_extra{ default_class_extra };
+		int          window_extra{ default_window_extra };
 		win32hicon   icon{ default_icon };
 		win32hcursor cursor{ default_cursor };
 		win32hbrush  background_brush{ default_background_brush };
 		win32hicon   icon_sm{ default_icon_sm };
-		word         menu_resource{ 0 };
+		win32word    menu_resource{ 0 };
 		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building WindowClass.
 		boolean      using_int_menu_resource{ false };
+	private:
+		static tsize default_number; // for unnamed instance
 		friend class WindowClassSet;
 	};
 }
@@ -170,24 +165,32 @@ namespace Petal
 		[[nodiscard]] const TString& Title() const noexcept;
 	public:
 		WindowCreatingArgs() = default;
-		WindowCreatingArgs(TStringView title, const Size2DI32& size = default_size, const Position2DI32& position = default_position, dword style = default_style, dword ex_style = default_ex_style, win32hmenu menu = default_menu);
+		WindowCreatingArgs(
+			TStringView   title,
+			Size2DI32     size      = default_size,
+			Position2DI32 position  = default_position,
+			win32dword    style     = default_style,
+			win32dword    ex_style  = default_ex_style,
+			win32hmenu    menu      = default_menu,
+			ptr<void>     user_data = nullptr);
 		WindowCreatingArgs(const WindowCreatingArgs&) = default;
 		WindowCreatingArgs(WindowCreatingArgs&&) noexcept = default;
 		~WindowCreatingArgs() = default;
 	public:
 		static constexpr Position2DI32 default_position{ CW_USEDEFAULT, CW_USEDEFAULT };
-		static constexpr Size2DI32     default_size{ 640, 480 };
-		static constexpr dword         default_ex_style{ 0L };
-		static constexpr dword         default_style{ WS_OVERLAPPEDWINDOW };
+		static constexpr Size2DI32     default_size{ CW_USEDEFAULT, CW_USEDEFAULT };
+		static constexpr win32dword    default_ex_style{ 0L };
+		static constexpr win32dword    default_style{ WS_OVERLAPPEDWINDOW };
 		static constexpr win32hmenu    default_menu{ nullptr };
 	private:
 		TString window_title{ Petal_TStr("Petal~Window") };
 	public:
 		Position2DI32 position{ default_position };
 		Size2DI32     size{ default_size };
-		dword         ex_style{ default_ex_style };
-		dword         style{ default_style };
+		win32dword    ex_style{ default_ex_style };
+		win32dword    style{ default_style };
 		win32hmenu    menu{ default_menu };
+		ptr<void>     user_data{ nullptr };
 	};
 }
 
@@ -203,29 +206,30 @@ namespace Petal::Abstract
 	public:
 		void Bind(win32hwnd window_handle);
 		void Unbind() noexcept;
-		[[nodiscard]] win32hwnd WindowHandle() const noexcept;
-		[[nodiscard]] boolean Valid() const noexcept;
-		CreateResult Create(win32atom class_atom, const WindowCreatingArgs& args = {});
-		DestroyResult Destroy() noexcept;
+		[[nodiscard]] auto WindowHandle() const noexcept -> win32hwnd;
+		[[nodiscard]] auto Valid() const noexcept -> boolean;
+		auto Create(win32atom class_atom = WindowClassArgs{}.Register().class_atom, const WindowCreatingArgs& args = {}) -> CreateResult;
+		auto Destroy() noexcept -> DestroyResult;
 	protected:
-		[[nodiscard]] dword WindowStyle() const noexcept;
-		[[nodiscard]] dword WindowExStyle() const noexcept;
+		[[nodiscard]] auto WindowLongPtr(int index) const noexcept -> win32lptr;
+		[[nodiscard]] auto UpdateWindowLongPtr(int index, win32lptr val) const noexcept -> win32lptr;
+		[[nodiscard]] auto GWLP_Id() const noexcept -> win32lptr;
+		[[nodiscard]] auto GWLP_Style() const noexcept -> win32dword;
+		[[nodiscard]] auto GWLP_ExStyle() const noexcept -> win32dword;
+		[[nodiscard]] auto GWLP_UserData() const noexcept -> win32lptr;
+		[[nodiscard]] auto GWLP_HInstance() const noexcept -> win32hins;
+		[[nodiscard]] auto GWLP_WindowProcess() const noexcept -> win32wndproc;
+		[[nodiscard]] auto GWLP_ParentWindowHandle() const noexcept -> win32hwnd;
 	public:
 		Window() = default;
 		Window(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
-		virtual ~Window() = default;
+		virtual ~Window();
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
 	private:
 		win32hwnd window_handle{};
 	};
-}
-
-namespace Petal
-{
-	win32lres CommonWindowProcess(ptr<Abstract::Window> target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
-	win32lres CommonWindowProcess(Abstract::Window& target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
 }
 
 namespace Petal

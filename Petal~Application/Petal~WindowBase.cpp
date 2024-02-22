@@ -7,14 +7,17 @@
 #include <utility>
 #include <format>
 
-#include <Windows.h>
-
 #ifdef CreateEvent
 #undef CreateEvent
 #endif
 
 namespace
 {
+	namespace PetalUnnamed
+	{
+		thread_local ::Petal::ptr<::Petal::Abstract::Window> global_window{ nullptr };
+		static_assert(sizeof(Petal::win32lptr) >= sizeof(Petal::ptr<Petal::Abstract::Window>), "[Petal] Size of user data (WIN32 Window) too small");
+	}
 	namespace PetalUnnamed::IWin32
 	{
 		using namespace Petal;
@@ -30,24 +33,30 @@ namespace
 
 namespace Petal
 {
-	win32lres CommonWindowProcess(ptr<Abstract::Window> target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
+	win32lres CALLBACK CommonWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
 	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		if (target_window && window_handle == target_window->WindowHandle()) return target_window->Process(message, w_param, l_param);
-		return IWindow::SystemDefWndProc(window_handle, message, w_param, l_param);
-	}
-	win32lres CommonWindowProcess(Abstract::Window& target_window, win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
-	{
-		ptr<Abstract::Window> win{ IWindow::WindowFromCreateEvent(message, l_param) };
-		if (win) win->Bind(window_handle);
-		if (window_handle == target_window.WindowHandle()) return target_window.Process(message, w_param, l_param);
+		if (auto window_ptr = (IWindow::WindowLongPtr(window_handle, GWLP_USERDATA)))
+		{
+			return reinterpret_cast<ptr<Abstract::Window>>(window_ptr)->Process(message, w_param, l_param);
+		}
+		else if (PetalUnnamed::global_window)
+		{
+			PetalUnnamed::global_window->Bind(window_handle);
+			return PetalUnnamed::global_window->Process(message, w_param, l_param);
+		}
 		return IWindow::SystemDefWndProc(window_handle, message, w_param, l_param);
 	}
 }
 
 namespace Petal::Abstract
 {
+	Window::~Window()
+	{
+		if (this->Valid())
+		{
+			IWindow::UpdateWindowLongPtr(window_handle, GWLP_USERDATA, reinterpret_cast<win32lptr>(nullptr));
+		}
+	}
 	void Window::Bind(win32hwnd window_handle)
 	{
 		if (this->Valid())
@@ -59,24 +68,33 @@ namespace Petal::Abstract
 			throw ::std::exception{ "[Petal] Cannot bind NULL to (Petal::Abstract::Window) object" };
 		}
 		this->window_handle = window_handle;
+		IWindow::UpdateWindowLongPtr(window_handle, GWLP_USERDATA, reinterpret_cast<win32lptr>(this));
 	}
 	void Window::Unbind() noexcept
 	{
+		if (this->Valid())
+		{
+			IWindow::UpdateWindowLongPtr(window_handle, GWLP_USERDATA, reinterpret_cast<win32lptr>(nullptr));
+		}
 		this->window_handle = {};
 	}
-	[[nodiscard]] win32hwnd Window::WindowHandle() const noexcept
+	[[nodiscard]] auto Window::WindowHandle() const noexcept -> win32hwnd
 	{
 		return this->window_handle;
 	}
-	[[nodiscard]] boolean Window::Valid() const noexcept
+	[[nodiscard]] auto Window::Valid() const noexcept -> boolean
 	{
 		return this->window_handle != nullptr;
 	}
-	Window::CreateResult Window::Create(win32atom class_atom, const WindowCreatingArgs& args)
+	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args) -> CreateResult
 	{
 		CreateResult result{};
 
+		PetalUnnamed::global_window = this;
+
 		result.window_handle = PetalUnnamed::IWin32::PetalCreateWindow(class_atom, *this, args);
+
+		PetalUnnamed::global_window = nullptr;
 
 		if (result.window_handle == nullptr)
 		{
@@ -93,9 +111,11 @@ namespace Petal::Abstract
 
 		return result;
 	}
-	Window::DestroyResult Window::Destroy() noexcept
+	auto Window::Destroy() noexcept -> DestroyResult
 	{
 		DestroyResult result{};
+
+		const ptrc<void> temp_handle = static_cast<ptr<void>>(this->WindowHandle());
 
 		result.return_value = PetalUnnamed::IWin32::PetalDestroyWindow(this->WindowHandle());
 
@@ -104,27 +124,53 @@ namespace Petal::Abstract
 			result.win32_error = ::GetLastError();
 
 			Petal_VSDbgT("[Petal] Failed in Window::Destroy!\r\n");
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow_handle: {}\r\n"), static_cast<ptr<void>>(this->WindowHandle())).c_str());
+			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow_handle: {}\r\n"), temp_handle).c_str());
 			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
 
 			return result;
 		}
 
-		const ptr<void> temp_handle = static_cast<ptr<void>>(this->WindowHandle());
-
-		this->window_handle = {};
+		this->Unbind();
 
 		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), temp_handle).c_str());
 
 		return result;
 	}
-	[[nodiscard]] dword Window::WindowStyle() const noexcept
+	[[nodiscard]] auto Window::WindowLongPtr(int index) const noexcept -> win32lptr
 	{
-		return static_cast<dword>(IWindow::WindowLongPtr(this->WindowHandle(), GWL_STYLE));
+		return IWindow::WindowLongPtr(this->WindowHandle(), index);
 	}
-	[[nodiscard]] dword Window::WindowExStyle() const noexcept
+	[[nodiscard]] auto Window::UpdateWindowLongPtr(int index, win32lptr val) const noexcept -> win32lptr
 	{
-		return static_cast<dword>(IWindow::WindowLongPtr(this->WindowHandle(), GWL_EXSTYLE));
+		return IWindow::UpdateWindowLongPtr(this->WindowHandle(), index, val);
+	}
+	[[nodiscard]] auto Window::GWLP_Id() const noexcept -> win32lptr
+	{
+		return this->WindowLongPtr(GWLP_ID);
+	}
+	[[nodiscard]] auto Window::GWLP_Style() const noexcept -> win32dword
+	{
+		return static_cast<win32dword>(this->WindowLongPtr(GWL_STYLE));
+	}
+	[[nodiscard]] auto Window::GWLP_ExStyle() const noexcept -> win32dword
+	{
+		return static_cast<win32dword>(this->WindowLongPtr(GWL_EXSTYLE));
+	}
+	[[nodiscard]] auto Window::GWLP_UserData() const noexcept -> win32lptr
+	{
+		return this->WindowLongPtr(GWLP_USERDATA);
+	}
+	[[nodiscard]] auto Window::GWLP_HInstance() const noexcept -> win32hins
+	{
+		return reinterpret_cast<win32hins>(this->WindowLongPtr(GWLP_HINSTANCE));
+	}
+	[[nodiscard]] auto Window::GWLP_WindowProcess() const noexcept -> win32wndproc
+	{
+		return reinterpret_cast<win32wndproc>(this->WindowLongPtr(GWLP_WNDPROC));
+	}
+	[[nodiscard]] auto Window::GWLP_ParentWindowHandle() const noexcept -> win32hwnd
+	{
+		return reinterpret_cast<win32hwnd>(this->WindowLongPtr(GWLP_HWNDPARENT));
 	}
 }
 
@@ -146,8 +192,18 @@ namespace Petal
 
 namespace Petal
 {
-	WindowClassArgs::WindowClassArgs(TStringView class_name, win32wndproc window_process) :
-		window_process{ window_process }
+	tsize WindowClassArgs::default_number = 0;
+	WindowClassArgs::WindowClassArgs()
+	{
+#if defined Petal_Enable_Unicode
+		TString number{ std::to_wstring(this->default_number) };
+#else
+		TString number{ std::to_string(this->default_number) };
+#endif
+		this->UpdateClassName(TString{ Petal_TStr("Petal-window-class=") } + number);
+		this->default_number += 1;
+	}
+	WindowClassArgs::WindowClassArgs(TStringView class_name)
 	{
 		this->UpdateClassName(class_name);
 	}
@@ -164,8 +220,8 @@ namespace Petal
 		window_class.hCursor = this->cursor;
 		window_class.hbrBackground = this->background_brush;
 		window_class.lpszMenuName = (this->using_int_menu_resource) ? IWindow::ToWinResource(this->menu_resource) :
-			((this->menu_name.length() <= 0) ? nullptr : this->menu_name.c_str());
-		window_class.lpszClassName = (this->class_name.length() <= 0) ? nullptr : this->class_name.c_str();
+			((this->menu_name.length() > 0) ? this->menu_name.c_str() : nullptr);
+		window_class.lpszClassName = (this->class_name.length() > 0) ? this->class_name.c_str() : nullptr;
 		window_class.hIconSm = this->icon_sm;
 		return window_class;
 	}
@@ -190,7 +246,7 @@ namespace Petal
 		this->UpdateMenuName(menu_name);
 		this->using_int_menu_resource = false;
 	}
-	void WindowClassArgs::UsingMenuResource(word menu_resource) noexcept
+	void WindowClassArgs::UsingMenuResource(win32word menu_resource) noexcept
 	{
 		this->menu_resource = menu_resource;
 		this->using_int_menu_resource = true;
@@ -215,12 +271,20 @@ namespace Petal
 
 namespace Petal
 {
-	WindowCreatingArgs::WindowCreatingArgs(TStringView title, const Size2DI32& size, const Position2DI32& position, dword style, dword ex_style, win32hmenu menu) :
+	WindowCreatingArgs::WindowCreatingArgs(
+		TStringView title,
+		Size2DI32 size,
+		Position2DI32 position,
+		win32dword style,
+		win32dword ex_style,
+		win32hmenu menu,
+		ptr<void> user_data) :
 		position{ position },
 		size{ size },
 		ex_style{ ex_style },
 		style{ style },
-		menu{ menu }
+		menu{ menu },
+		user_data{ user_data }
 	{
 		this->UpdateTitle(title);
 	}
@@ -610,6 +674,10 @@ namespace Petal::IWindow
 	{
 		return ::GetWindowLongPtrW(hwnd, index);
 	}
+	win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
+	{
+		return ::SetWindowLongPtrW(hwnd, index, lptr);
+	}
 #else
 	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
 	{
@@ -626,6 +694,10 @@ namespace Petal::IWindow
 	[[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
 	{
 		return ::GetWindowLongPtrA(hwnd, index);
+	}
+	win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
+	{
+		return ::SetWindowLongPtrA(hwnd, index, lptr);
 	}
 #endif
 }
@@ -649,10 +721,21 @@ namespace
 		}
 		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
 		{
-			Win32Rect rect{ 0, 0, args.size.width, args.size.height };
-			::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
-			i32 width{ rect.right - rect.left };
-			i32 height{ rect.bottom - rect.top };
+			i32 width{};
+			i32 height{};
+			if (args.size == WindowCreatingArgs::default_size)
+			{
+				width = args.size.width;
+				height = args.size.height;
+			}
+			else
+			{
+				Win32Rect rect{ 0, 0, args.size.width, args.size.height };
+				::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
+				width = rect.right - rect.left;
+				height = rect.bottom - rect.top;
+			}
+
 			return ::CreateWindowExW
 			(
 				args.ex_style,
@@ -666,7 +749,7 @@ namespace
 				nullptr,
 				args.menu,
 				WinMain::HIns(),
-				static_cast<::LPVOID>(&window)
+				args.user_data
 			);
 		}
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept

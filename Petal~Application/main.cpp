@@ -9,42 +9,18 @@ namespace App
 	public:
 		AppWindow() : Window()
 		{
-			if (instance)
-				throw std::exception{ "Instance has already existed" }; // 不允许同时存在多个实例
-			instance = this;
-		}
-		~AppWindow()
-		{
-			if (Valid())
-				this->Destroy(); // 当异常发生等情况未产生CloseEvent时，手动Destroy窗口
-			instance = nullptr;
-		}
-		void Init()
-		{
-			this->Create(Petal::WindowClassArgs{ Petal_TStr("My app wnd class"), my_app_proc }.Register().class_atom);
+			this->Create();
 			this->UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
 			this->Show();
 			this->UpdateWindow();
 			Petal::Debug::println("Hello Visual Studio 2022 Community Preview");
 		}
-		static inline AppWindow* instance{ nullptr };
-		static Petal_Decl_WndProc(my_app_proc)
-		{
-			return Petal::CommonWindowProcess(instance, window_handle, message, w_param, l_param);
-		}
 	};
 
-	int main() try
+	int main()
 	{
 		AppWindow app{};
-		AppWindow double_instance_make_except{}; // throw
-		app.Init();
 		return Petal::MessageLoop();
-	}
-	catch (const std::exception& e)
-	{
-		Petal::Debug::println("[Exception] {}", e.what());
-		return -1;
 	}
 }
 

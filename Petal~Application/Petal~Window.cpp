@@ -26,33 +26,29 @@ namespace Petal
 	}
 	win32bool Window::ShowNoBorder(boolean no_border_mode) noexcept
 	{
-		constexpr dword no_border_style{ WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP };
+		constexpr win32dword no_border_style{ WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP };
 		if (this->pt_no_border_mode == no_border_mode)
 		{
-			return TRUE;
+			return win32_true;
 		}
 		this->pt_no_border_mode = no_border_mode;
 		if (no_border_mode == true)
 		{
-			this->pt_former_style = static_cast<dword>(this->WindowStyle());
+			this->pt_former_style = static_cast<win32dword>(this->GWLP_Style());
 		}
 
-		dword target_style{ (no_border_mode == true) ? no_border_style : this->pt_former_style };
+		win32dword target_style{ (no_border_mode == true) ? no_border_style : this->pt_former_style };
 
 		Win32Rect client_rect{};
-		if (this->ClientRect(client_rect) == FALSE)
+		if (this->ClientRect(client_rect) == win32_false)
 		{
-			return FALSE;
+			return win32_false;
 		}
-		if (::AdjustWindowRectEx(&client_rect, target_style, ::GetMenu(this->WindowHandle()) != nullptr, static_cast<dword>(this->WindowExStyle())) == FALSE)
+		if (::AdjustWindowRectEx(&client_rect, target_style, ::GetMenu(this->WindowHandle()) != nullptr, static_cast<win32dword>(this->GWLP_ExStyle())) == win32_false)
 		{
-			return FALSE;
+			return win32_false;
 		}
-#ifdef Petal_Enable_Unicode
-		::SetWindowLongPtrW(this->WindowHandle(), GWL_STYLE, target_style);
-#else
-		::SetWindowLongPtrA(this->WindowHandle(), GWL_STYLE, target_style);
-#endif
+		IWindow::UpdateWindowLongPtr(this->WindowHandle(), GWL_STYLE, target_style);
 		return ::SetWindowPos(this->WindowHandle(), nullptr, 0, 0, client_rect.right - client_rect.left, client_rect.bottom - client_rect.top, SWP_NOMOVE);
 	}
 	win32bool Window::Repaint(win32uint flags) noexcept
@@ -126,7 +122,7 @@ namespace Petal
 	win32bool Window::Resize(i32 width, i32 height) noexcept
 	{
 		Win32Rect rect{ 0, 0, width, height };
-		win32bool result{ ::AdjustWindowRectEx(&rect, this->WindowStyle(), ::GetMenu(this->WindowHandle()) != nullptr, this->WindowExStyle()) };
+		win32bool result{ ::AdjustWindowRectEx(&rect, this->GWLP_Style(), ::GetMenu(this->WindowHandle()) != nullptr, this->GWLP_ExStyle()) };
 		if (result == FALSE)
 		{
 			return result;
@@ -162,7 +158,7 @@ namespace Petal
 	void Window::MovedEvent(MovedMessage& e) noexcept {}
 	void Window::CloseEvent(CloseMessage& e) noexcept { this->Destroy(); ExitMessageLoop(); }
 	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
-	void Window::DestroyEvent(DestroyMessage& e) noexcept { this->Unbind(); }
+	void Window::DestroyEvent(DestroyMessage& e) noexcept {}
 	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
 	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
 	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept {}
@@ -242,7 +238,7 @@ namespace Petal
 			}
 			SizingMessage wrapped_msg{ msg, w, l };
 			this->SizingEvent(wrapped_msg);
-			return TRUE;
+			return win32_true;
 		}
 		break;
 		case WM_MOVING:
@@ -255,7 +251,7 @@ namespace Petal
 			}
 			MovingMessage wrapped_msg{ msg, w, l };
 			this->MovingEvent(wrapped_msg);
-			return TRUE;
+			return win32_true;
 		}
 		break;
 		case WM_EXITSIZEMOVE:
@@ -319,7 +315,7 @@ namespace Petal
 		case WM_GETMINMAXINFO:
 		{
 			Win32Rect rect{ 0, 0, pt_limit_client_size.width, pt_limit_client_size.height };
-			::AdjustWindowRectEx(&rect, this->WindowStyle(), ::GetMenu(this->WindowHandle()) != NULL, this->WindowExStyle());
+			::AdjustWindowRectEx(&rect, this->GWLP_Style(), ::GetMenu(this->WindowHandle()) != NULL, this->GWLP_ExStyle());
 			reinterpret_cast<::MINMAXINFO*>(l)->ptMinTrackSize.x = rect.right - rect.left;
 			reinterpret_cast<::MINMAXINFO*>(l)->ptMinTrackSize.y = rect.bottom - rect.top;
 			return 0;
@@ -424,14 +420,14 @@ namespace Petal
 			{
 				MouseXButton1DownMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton1DownEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			case XBUTTON2:
 			{
 				MouseXButton2DownMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton2DownEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			default:
@@ -447,14 +443,14 @@ namespace Petal
 			{
 				MouseXButton1UpMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton1UpEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			case XBUTTON2:
 			{
 				MouseXButton2UpMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton2UpEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			default:
@@ -470,14 +466,14 @@ namespace Petal
 			{
 				MouseXButton1DoubleClickMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton1DoubleClickEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			case XBUTTON2:
 			{
 				MouseXButton2DoubleClickMessage wrapped_msg{ msg, w, l };
 				this->MouseXButton2DoubleClickEvent(wrapped_msg);
-				return TRUE;
+				return win32_true;
 			}
 			break;
 			default:
