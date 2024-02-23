@@ -59,37 +59,34 @@ namespace Petal
 	{
 		return ::UpdateWindow(this->WindowHandle());
 	}
-	const Size2DI32& Window::MinimumSize() const noexcept
-	{
-		return this->pt_limit_client_size;
-	}
-	void Window::UpdateMinimumSize(const Size2DI32& new_size) noexcept
-	{
-		this->pt_limit_client_size = new_size;
-	}
-	void Window::UpdateMinimumSize(i32 new_width, i32 new_height) noexcept
-	{
-		this->pt_limit_client_size = { new_width, new_height };
-	}
 	::std::optional<Win32Rect> Window::WindowRect() const noexcept
 	{
 		Win32Rect rect{};
 		win32bool result{ this->WindowRect(rect) };
-		if (result == win32_false) return ::std::nullopt;
+		if (result == win32_false)
+		{
+			return ::std::nullopt;
+		}
 		return ::std::make_optional<Win32Rect>(rect);
 	}
 	::std::optional<Win32Rect> Window::ClientRect() const noexcept
 	{
 		Win32Rect rect{};
 		win32bool result{ this->ClientRect(rect) };
-		if (result == win32_false) return ::std::nullopt;
+		if (result == win32_false)
+		{
+			return ::std::nullopt;
+		}
 		return ::std::make_optional<Win32Rect>(rect);
 	}
 	::std::optional<Size2DI32> Window::ClientSize() const noexcept
 	{
 		Size2DI32 size{};
 		win32bool result{ this->ClientSize(size) };
-		if (result == win32_false) return ::std::nullopt;
+		if (result == win32_false)
+		{
+			return ::std::nullopt;
+		}
 		return ::std::make_optional<Size2DI32>(size);
 	}
 	win32bool Window::WindowRect(Win32Rect& rect) const noexcept
@@ -314,7 +311,11 @@ namespace Petal
 		break;
 		case WM_GETMINMAXINFO:
 		{
-			Win32Rect rect{ 0, 0, pt_limit_client_size.width, pt_limit_client_size.height };
+			if (this->using_default_get_min_max_info_process)
+			{
+				return IWindow::SystemDefWndProc(this->WindowHandle(), msg, w, l);
+			}
+			Win32Rect rect{ 0, 0, this->minimum_client_size.width, this->minimum_client_size.height };
 			::AdjustWindowRectEx(&rect, this->GWLP_Style(), ::GetMenu(this->WindowHandle()) != NULL, this->GWLP_ExStyle());
 			reinterpret_cast<::MINMAXINFO*>(l)->ptMinTrackSize.x = rect.right - rect.left;
 			reinterpret_cast<::MINMAXINFO*>(l)->ptMinTrackSize.y = rect.bottom - rect.top;

@@ -23,7 +23,7 @@ namespace
 		using namespace Petal;
 		[[nodiscard]] win32atom RegisterPetalWindowClass(const WindowClass& window_class) noexcept;
 		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept;
-		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept;
+		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) noexcept;
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept;
 		[[nodiscard]] win32bool PeekWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max, win32msg remove) noexcept;
 		[[nodiscard]] win32bool PetalDestroyWindow(win32hwnd target_window) noexcept;
@@ -86,13 +86,13 @@ namespace Petal::Abstract
 	{
 		return this->window_handle != nullptr;
 	}
-	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args) -> CreateResult
+	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> CreateResult
 	{
 		CreateResult result{};
 
 		PetalUnnamed::global_window = this;
 
-		result.window_handle = PetalUnnamed::IWin32::PetalCreateWindow(class_atom, *this, args);
+		result.window_handle = PetalUnnamed::IWin32::PetalCreateWindow(class_atom, *this, args, interpret_args_size_as_client_size);
 
 		PetalUnnamed::global_window = nullptr;
 
@@ -295,6 +295,14 @@ namespace Petal
 	[[nodiscard]] const TString& WindowCreatingArgs::Title() const noexcept
 	{
 		return this->window_title;
+	}
+	[[nodiscard]] constexpr Size2DI32 WindowCreatingArgs::WindowSize(boolean interpret_size_as_client_size) const noexcept
+	{
+		if (interpret_size_as_client_size)
+		{
+			return this->WindowSize<true>();
+		}
+		return this->WindowSize<false>();
 	}
 }
 
@@ -719,22 +727,9 @@ namespace
 		{
 			return ::UnregisterClassW(Petal::IWindow::ToWinResource(class_atom), WinMain::HIns());
 		}
-		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
+		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) noexcept
 		{
-			i32 width{};
-			i32 height{};
-			if (args.size == WindowCreatingArgs::default_size)
-			{
-				width = args.size.width;
-				height = args.size.height;
-			}
-			else
-			{
-				Win32Rect rect{ 0, 0, args.size.width, args.size.height };
-				::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
-				width = rect.right - rect.left;
-				height = rect.bottom - rect.top;
-			}
+			Size2DI32 size{ args.WindowSize(interpret_args_size_as_client_size) };
 
 			return ::CreateWindowExW
 			(
@@ -744,8 +739,8 @@ namespace
 				args.style,
 				args.position.x,
 				args.position.y,
-				width,
-				height,
+				size.width,
+				size.height,
 				nullptr,
 				args.menu,
 				WinMain::HIns(),

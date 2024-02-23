@@ -44,11 +44,6 @@ namespace Petal
 		win32bool ShowNoBorder(boolean no_border_mode = true) noexcept;
 		win32bool Repaint(win32uint flags = RDW_INTERNALPAINT || RDW_UPDATENOW || RDW_ALLCHILDREN) noexcept;
 		win32bool UpdateWindow() noexcept;
-
-		const Size2DI32& MinimumSize() const noexcept;
-		void UpdateMinimumSize(const Size2DI32& new_size) noexcept;
-		void UpdateMinimumSize(i32 new_width, i32 new_height) noexcept;
-
 		::std::optional<Win32Rect> WindowRect() const noexcept;
 		::std::optional<Win32Rect> ClientRect() const noexcept;
 		::std::optional<Size2DI32> ClientSize() const noexcept;
@@ -114,13 +109,15 @@ namespace Petal
 		virtual ~Window() = default;
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
-	private:
-		Size2DI32 pt_limit_client_size{ 120, 90 };
+	public:
+		Size2DI32 minimum_client_size{ 120, 90 };
 	private:
 		dword pt_former_style{};
 		boolean pt_enter_size{ false };
 		boolean pt_enter_move{ false };
 		boolean pt_no_border_mode{ false };
+	public:
+		boolean using_default_get_min_max_info_process{ false };
 	};
 }
 

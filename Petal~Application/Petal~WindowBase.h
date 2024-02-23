@@ -163,6 +163,9 @@ namespace Petal
 	public:
 		void UpdateTitle(TStringView new_title);
 		[[nodiscard]] const TString& Title() const noexcept;
+		template <boolean interpret_size_as_client_size = true>
+		[[nodiscard]] constexpr Size2DI32 WindowSize() const noexcept;
+		[[nodiscard]] constexpr Size2DI32 WindowSize(boolean interpret_size_as_client_size) const noexcept;
 	public:
 		WindowCreatingArgs() = default;
 		WindowCreatingArgs(
@@ -208,7 +211,10 @@ namespace Petal::Abstract
 		void Unbind() noexcept;
 		[[nodiscard]] auto WindowHandle() const noexcept -> win32hwnd;
 		[[nodiscard]] auto Valid() const noexcept -> boolean;
-		auto Create(win32atom class_atom = WindowClassArgs{}.Register().class_atom, const WindowCreatingArgs& args = {}) -> CreateResult;
+		auto Create(
+			win32atom class_atom = WindowClassArgs{}.Register().class_atom,
+			const WindowCreatingArgs& args = {},
+			boolean interpret_args_size_as_client_size = true) -> CreateResult;
 		auto Destroy() noexcept -> DestroyResult;
 	protected:
 		[[nodiscard]] auto WindowLongPtr(int index) const noexcept -> win32lptr;
@@ -282,6 +288,28 @@ namespace Petal
 		boolean unregister_all_when_deconstruction{ true };
 		friend WindowClassSet& IWindowClassSet();
 	};
+}
+
+namespace Petal
+{
+	template <boolean interpret_size_as_client_size>
+	[[nodiscard]] constexpr Size2DI32 WindowCreatingArgs::WindowSize() const noexcept
+	{
+		if constexpr (interpret_size_as_client_size)
+		{
+			if (this->size == WindowCreatingArgs::default_size)
+			{
+				return this->size;
+			}
+			else
+			{
+				Win32Rect rect{ 0, 0, this->size.width, this->size.height };
+				::AdjustWindowRectEx(&rect, this->style, this->menu != nullptr, this->ex_style);
+				return { .width = rect.right - rect.left, .height = rect.bottom - rect.top };
+			}
+		}
+		return this->size;
+	}
 }
 
 #endif // !Petal_Header_WindowManger
