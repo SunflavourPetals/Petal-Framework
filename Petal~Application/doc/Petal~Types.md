@@ -20,8 +20,11 @@ struct Position2D
 {
     Ty x{};
     Ty y{};
+    friend bool operator==(const Position2D&, const Position2D&) noexcept = default;
 };
 ```
+
+提供预置的 `==` 和 `!=` 操作；
 
 #### 类型别名 Position2DF32
 
@@ -44,8 +47,11 @@ struct Position3D
     Ty x{};
     Ty y{};
     Ty z{};
+    friend bool operator==(const Position3D&, const Position3D&) noexcept = default;
 };
 ```
+
+提供预置的 `==` 和 `!=` 操作；
 
 #### 类型别名 Position3DF32
 
@@ -67,8 +73,11 @@ struct Rectangle
 {
     Position2D<Ty> left_top;
     Position2D<Ty> right_bottom;
+    friend bool operator==(const Rectangle&, const Rectangle&) noexcept = default;
 };
 ```
+
+提供预置的 `==` 和 `!=` 操作；
 
 #### 类型别名 RectangleF32
 
@@ -90,8 +99,11 @@ struct Size2D
 {
     Ty width{};
     Ty height{};
+    friend bool operator==(const Size2D&, const Size2D&) noexcept = default;
 };
 ```
+
+提供预置的 `==` 和 `!=` 操作；
 
 #### 类型别名 Size2DF32
 
