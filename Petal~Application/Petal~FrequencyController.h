@@ -87,16 +87,16 @@ namespace Petal
 	private:
 		PerformanceCounter pt_performance_counter;
 		fptr<void> pt_sleep_fn{ pt_default_sleep_fn };
-		i64 pt_frame_count{}; // Ö¡Êı: Êµ¼Ê¼ä¸ôÊ±¼äÄÚÖ´ĞĞµÄ´ÎÊı
-		i64 pt_sleep_failure_threshold_count{ pt_max_value }; // Ë¯ÃßÊ§Ğ§ãĞÖµ£¬µ±¾àÀë actual_delta_count µÄ tick Êı²»×ã´ËÖµÊ±£¬²»½øĞĞË¯Ãß£¬µ«ÊÇ³ÉÔ± Sleep º¯ÊıÒÀ¾É·µ»Ø false
-		i64 pt_sleep_count{}; // ¼ä¸ôÊ±¼äÄÚÊ£ÓàµÄË¯Ãß´ÎÊı£¬Ã¿¸ö¼ä¸ô»áÖØÖÃ
-		i64 pt_sleep_limitation{ pt_max_value }; // Ä¿±ê¼ä¸ôÊ±¼äÄÚÔÊĞíµÄË¯Ãß´ÎÊı
-		i64 pt_delta_count{}; // ¼ä¸ôÊ±¼ä
-		i64 pt_target_delta_count{}; // Ä¿±ê¼ä¸ôÊ±¼ä
-		i64 pt_actual_delta_count{}; // ¾­ĞŞÕıµÄÄ¿±ê¼ä¸ôÊ±¼ä
-		i64 pt_statistics_count{}; // Ã¿´ÎÍ³¼ÆµÄ¼ä¸ôÊ±¼ä
-		i64 pt_target_statistics_count{}; // Ã¿´ÎÍ³¼ÆµÄÄ¿±ê¼ä¸ôÊ±¼ä
-		i64 pt_actual_statistics_count{}; // Ã¿´ÎÍ³¼ÆµÄÊµ¼Ê¼ä¸ôÊ±¼ä
+		i64 pt_frame_count{}; // å¸§æ•°: å®é™…é—´éš”æ—¶é—´å†…æ‰§è¡Œçš„æ¬¡æ•°
+		i64 pt_sleep_failure_threshold_count{ pt_max_value }; // ç¡çœ å¤±æ•ˆé˜ˆå€¼ï¼Œå½“è·ç¦» actual_delta_count çš„ tick æ•°ä¸è¶³æ­¤å€¼æ—¶ï¼Œä¸è¿›è¡Œç¡çœ ï¼Œä½†æ˜¯æˆå‘˜ Sleep å‡½æ•°ä¾æ—§è¿”å› false
+		i64 pt_sleep_count{}; // é—´éš”æ—¶é—´å†…å‰©ä½™çš„ç¡çœ æ¬¡æ•°ï¼Œæ¯ä¸ªé—´éš”ä¼šé‡ç½®
+		i64 pt_sleep_limitation{ pt_max_value }; // ç›®æ ‡é—´éš”æ—¶é—´å†…å…è®¸çš„ç¡çœ æ¬¡æ•°
+		i64 pt_delta_count{}; // é—´éš”æ—¶é—´
+		i64 pt_target_delta_count{}; // ç›®æ ‡é—´éš”æ—¶é—´
+		i64 pt_actual_delta_count{}; // ç»ä¿®æ­£çš„ç›®æ ‡é—´éš”æ—¶é—´
+		i64 pt_statistics_count{}; // æ¯æ¬¡ç»Ÿè®¡çš„é—´éš”æ—¶é—´
+		i64 pt_target_statistics_count{}; // æ¯æ¬¡ç»Ÿè®¡çš„ç›®æ ‡é—´éš”æ—¶é—´
+		i64 pt_actual_statistics_count{}; // æ¯æ¬¡ç»Ÿè®¡çš„å®é™…é—´éš”æ—¶é—´
 	};
 }
 

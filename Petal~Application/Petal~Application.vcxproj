@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -89,7 +89,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -104,7 +104,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -119,7 +119,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain_False;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -146,6 +146,7 @@
     <ClInclude Include="Petal~RawInputWindow.h" />
     <ClInclude Include="Petal~String.h" />
     <ClInclude Include="Petal~Types.h" />
+    <ClInclude Include="Petal~UserEntrance.h" />
     <ClInclude Include="Petal~VirtualKey.h" />
     <ClInclude Include="Petal~VSDebugOutput.h" />
     <ClInclude Include="Petal~Window.h" />
@@ -165,6 +166,7 @@
     <ClCompile Include="Petal~PerformanceCounter.cpp" />
     <ClCompile Include="Petal~RawInputKeyboardController.cpp" />
     <ClCompile Include="Petal~RawInputWindow.cpp" />
+    <ClCompile Include="Petal~UserEntrance.cpp" />
     <ClCompile Include="Petal~VSDebugOutput.cpp" />
     <ClCompile Include="Petal~Window.cpp" />
     <ClCompile Include="Petal~WindowBase.cpp" />

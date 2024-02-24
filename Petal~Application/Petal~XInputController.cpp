@@ -169,7 +169,7 @@ namespace Petal::XInput
 	{
 		this->pt_last_gamepad.ClearState();
 	}
-	boolean Controller::UpdateUserIndex(UserIndexValue::Type user_index) noexcept // 指定新的用户索引
+	boolean Controller::UpdateUserIndex(UserIndexValue::Type user_index) noexcept
 	{
 		return this->pt_gamepad.UpdateUserIndex(user_index);
 	}
@@ -181,7 +181,7 @@ namespace Petal::XInput
 	{
 		return this->pt_last_gamepad;
 	}
-	win32dword Controller::QueryState() noexcept // 查询控制器输入状态
+	win32dword Controller::QueryState() noexcept
 	{
 		this->pt_last_gamepad = this->pt_gamepad;
 		return this->pt_gamepad.QueryState();

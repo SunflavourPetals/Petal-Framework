@@ -769,12 +769,10 @@ namespace
 		{
 			return ::UnregisterClassA(Petal::IWindow::ToWinResource(class_atom), WinMain::HIns());
 		}
-		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args) noexcept
+		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) noexcept
 		{
-			Win32Rect rect{ 0, 0, args.size.width, args.size.height };
-			::AdjustWindowRectEx(&rect, args.style, args.menu != nullptr, args.ex_style);
-			i32 width{ rect.right - rect.left };
-			i32 height{ rect.bottom - rect.top };
+			Size2DI32 size{ args.WindowSize(interpret_args_size_as_client_size) };
+
 			return ::CreateWindowExA
 			(
 				args.ex_style,
@@ -783,8 +781,8 @@ namespace
 				args.style,
 				args.position.x,
 				args.position.y,
-				width,
-				height,
+				size.width,
+				size.height,
 				nullptr,
 				args.menu,
 				WinMain::HIns(),

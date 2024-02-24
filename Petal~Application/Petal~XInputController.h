@@ -124,14 +124,14 @@ namespace Petal::XInput
 	class WrappedGamepad final
 	{
 	public:
-		boolean Connected() const noexcept; // 查看控制器是否已连接 需要提前调用 QueryState 获取或更新状态
-		boolean CheckConnection() const noexcept; // 检查控制器是否已连接 无需提前调用 QueryState
-		UserIndexValue::Type UserIndex() const noexcept; // 查看控制器的用户索引
-		const State& GetState() const noexcept; // 获得 XINPUT_GAMEPAD 信息 需要提前调用 QueryState 获取或更新状态
+		boolean Connected() const noexcept;
+		boolean CheckConnection() const noexcept; // Check connection, and no calling function QueryState required.
+		UserIndexValue::Type UserIndex() const noexcept;
+		const State& GetState() const noexcept;
 		const Gamepad& GetGamepad() const noexcept;
-		boolean StateChanged() const noexcept; // 查看输入状态是否有变		需要提前调用 QueryState 获取或更新状态
-		void ClearState() noexcept; // 清空属性
-		boolean Pushed(Button::Type buttons) const noexcept; // 输入 XInputGamepad::Button 枚举的组合 查看该组合是否被激活(列举的所有按钮被按下)
+		boolean StateChanged() const noexcept;
+		void ClearState() noexcept;
+		boolean Pushed(Button::Type buttons) const noexcept;
 		TriggerValue::Type LeftTrigger() const noexcept;
 		TriggerValue::Type RightTrigger() const noexcept;
 		StickValue::Type LeftStickX() const noexcept;
@@ -146,9 +146,9 @@ namespace Petal::XInput
 		StickValue::Type CalcRStickDown() const noexcept;
 		StickValue::Type CalcRStickLeft() const noexcept;
 		StickValue::Type CalcRStickRight() const noexcept;
-		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept; // 指定新的用户索引
-		win32dword QueryState() noexcept; // 查询控制器输入状态
-		win32dword Vibration(VibrationValue::Type left_motor_speed, VibrationValue::Type right_motor_speed) const noexcept;	// 设置控制器震动 最小值 0 最大值 65535
+		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept;
+		win32dword QueryState() noexcept;
+		win32dword Vibration(VibrationValue::Type left_motor_speed, VibrationValue::Type right_motor_speed) const noexcept;	// Set vibration, arguments in range [0, 65535] integer
 		win32dword AudioDeviceIDs(ptr<WChar> render_device_id, win32uint& render_count, ptr<WChar> capture_device_id, win32uint& capture_count) const noexcept;
 		win32dword GetBatteryInformation(BatteryInformation& battery_info) const noexcept;
 		win32dword GetCapabilities(Capabilities& capabilities) const noexcept;
@@ -161,10 +161,10 @@ namespace Petal::XInput
 		WrappedGamepad& operator=(const WrappedGamepad&) noexcept = default;
 		WrappedGamepad& operator=(WrappedGamepad&&) noexcept = default;
 	private:
-		State pt_gamepad_state{}; // 控制器状态 调用 QueryState 后更新
-		UserIndexValue::Type pt_user_index{ 0 }; // 用户索引 数值为 0 到 3
-		mutable boolean pt_gamepad_connected{}; // 控制器是否已连接 调用 QueryState 后更新
-		boolean pt_state_changed{}; // 控制器状态有无变化 调用 QueryState 后更新
+		State pt_gamepad_state{}; // XINPUT_STATE, updates after QueryState is called
+		UserIndexValue::Type pt_user_index{ 0 }; // User index, 0 to 3
+		mutable boolean pt_gamepad_connected{}; // Connection state, updates after QueryState is called
+		boolean pt_state_changed{}; // is state changing, updates after QueryState is called
 	};
 
 	class Controller final

@@ -9,10 +9,10 @@ namespace App
 	public:
 		AppWindow() : Window()
 		{
-			this->Create();
-			this->UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
-			this->Show();
-			this->UpdateWindow();
+			Create();
+			UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
+			Show();
+			UpdateWindow();
 			Petal::Debug::println("Hello Visual Studio 2022 Community Preview");
 		}
 	};
@@ -23,5 +23,3 @@ namespace App
 		return Petal::MessageLoop();
 	}
 }
-
-Petal_SetMainSpace(App);

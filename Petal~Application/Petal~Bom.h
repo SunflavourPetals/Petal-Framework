@@ -33,7 +33,7 @@ namespace Petal::BOM
 	extern const Bom utf_32_le;
 	extern const Bom utf_32_be;
 
-	// 根据模板参数 CharT、std::endian::native 和 非类型模板参数 force_utf_8_with_bom 推荐 Bom
+	// Recommend BOM by template parameter CharT, std::endian::native and nttp force_utf_8_with_bom
 	template <typename CharT, boolean force_utf_8_with_bom = false>
 	[[nodiscard]] constexpr const Bom& RecommendBom() noexcept
 	{

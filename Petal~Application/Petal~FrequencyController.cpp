@@ -177,8 +177,8 @@ namespace Petal
 	void FrequencyController::Count() noexcept(noexcept_fc_count)
 	{
 		this->pt_performance_counter.Count();
-		this->pt_delta_count += this->pt_performance_counter.DeltaCounts(); // 增加间隔时间
-		this->pt_statistics_count += this->pt_performance_counter.DeltaCounts(); // 增加统计间隔时间
+		this->pt_delta_count += this->pt_performance_counter.DeltaCounts();
+		this->pt_statistics_count += this->pt_performance_counter.DeltaCounts();
 	}
 	boolean FrequencyController::Sleep() noexcept(noexcept_fc_sleep)
 	{

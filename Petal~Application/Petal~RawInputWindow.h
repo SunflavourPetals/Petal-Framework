@@ -25,17 +25,18 @@ namespace Petal
 	private:
 		void Alloc(tsize size);
 	public:
+		// Call to get buffer for write only.
 		::std::span<Petal::byte> WriteOnlyBuffer(tsize size);
-		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// Invocable only after function WriteOnlyBuffer called!
 		::std::span<const Petal::byte> ReadOnlyBuffer() const noexcept;
 		tsize BufferSize() const noexcept;
-		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// Invocable only after function WriteOnlyBuffer called!
 		RawInputRef AsRawInput() const noexcept;
-		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// Invocable only after function WriteOnlyBuffer called!
 		Win32RawInput& AsWin32RawInput() noexcept;
-		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// Invocable only after function WriteOnlyBuffer called!
 		const Win32RawInput& AsWin32RawInput() const noexcept;
-		// 对此函数的调用只能在调用 WriteOnlyBuffer 函数之后！
+		// Invocable only after function WriteOnlyBuffer called!
 		tsize RawInputSize() const noexcept;
 	public:
 		RawInputDataBuffer();
