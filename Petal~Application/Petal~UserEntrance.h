@@ -9,6 +9,8 @@
 #undef Petal_PetalMain
 #endif
 
+// using Petal_PetalMain in "Petal~UserEntrance.cpp", and do not reuse.
+
 #define Petal_PetalMain(MainFunc) \
 namespace Petal::UserEntrance \
 {   \
@@ -18,7 +20,9 @@ namespace Petal::UserEntrance \
 }
 
 // Declare user entrance "fn_user_entrance"(any valid name you want) here.
-// declaration function and do not declaration a class/struct, if want a static function member of class be user entrance, set Petal_Enable_PetalMain undefined.
+// declaration function and do not declaration a class/struct.
+// if want a static function member of class be user entrance then make Petal_Enable_PetalMain undefined.
+
 namespace App
 {
 	int main();
