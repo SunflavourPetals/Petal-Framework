@@ -6,6 +6,8 @@
 
 ## 参考
 
+### 全局命名空间
+
 #### 宏 Petal_Header_BasicTypes
 
 指示头文件添加状态。  
@@ -26,7 +28,7 @@
 
 `using byte = u8;`  
 
-将 `byte` 定义为 `u8`，与 c++ 的 `std::byte` 不一致。
+将 `byte` 定义为 `u8`，可以进行算数运算，与 c++ 的 `std::byte` 不一致。
 
 #### 类型别名 dword
 
@@ -47,6 +49,7 @@
 `template <typename ReturnT, typename... Args> using fptr = ReturnT(*)(Args...);`  
 
 表示一个指向 `ReturnT(Args...)` 类型函数的指针：  
+
 ```cpp
 #include "Petal~BasicTypes.h"
 #include "Petal~VSDebugOutput.h"
@@ -61,8 +64,10 @@ void bar()
     Petal::Debug::println("{}", foo_ptr(5));
 }
 ```
+
 输出  
-```
+
+```output
 5
 2.5
 ```
@@ -88,6 +93,7 @@ void bar()
 `template <typename Ty> using ptr = Ty*;`  
 
 表示一个指向 `Ty` 的指针：  
+
 ```cpp
 #include "Petal~BasicTypes.h"
 #include "Petal~VSDebugOutput.h"
@@ -99,6 +105,7 @@ void foo()
     Petal::Debug::println("{}", number);
 }
 ```
+
 输出 `321`。  
 
 #### 类型别名模板 ptrc
@@ -106,6 +113,7 @@ void foo()
 `template <typename Ty> using ptrc = const Ty*;`  
 
 表示一个指向 `const Ty` 的指针：  
+
 ```cpp
 #include "Petal~BasicTypes.h"
 #include "Petal~VSDebugOutput.h"
@@ -117,6 +125,7 @@ void foo()
     Petal::Debug::println("{}", *int_ptr);
 }
 ```
+
 输出 `123`。  
 
 #### 类型别名 qword

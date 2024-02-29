@@ -2,6 +2,8 @@
 
 ## 概述
 
+`!!!`源代码有更改，这部分文档还未进行修改。  
+
 1. 提供入口函数的参数，但在进入用户入口函数后才可能有效。  
 2. 提供封装后的模块实例句柄获取函数 `::HINSTANCE Petal::WinMain::HIns() noexcept`。  
 3. 提供封装后的命令行参数获取函数 `Petal::TCStringRef Petal::WinMain::CmdLine() noexcept`。  

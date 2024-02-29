@@ -1,13 +1,16 @@
 # Petal~WinTypes
 
-
 ## 概述
 
 定义了大部分本框架常用的 WIN32 所使用的类型的别名，及部分常量。  
 
 由框架内部使用，暂未服务本框架不使用的 WIN32 类型。  
 
+本头文件引入 `<Windows.h>` 但是做了两个特殊处理，在引入前定义宏 `NOMINMAX`、`WIN32_LEAN_AND_MEAN`，并在引入后取消宏定义(若该宏定义是引入前由本框架定义)。  
+
 ## 参考
+
+### 全局命名空间
 
 #### 宏 Petal_Header_WinTypes
 
@@ -15,25 +18,13 @@
 
 ### 命名空间 Petal
 
-#### 类型别名 WindowClass
-
-```cpp
-#ifdef Petal_Enable_Unicode
-	using WindowClass = typename ::WNDCLASSEXW;
-#else
-	using WindowClass = typename ::WNDCLASSEXA;
-#endif
-```
-
-只受宏 `Petal_Enable_Unicode` 影响。  
-
 #### 类型别名 Win32CreateStruct
 
 ```cpp
 #ifdef Petal_Enable_Unicode
-	using Win32CreateStruct = typename ::CREATESTRUCTW;
+    using Win32CreateStruct = typename ::CREATESTRUCTW;
 #else
-	using Win32CreateStruct = typename ::CREATESTRUCTA;
+    using Win32CreateStruct = typename ::CREATESTRUCTA;
 #endif
 ```
 
@@ -46,6 +37,18 @@
 #### 类型别名 Win32Rect
 
 `using Win32Rect = typename ::RECT;`
+
+#### 类型别名 Win32WindowClass
+
+```cpp
+#ifdef Petal_Enable_Unicode
+    using Win32WindowClass = typename ::WNDCLASSEXW;
+#else
+    using Win32WindowClass = typename ::WNDCLASSEXA;
+#endif
+```
+
+只受宏 `Petal_Enable_Unicode` 影响。  
 
 #### constexpr 命名空间局部变量 win32_false
 
@@ -81,9 +84,9 @@
 
 ```cpp
 #ifdef Petal_Enable_Unicode
-	using win32ctstr = typename ::LPCWSTR;
+    using win32ctstr = typename ::LPCWSTR;
 #else
-	using win32ctstr = typename ::LPCSTR;
+    using win32ctstr = typename ::LPCSTR;
 #endif
 ```
 
@@ -157,9 +160,9 @@
 
 ```cpp
 #ifdef Petal_Enable_Unicode
-	using win32tchar = typename ::CHAR;
+    using win32tchar = typename ::CHAR;
 #else
-	using win32tchar = typename ::WCHAR;
+    using win32tchar = typename ::WCHAR;
 #endif
 ```
 
@@ -169,9 +172,9 @@
 
 ```cpp
 #ifdef Petal_Enable_Unicode
-	using win32tstr = typename ::LPWSTR;
+    using win32tstr = typename ::LPWSTR;
 #else
-	using win32tstr = typename ::LPSTR;
+    using win32tstr = typename ::LPSTR;
 #endif
 ```
 
@@ -192,6 +195,10 @@
 #### 类型别名 win32ushort
 
 `using win32ushort = typename ::USHORT;`
+
+#### 类型别名 win32wndproc
+
+`using win32wndproc = typename ::WNDPROC;`  
 
 #### 类型别名 win32word
 

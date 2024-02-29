@@ -1,6 +1,6 @@
 # Petal~String
 
-源代码已更改，这部分内容还未完成修改。  
+`!!!`源代码有更改，这部分文档还未进行修改。  
 
 ## 概述
 
@@ -8,30 +8,32 @@
 
 此标头定义了字符类型和字符串类型相关的别名。  
 
- * using Char = achar;
- * using WChar = wchar;
- * using CharU8 = u8char;
- * using CharU16 = u16char;
- * using CharU32 = u32char;
- * using String = typename ::std::basic_string&lt;Char>;
- * using WString = typename ::std::basic_string&lt;WChar>;
- * using StringU8 = typename ::std::basic_string&lt;CharU8>;
- * using StringU16 = typename ::std::basic_string&lt;CharU16>;
- * using StringU32 = typename ::std::basic_string&lt;CharU32>;
+* `using Char = achar;`
+* `using WChar = wchar;`
+* `using CharU8 = u8char;`
+* `using CharU16 = u16char;`
+* `using CharU32 = u32char;`
+* `using String = typename ::std::basic_string<Char>;`
+* `using WString = typename ::std::basic_string<WChar>;`
+* `using StringU8 = typename ::std::basic_string<CharU8>;`
+* `using StringU16 = typename ::std::basic_string<CharU16>;`
+* `using StringU32 = typename ::std::basic_string<CharU32>;`
 
 achar、wchar、u8char等类型别名详见标头[Petal~BasicTypes.h](Petal~BasicTypes.md)  
 
 此标头提供了函数模板`StringToCStyleString`用于制作一个兼容C风格字符串的C++字符串(在串结尾处前不存在空字符)。  
 
-[示例](#ref_Petal_TemplateFunction_StringToCStyleString)。  
+[示例](#函数模板-stringtocstylestring)。  
+
+此标头提供了模板类 `BasicCStringRef`, 用于需要对 null-terminated 做出保证的部分字符串引用之处。  
 
 ### T系列字符(串)类型
 
 根据宏`Petal_Enable_Unicode`  
-TChar 将被定义为 defined(Petal_Enable_Unicode) ? WChar : Char;  
-TString 将被定义为 defined(Petal_Enable_Unicode) ? WString : String;  
+TChar 将被定义为 `defined(Petal_Enable_Unicode) ? WChar : Char`(伪代码)。  
+TString 将被定义为 `defined(Petal_Enable_Unicode) ? WString : String`(伪代码)。  
 
-TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则统一使用A版本。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是与WIN32沟通的桥梁。  
+TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则统一使用A版本。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
 使用宏`Petal_TStr(quote)`将字符串字面量在预处理阶段制作成T系列类型的字符串字面量。  
 
 ### Dbg系列字符(串)类型
@@ -42,12 +44,9 @@ DbgString 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? String : TString;
 
 用于框架内调试输出，详见[Petal~VSDebugOutput.h](Petal~VSDebugOutput.md)。  
 
-### Excep系列字符类型
+### CStringRef 系列类型
 
-根据宏`Petal_Enable_ForceExcepDescANSI`和宏`Petal_Enable_Unicode`  
-ExcepChar 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? Char : TChar;  
-
-用于框架内异常使用的异常描述字符串，详见[Petal~Exception.h](Petal~Exception.md)。  
+C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数，使得 `string_view` 难以和C风格接口协作，故设置了 `CStringRef` 系列类型。但是只有部分地方它能起点作用，框架也没对它做多少支持，`CStringRef` 更多是在框架内由框架使用。  
 
 ## 参考
 
@@ -67,7 +66,7 @@ ExcepChar 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? Char : TChar;
 
 ### 命名空间 Petal
 
-#### 函数模板 StringToCStyleString {#ref_Petal_TemplateFunction_StringToCStyleString}
+#### 函数模板 StringToCStyleString
 
 返回值 ::std::basic_string&lt;CharT, Traits, Alloc> // CharT Traits Alloc 为模板参数  
 

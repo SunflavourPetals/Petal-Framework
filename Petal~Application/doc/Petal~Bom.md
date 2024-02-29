@@ -17,6 +17,8 @@
 
 ## 参考
 
+### 全局命名空间
+
 #### 宏 Petal_Header_Bom
 
 指示头文件添加状态。  
@@ -36,6 +38,7 @@
 size 参数为 bom 大小，即字节数，bn 参数为相应字节上的值。  
 
 ```cpp
+// 示例
 Bom my_bom{ 3, 0xEFu, 0xBBu, 0xBFu };
 // | ***** Data of Bom Object ***** |
 // | Data()|     valid    | invalid |
@@ -107,7 +110,7 @@ template <typename CharT, boolean force_utf_8_with_bom = false>
 对于 `wchar_t`，需要使用 `sizeof` 获取其所占字节大小来推测其可能使用 utf-16 还是 utf-32，在 Win 平台上，它使用 utf-16 le，占两个字节。  
 
 | CharT | std::endian::native | force_utf_8_with_bom | sizeof(CharT) | result |
-| :---: | :---: | :---: | :---: | :--: |
+|:---:|:---:|:---:|:---:|:---:|
 | char | | | | no_bom |
 | wchar_t | std::endian::little | | 2 | utf_16_le |
 | wchar_t | std::endian::little | | 4 | utf_32_le |
