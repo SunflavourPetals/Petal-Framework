@@ -280,7 +280,7 @@ namespace Petal
 	}
 	MovedMessage::MovedMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_pos({ GET_X_LPARAM(l), GET_Y_LPARAM(l) })
+		pt_pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) }
 	{
 
 	}

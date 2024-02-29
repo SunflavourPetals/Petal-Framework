@@ -6,10 +6,12 @@ namespace App
 {
 	class AppWindow : public Petal::Window
 	{
+		Petal::WindowClass window_class;
 	public:
 		AppWindow() : Window()
 		{
-			Create();
+			window_class.Register();
+			Create(window_class.ClassAtom());
 			UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
 			Show();
 			UpdateWindow();

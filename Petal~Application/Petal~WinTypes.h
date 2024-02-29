@@ -64,10 +64,10 @@ namespace Petal
 	using Win32Message = typename ::MSG;
 
 #ifdef Petal_Enable_Unicode
-	using WindowClass = typename ::WNDCLASSEXW;
+	using Win32WindowClass = typename ::WNDCLASSEXW;
 	using Win32CreateStruct = typename ::CREATESTRUCTW;
 #else
-	using WindowClass = typename ::WNDCLASSEXA;
+	using Win32WindowClass = typename ::WNDCLASSEXA;
 	using Win32CreateStruct = typename ::CREATESTRUCTA;
 #endif
 

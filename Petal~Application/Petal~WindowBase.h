@@ -8,59 +8,35 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 
-#include <unordered_map>
-#include <unordered_set>
-#include <list>
-#include <memory>
-
 namespace Petal
 {
 	class WindowClassArgs;
 	class WindowCreatingArgs;
-	class WindowClassSet;
-	class WindowClassNameAtomHash;
-	struct WindowClassNameAtomPair final
-	{
-		using Name = TString;
-		using NameView = TStringView;
-		using Atom = win32atom;
-		Name name;
-		Atom atom{ 0 };
-	};
+	class WindowClassHash;
+	class WindowClass;
 	struct WindowClassRegisteringResult final
 	{
 		win32atom class_atom{ 0 };
-		win32error error{ win32_no_error };
+		win32error win32_error{ win32_no_error };
+		operator bool() const noexcept { return this->win32_error == win32_no_error; }
 	};
 	struct WindowClassUnregisteringResult final
 	{
-		enum class Condition : i16
-		{
-			Unknown = 0,
-			Success = 1,
-			Win32,
-			PetalFramework,
-		};
-		enum class Error : i16
-		{
-			Unknown = 0,
-			CannotFindPair,
-			FailedWhenEraseFromIWindowClassSet,
-		};
-		Condition condition{ Condition::Success };
-		Error framework_error{ Error::Unknown };
 		win32bool value{ win32_true };
 		win32error win32_error{ win32_no_error };
+		operator bool() const noexcept { return this->win32_error == win32_no_error; }
 	};
 	struct WindowCreatingResult final
 	{
-		win32error win32_error{ win32_no_error };
 		win32hwnd window_handle{ nullptr };
+		win32error win32_error{ win32_no_error };
+		operator bool() const noexcept { return this->win32_error == win32_no_error; }
 	};
 	struct WindowDestroyingResult final
 	{
-		win32bool return_value{ win32_false };
+		win32bool value{ win32_false };
 		win32error win32_error{ win32_no_error };
+		operator bool() const noexcept { return this->win32_error == win32_no_error; }
 	};
 }
 
@@ -71,42 +47,64 @@ namespace Petal::Abstract
 
 namespace Petal
 {
-	win32lres CALLBACK CommonWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param);
-	WindowClassSet& IWindowClassSet();
-	i32 MessageLoop(win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
-	i32 MessageLoop(Abstract::Process<>& user_process, boolean remove = true, boolean yield = true, win32hwnd window_handle = nullptr, win32msg message_filter_min = 0, win32msg message_filter_max = 0);
 	void ExitMessageLoop(i32 exit_code = 0) noexcept;
+	win32lres CALLBACK CommonWindowProcess(
+		win32hwnd window_handle,
+		win32msg  message,
+		win32wprm w_param,
+		win32lprm l_param);
+	i32 MessageLoop(
+		win32hwnd window_handle = nullptr,
+		win32msg  message_filter_min = 0,
+		win32msg  message_filter_max = 0);
+	i32 MessageLoop(
+		Abstract::Process<>& user_process,
+		boolean   remove = true,
+		boolean   yield = true,
+		win32hwnd window_handle = nullptr,
+		win32msg  message_filter_min = 0,
+		win32msg  message_filter_max = 0);
+	template <typename UserProcess>
+		requires requires(UserProcess p) { p(); }
+	i32 MessageLoop(
+		const UserProcess& user_process,
+		boolean   remove = true,
+		boolean   yield = true,
+		win32hwnd window_handle = nullptr,
+		win32msg  message_filter_min = 0,
+		win32msg  message_filter_max = 0)
+	{
+		struct UP : Abstract::Process<>
+		{
+			const UserProcess& proc;
+			UP(const UserProcess& user_proc) : proc{ user_proc } {}
+			virtual void Execution() override { proc(); }
+		};
+		UP wrapped_proc{ user_process };
+
+		return MessageLoop(wrapped_proc, remove, yield, window_handle, message_filter_min, message_filter_max);
+	}
 }
 
 namespace Petal::IWindow
 {
-	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept;
-	win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept;
-	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept;
-	[[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept;
-	[[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept;
-	[[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept;
-	[[nodiscard]] ptr<Abstract::Window> WindowFromCreateEvent(win32msg msg, win32lprm l);
+	auto CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept -> win32lres;
+	auto UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept -> win32lptr;
+	[[nodiscard]] auto ToWinResource(word integer) noexcept -> win32ctstr;
+	[[nodiscard]] auto LoadDefaultWinAppIcon() noexcept -> win32hicon;
+	[[nodiscard]] auto LoadDefaultWinAppCursor() noexcept -> win32hcursor;
+	[[nodiscard]] auto WindowLongPtr(win32hwnd hwnd, i32 index) noexcept -> win32lptr;
+	[[nodiscard]] auto WindowFromCreateEvent(win32msg msg, win32lprm l) -> ptr<Abstract::Window>;
 }
 
 namespace Petal
 {
-	class WindowClassNameAtomHash final
-	{
-	public:
-		using KeyTy = ::std::unique_ptr<WindowClassNameAtomPair>;
-		using ResultTy = ::std::size_t;
-		[[nodiscard]] ResultTy operator() (const KeyTy& o) const
-			noexcept(noexcept(WindowClassNameAtomHash::HashValue({})));
-		[[nodiscard]] static ResultTy HashValue(const KeyTy& o)
-			noexcept(noexcept(::std::declval<::std::hash<win32atom>>()({})));
-	};
 	class WindowClassArgs final
 	{
 	public:
 		using RegisterResult = WindowClassRegisteringResult;
 	public:
-		[[nodiscard]] WindowClass BuildWindowClass() const noexcept;
+		[[nodiscard]] Win32WindowClass BuildWindowClass() const noexcept;
 		[[nodiscard]] const TString& ClassName() const noexcept;
 		[[nodiscard]] const TString& MenuName() const noexcept;
 		void UpdateClassName(TStringView class_name) noexcept(noexcept(StringToCStyleString(class_name)));
@@ -114,7 +112,6 @@ namespace Petal
 		void UsingMenuName(TStringView menu_name) noexcept(noexcept(::std::declval<WindowClassArgs>().UpdateMenuName(menu_name)));
 		void UsingMenuResource(win32word menu_resource) noexcept;
 		void EnableDoubleClickMessage(boolean enable = true) noexcept;
-		RegisterResult Register() const noexcept(false);
 	public:
 		WindowClassArgs();
 		WindowClassArgs(TStringView class_name);
@@ -131,12 +128,13 @@ namespace Petal
 		static inline const win32hicon   default_icon{ IWindow::LoadDefaultWinAppIcon() };
 		static inline const win32hcursor default_cursor{ IWindow::LoadDefaultWinAppCursor() };
 	private:
-		// WIN32-RegisterClassEx requires that string WindowClass::lpszClassName not be nullptr and not equal to null_tstr.
+		// WIN32-RegisterClassEx requires that string Win32WindowClass::lpszClassName not be nullptr and not equal to null_tstr.
 		// WIN32-RegisterClassEx requires class_name's length less than 256 after processing(StringToCStyleString).
 		TString class_name;
 		// When using_int_menu_res == false:
 		// If menu_name != null_tstr, method BuildWindowClass will assign menu_name.c_str() to lpszMenuName. 
 		// If menu_name == null_tstr, method BuildWindowClass will assign nullptr to lpszMenuName. 
+		// Use StringToCStyleString to ignore NUL characters. 
 		TString menu_name;
 	public:
 		win32wndproc window_process{ default_window_process };
@@ -148,7 +146,7 @@ namespace Petal
 		win32hbrush  background_brush{ default_background_brush };
 		win32hicon   icon_sm{ default_icon_sm };
 		win32word    menu_resource{ 0 };
-		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building WindowClass.
+		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building Win32WindowClass.
 		boolean      using_int_menu_resource{ false };
 	private:
 		static tsize default_number; // for unnamed instance
@@ -197,6 +195,53 @@ namespace Petal
 	};
 }
 
+namespace Petal
+{
+	class WindowClass
+	{
+	public:
+		using Atom = win32atom;
+		using Name = TString;
+		using NameView = TStringView;
+		using NameCRef = TCStringRef;
+		using RegisterResult = WindowClassRegisteringResult;
+		using UnregisterResult = WindowClassUnregisteringResult;
+		using Hash = WindowClassHash;
+	public:
+		[[nodiscard]] auto ClassAtom() const noexcept -> Atom;
+		[[nodiscard]] auto ClassName() const noexcept -> const Name&;
+		[[nodiscard]] auto ClassNameView() const noexcept -> NameView;
+		[[nodiscard]] auto ClassNameCRef() const noexcept -> NameCRef;
+		[[nodiscard]] auto Valid() const noexcept -> boolean;
+		auto Register(const Win32WindowClass& window_class) -> RegisterResult;
+		auto Register(const WindowClassArgs& window_class_args = {}) -> RegisterResult;
+		auto Unregister() noexcept -> UnregisterResult;
+		auto Reset() noexcept -> void;
+		auto Clear() noexcept -> Atom;
+	public:
+		WindowClass() = default;
+		WindowClass(const WindowClass& o) = delete;
+		WindowClass(WindowClass&& o) noexcept;
+		~WindowClass() noexcept;
+		WindowClass& operator=(const WindowClass& o) = delete;
+		WindowClass& operator=(WindowClass&& o) noexcept;
+	private:
+		Name name{};
+		Atom atom{};
+	};
+
+	class WindowClassHash final
+	{
+	public:
+		using KeyTy = WindowClass;
+		using ResultTy = ::std::size_t;
+		[[nodiscard]] ResultTy operator() (const KeyTy& o) const
+			noexcept(noexcept(WindowClassHash::HashValue({})));
+		[[nodiscard]] static ResultTy HashValue(const KeyTy& o)
+			noexcept(noexcept(::std::declval<::std::hash<win32atom>>()({})));
+	};
+}
+
 namespace Petal::Abstract
 {
 	class Window
@@ -212,7 +257,10 @@ namespace Petal::Abstract
 		[[nodiscard]] auto WindowHandle() const noexcept -> win32hwnd;
 		[[nodiscard]] auto Valid() const noexcept -> boolean;
 		auto Create(
-			win32atom class_atom = WindowClassArgs{}.Register().class_atom,
+			win32atom class_atom,
+			const WindowCreatingArgs& args = {},
+			boolean interpret_args_size_as_client_size = true) -> CreateResult;
+		auto Create(
 			const WindowCreatingArgs& args = {},
 			boolean interpret_args_size_as_client_size = true) -> CreateResult;
 		auto Destroy() noexcept -> DestroyResult;
@@ -235,58 +283,6 @@ namespace Petal::Abstract
 		Window& operator= (Window&&) = delete;
 	private:
 		win32hwnd window_handle{};
-	};
-}
-
-namespace Petal
-{
-	class WindowClassSet final
-	{
-	public:
-		using RegisterResult = WindowClassRegisteringResult;
-		using UnregisterResult = WindowClassUnregisteringResult;
-		using Hash = WindowClassNameAtomHash;
-		using Pair = WindowClassNameAtomPair;
-	private:
-		class Set final
-		{
-		public:
-			using Unique = ::std::unique_ptr<Pair>;
-			using AtomToData = ::std::unordered_map<Pair::Atom, Unique>;
-			using NameToData = ::std::unordered_map<Pair::NameView, ptrc<Pair>>;
-		public:
-			void Insert(Unique&& data_ptr);
-			tsize Erase(Pair::Atom atom);
-			tsize Erase(Pair::Name name);
-			ptrc<Pair> Find(Pair::Atom atom) const;
-			ptrc<Pair> Find(Pair::NameView name) const;
-		public:
-			AtomToData atom_to_data;
-			NameToData name_to_data;
-		};
-	public:
-		[[nodiscard]] RegisterResult Register(const WindowClassArgs& wrapped_window_class) noexcept(false);
-		[[nodiscard]] UnregisterResult Unregister(Pair::Atom class_atom) noexcept;
-		tsize UnregisterAll() noexcept;
-		[[nodiscard]] boolean Check(Pair::Atom class_atom) const noexcept;
-		[[nodiscard]] boolean Empty() const noexcept;
-		[[nodiscard]] const Pair::Name& operator[](Pair::Atom class_atom) const noexcept;
-		[[nodiscard]] Pair::Atom operator[](Pair::NameView class_name) const noexcept;
-	private:
-		static [[nodiscard]] WindowClassSet& Instance();
-	private:
-		WindowClassSet() = default;
-		~WindowClassSet();
-	public:
-		WindowClassSet(const WindowClassSet&) = delete;
-		WindowClassSet(WindowClassSet&&) noexcept = delete;
-		WindowClassSet& operator= (const WindowClassSet&) = delete;
-		WindowClassSet& operator= (WindowClassSet&&) = delete;
-	private:
-		Set pt_set;
-	public:
-		boolean unregister_all_when_deconstruction{ true };
-		friend WindowClassSet& IWindowClassSet();
 	};
 }
 

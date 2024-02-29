@@ -1,8 +1,6 @@
 #include "Petal~PerformanceCounter.h"
 #include "Petal~WinTypes.h"
 
-#include <Windows.h>
-
 namespace
 {
 	constexpr Petal::PerformanceCounter::Tick zero{ 0LL };

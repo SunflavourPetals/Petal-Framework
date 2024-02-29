@@ -8,7 +8,6 @@
 #include "Petal~Output.h"
 #include "Petal~Bom.h"
 
-#include <xstring>
 #include <fstream>
 
 namespace Petal::Log

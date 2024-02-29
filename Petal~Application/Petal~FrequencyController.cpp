@@ -1,8 +1,5 @@
 #include "Petal~FrequencyController.h"
 
-#include <thread>
-#include <utility>
-
 namespace Petal
 {
 	FrequencyController::FrequencyController(f64 target_frequency, f64 sleep_failure_second, f64 statistics_interval_second)

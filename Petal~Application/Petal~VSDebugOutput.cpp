@@ -1,6 +1,5 @@
 #include "Petal~VSDebugOutput.h"
-
-#include <Windows.h>
+#include "Petal~WinTypes.h"
 
 namespace Petal::Debug
 {
