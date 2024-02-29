@@ -1,5 +1,5 @@
-#include "Petal~Main.h"
 #include "Petal~Window.h"
+
 #include "Petal~VSDebugOutput.h"
 
 namespace App

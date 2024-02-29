@@ -5,13 +5,13 @@
 
 #ifdef Petal_Enable_PetalMain
 
-#ifdef Petal_PetalMain
-#undef Petal_PetalMain
+#ifdef Petal_Main_Config
+#undef Petal_Main_Config
 #endif
 
-// using Petal_PetalMain in "Petal~UserEntrance.cpp", and do not reuse.
+// using Petal_Main_Config in "Petal~UserEntrance.cpp", and do not reuse.
 
-#define Petal_PetalMain(MainFunc) \
+#define Petal_Main_Config(MainFunc) \
 namespace Petal::UserEntrance \
 {   \
 	extern const fptr<int> pt_user_main{ &::MainFunc };  \
@@ -28,7 +28,7 @@ namespace App
 	int main();
 }
 
-// Use macro Petal_PetalMain(fn_user_entrance) in "Petal~UserEntrance.cpp"
+// Use macro Petal_Main_Config(fn_user_entrance) in "Petal~UserEntrance.cpp"
 
 #endif
 
