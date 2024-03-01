@@ -21,6 +21,24 @@ namespace App
 
 	int main()
 	{
+		using namespace Petal;
+		struct myt : ::std::char_traits<char>{};
+		BasicString<char, myt> s = "cnm";
+
+		CStringRef a = ""_csr;
+
+		using namespace Petal;
+		auto csr = "string"_csr;
+		using csr_type = decltype(csr);
+		csr_type::hasher hasher{}; // CStringRefHash<csr_type::value_type>
+		auto hash_val = hasher(csr);
+
+		a = s;
+		if ("cnm"_csr)
+		{
+			Petal::Debug::println("cnmmmm");
+		}
+
 		AppWindow app{};
 		return Petal::MessageLoop();
 	}

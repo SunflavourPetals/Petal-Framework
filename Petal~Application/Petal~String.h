@@ -45,7 +45,8 @@ namespace Petal
 	using U32StringView = BasicStringView<U32Char>;
 
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	[[nodiscard]] inline BasicString<CharT, Traits, Alloc> StringToCStyleString(BasicStringView<CharT, Traits> in_str)
+	[[nodiscard]] inline auto StringToCStyleString(BasicStringView<CharT, Traits> in_str)
+		-> BasicString<CharT, Traits, Alloc>
 	{
 		using InnerChar = CharT;
 		using InnerString = BasicString<CharT, Traits, Alloc>;
@@ -70,8 +71,11 @@ namespace Petal
 	{
 		return StringToCStyleString<CharT, Traits, Alloc>(BasicStringView<CharT, Traits>{ in_str });
 	}
-	template <tsize char_arr_size, typename InCharT,
-		typename CharT = ::std::remove_const_t<InCharT>, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+	template <tsize char_arr_size,
+		typename InCharT,
+		typename CharT = ::std::remove_const_t<InCharT>,
+		typename Traits = ::std::char_traits<CharT>,
+		typename Alloc = ::std::allocator<CharT>>
 		requires ::std::is_same_v<CharT, ::std::remove_cv_t<CharT>>
 	[[nodiscard]] inline auto StringToCStyleString(InCharT (&in_str)[char_arr_size])
 		-> BasicString<CharT, Traits, Alloc>
@@ -442,22 +446,11 @@ namespace Petal
 			this->str_length = str.length();
 			return *this;
 		}
-		template <typename Traits, typename Alloc>
-		constexpr BasicCStringRef& operator= (const BasicString<CharT, Traits, Alloc>& ref_str) noexcept
-		{
-			this->str_ptr = ref_str.c_str();
-			this->str_length = ref_str.length();
-			return *this;
-		}
 		constexpr BasicCStringRef& operator= (::std::nullptr_t) noexcept
 		{
 			this->str_ptr = nullptr;
 			this->str_length = 0;
 			return *this;
-		}
-		constexpr operator bool() const noexcept
-		{
-			return this->str_ptr;
 		}
 		constexpr operator const CharT*() const noexcept
 		{
@@ -467,11 +460,6 @@ namespace Petal
 			noexcept(noexcept(::std::declval<BasicCStringRef>().view()))
 		{
 			return this->view();
-		}
-		constexpr operator BasicString<CharT>() const
-			noexcept(noexcept(::std::declval<BasicCStringRef>().to_string()))
-		{
-			return this->to_string();
 		}
 	private:
 		const_pointer str_ptr{ nullptr };
@@ -522,6 +510,13 @@ namespace Petal
 		return out << csr.view();
 	}
 
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
+	[[nodiscard]] inline auto StringToCStyleString(const BasicCStringRef<CharT>& in_str)
+		-> BasicString<CharT, Traits, Alloc>
+	{
+		return StringToCStyleString<CharT, Traits, Alloc>(in_str.view());
+	}
+
 #if defined(Petal_Enable_Unicode)
 	using TChar = WChar;
 	using TString = WString;
@@ -560,70 +555,87 @@ namespace Petal::TypeTraits
 	constexpr bool is_dbg_char{ ::std::is_same_v<::std::remove_cv_t<Ty>, DbgChar> };
 }
 
-namespace Petal::StringLiterals
+namespace Petal
 {
-	inline constexpr String operator""_s(const Char * str, ::std::size_t length)
+	inline namespace Literals
 	{
-		using namespace std::string_literals;
-		return { str, length };
-	}
-	inline constexpr WString operator""_s(const WChar * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U8String operator""_s(const U8Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16String operator""_s(const U16Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32String operator""_s(const U32Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-
-	inline constexpr StringView operator""_sv(const Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr WStringView operator""_sv(const WChar * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U8StringView operator""_sv(const U8Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16StringView operator""_sv(const U16Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32StringView operator""_sv(const U32Char * str, ::std::size_t length)
-	{
-		return { str, length };
+		inline namespace StringLiterals
+		{
+			[[nodiscard]] inline constexpr String operator""_s(const Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr WString operator""_s(const WChar * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U8String operator""_s(const U8Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U16String operator""_s(const U16Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U32String operator""_s(const U32Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+		}
 	}
 
-	inline constexpr CStringRef operator""_csr(const Char * str, ::std::size_t length)
+	inline namespace Literals
 	{
-		return { str, length };
+		inline namespace StringViewLiterals
+		{
+			[[nodiscard]] inline constexpr StringView operator""_sv(const Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr WStringView operator""_sv(const WChar * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U8StringView operator""_sv(const U8Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U16StringView operator""_sv(const U16Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U32StringView operator""_sv(const U32Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+		}
 	}
-	inline constexpr WCStringRef operator""_csr(const WChar * str, ::std::size_t length)
+
+	inline namespace Literals
 	{
-		return { str, length };
-	}
-	inline constexpr U8CStringRef operator""_csr(const U8Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U16CStringRef operator""_csr(const U16Char * str, ::std::size_t length)
-	{
-		return { str, length };
-	}
-	inline constexpr U32CStringRef operator""_csr(const U32Char * str, ::std::size_t length)
-	{
-		return { str, length };
+		inline namespace CStringRefLiterals
+		{
+			[[nodiscard]] inline constexpr CStringRef operator""_csr(const Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr WCStringRef operator""_csr(const WChar * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U8CStringRef operator""_csr(const U8Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U16CStringRef operator""_csr(const U16Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+			[[nodiscard]] inline constexpr U32CStringRef operator""_csr(const U32Char * str, ::std::size_t length)
+			{
+				return { str, length };
+			}
+		}
 	}
 }
 
