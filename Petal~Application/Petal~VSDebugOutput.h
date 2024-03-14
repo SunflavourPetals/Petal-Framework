@@ -11,13 +11,15 @@
 
 namespace Petal::Debug
 {
-	class VSDebugOutputA : public Abstract::OutputA, public Abstract::COutputA
+	class VSDebugOutputA : public Abstract::IOutputA, public Abstract::ICOutputA
 	{
 	public:
-		using InnerChar = typename Abstract::OutputA::InnerChar;
-		using InnerString = typename Abstract::OutputA::InnerString;
-		using InnerStringView = typename Abstract::OutputA::InnerStringView;
-		using InnerCStringRef = typename Abstract::OutputA::InnerCStringRef;
+		using CharType = typename Abstract::IOutputA::CharType;
+		using TraitsType = typename Abstract::IOutputA::TraitsType;
+		using InnerChar = typename Abstract::IOutputA::InnerChar;
+		using InnerString = typename Abstract::IOutputA::InnerString;
+		using InnerStringView = typename Abstract::IOutputA::InnerStringView;
+		using InnerCStringRef = typename Abstract::IOutputA::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str) override;
 		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
@@ -29,13 +31,15 @@ namespace Petal::Debug
 		LineBreakMode line_break_mode{};
 	};
 
-	class VSDebugOutputW : public Abstract::OutputW, public Abstract::COutputW
+	class VSDebugOutputW : public Abstract::IOutputW, public Abstract::ICOutputW
 	{
 	public:
-		using InnerChar = typename Abstract::OutputW::InnerChar;
-		using InnerString = typename Abstract::OutputW::InnerString;
-		using InnerStringView = typename Abstract::OutputW::InnerStringView;
-		using InnerCStringRef = typename Abstract::OutputW::InnerCStringRef;
+		using CharType = typename Abstract::IOutputW::CharType;
+		using TraitsType = typename Abstract::IOutputW::TraitsType;
+		using InnerChar = typename Abstract::IOutputW::InnerChar;
+		using InnerString = typename Abstract::IOutputW::InnerString;
+		using InnerStringView = typename Abstract::IOutputW::InnerStringView;
+		using InnerCStringRef = typename Abstract::IOutputW::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str) override;
 		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;

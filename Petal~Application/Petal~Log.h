@@ -10,16 +10,18 @@
 
 #include <fstream>
 
-namespace Petal::Log
+namespace Petal
 {
-	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
-	class LogStream : public Abstract::BasicOutput<CharT, Traits, Alloc>
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
+	class BasicLog : public Abstract::IOutput<CharT, Traits>
 	{
 	public:
-		using InnerChar = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerChar;
-		using InnerString = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerString;
-		using InnerStringView = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerStringView;
-		using InnerCStringRef = typename Abstract::BasicOutput<CharT, Traits, Alloc>::InnerCStringRef;
+		using CharType = typename Abstract::IOutput<CharT, Traits>::CharType;
+		using TraitsType = typename Abstract::IOutput<CharT, Traits>::TraitsType;
+		using InnerChar = typename Abstract::IOutput<CharT, Traits>::InnerChar;
+		using InnerString = typename Abstract::IOutput<CharT, Traits>::InnerString;
+		using InnerStringView = typename Abstract::IOutput<CharT, Traits>::InnerStringView;
+		using InnerCStringRef = typename Abstract::IOutput<CharT, Traits>::InnerCStringRef;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());
@@ -34,15 +36,15 @@ namespace Petal::Log
 		virtual void Output(InnerStringView str) override;
 		virtual LineBreakMode LnMode() noexcept override;
 	public:
-		LogStream() = default;
-		LogStream(const ::std::string& file_name, const BOM::Bom& bom);
-		LogStream(const ::std::wstring& file_name, const BOM::Bom& bom);
-		LogStream(const ::std::string& file_name);
-		LogStream(const ::std::wstring& file_name);
-		LogStream(const LogStream&) = delete;
-		LogStream(LogStream&&) = delete;
-		LogStream& operator=(const LogStream&) = delete;
-		virtual ~LogStream();
+		BasicLog() = default;
+		BasicLog(const ::std::string& file_name, const BOM::Bom& bom);
+		BasicLog(const ::std::wstring& file_name, const BOM::Bom& bom);
+		BasicLog(const ::std::string& file_name);
+		BasicLog(const ::std::wstring& file_name);
+		BasicLog(const BasicLog&) = delete;
+		BasicLog(BasicLog&&) = delete;
+		BasicLog& operator=(const BasicLog&) = delete;
+		virtual ~BasicLog();
 	private:
 		FileStream file{};
 		LineBreakMode line_break_mode{};
@@ -50,101 +52,101 @@ namespace Petal::Log
 		static constexpr auto open_mode_append{ ::std::ios_base::out | ::std::ios_base::binary | ::std::ios_base::app };
 	};
 
-	using LogA = LogStream<Char>;
-	using LogW = LogStream<WChar>;
-	using LogU8 = LogStream<U8Char>;
-	using LogU16 = LogStream<U16Char>;
-	using LogU32 = LogStream<U32Char>;
+	using LogA = BasicLog<Char>;
+	using LogW = BasicLog<WChar>;
+	using LogU8 = BasicLog<U8Char>;
+	using LogU16 = BasicLog<U16Char>;
+	using LogU32 = BasicLog<U32Char>;
 }
 
-namespace Petal::Log
+namespace Petal
 {
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LogStream<CharT, Traits, Alloc>::LogStream(const ::std::string& file_name, const BOM::Bom& bom) :
-		Abstract::BasicOutput<InnerChar, Traits, Alloc>()
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name, const BOM::Bom& bom) :
+		Abstract::IOutput<InnerChar, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LogStream<CharT, Traits, Alloc>::LogStream(const ::std::wstring& file_name, const BOM::Bom& bom) :
-		Abstract::BasicOutput<InnerChar, Traits, Alloc>()
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name, const BOM::Bom& bom) :
+		Abstract::IOutput<InnerChar, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LogStream<CharT, Traits, Alloc>::LogStream(const ::std::string& file_name) :
-		Abstract::BasicOutput<InnerChar, Traits, Alloc>()
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name) :
+		Abstract::IOutput<InnerChar, Traits>()
 	{
 		this->AppendOpen(file_name);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LogStream<CharT, Traits, Alloc>::LogStream(const ::std::wstring& file_name) :
-		Abstract::BasicOutput<InnerChar, Traits, Alloc>()
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name) :
+		Abstract::IOutput<InnerChar, Traits>()
 	{
 		this->AppendOpen(file_name);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LogStream<CharT, Traits, Alloc>::~LogStream()
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::~BasicLog()
 	{
 		this->Close();
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Open(const ::std::string& file_name, const BOM::Bom& bom)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::Open(const ::std::string& file_name, const BOM::Bom& bom)
 	{
 		this->file.open(file_name, this->open_mode_trunc);
 		this->WriteBom(bom);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Open(const ::std::wstring& file_name, const BOM::Bom& bom)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::Open(const ::std::wstring& file_name, const BOM::Bom& bom)
 	{
 		this->file.open(file_name, this->open_mode_trunc);
 		this->WriteBom(bom);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::AppendOpen(const ::std::string& file_name)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::AppendOpen(const ::std::string& file_name)
 	{
 		this->file.open(file_name, this->open_mode_append);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::AppendOpen(const ::std::wstring& file_name)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::AppendOpen(const ::std::wstring& file_name)
 	{
 		this->file.open(file_name, this->open_mode_append);
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline boolean LogStream<CharT, Traits, Alloc>::Opened() const noexcept
+	template <typename CharT, typename Traits>
+	inline boolean BasicLog<CharT, Traits>::Opened() const noexcept
 	{
 		return this->file.is_open();
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline boolean LogStream<CharT, Traits, Alloc>::Valid() const noexcept
+	template <typename CharT, typename Traits>
+	inline boolean BasicLog<CharT, Traits>::Valid() const noexcept
 	{
 		return (this->file.is_open() && this->file.good());
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Close()
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::Close()
 	{
 		if (this->file.is_open() == true) this->file.close();
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::ByteWrite(ptrc<byte> data, tsize size)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::ByteWrite(ptrc<byte> data, tsize size)
 	{
 		if (this->Valid() == true && data != nullptr && size > 0)
 		{
 			this->file.write(data, size);
 		}
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::WriteBom(const BOM::Bom& bom)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::WriteBom(const BOM::Bom& bom)
 	{
 		this->ByteWrite(bom.Data(), bom.Size());
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline void LogStream<CharT, Traits, Alloc>::Output(InnerStringView str)
+	template <typename CharT, typename Traits>
+	inline void BasicLog<CharT, Traits>::Output(InnerStringView str)
 	{
 		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename InnerStringView::value_type) * str.size());
 	}
-	template <typename CharT, typename Traits, typename Alloc>
-	inline LineBreakMode LogStream<CharT, Traits, Alloc>::LnMode() noexcept
+	template <typename CharT, typename Traits>
+	inline LineBreakMode BasicLog<CharT, Traits>::LnMode() noexcept
 	{
 		return this->line_break_mode;
 	}
