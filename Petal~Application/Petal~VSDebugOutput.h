@@ -63,7 +63,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void print(StringView fmt, Args&&... args)
 	{
-		dout + ::std::vformat(fmt, ::std::make_format_args(::std::forward<Args>(args)...));
+		dout + ::std::vformat(fmt, ::std::make_format_args(args...));
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<Char, std::remove_const_t<CharT>>
@@ -91,7 +91,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void wprint(WStringView fmt, Args&&... args)
 	{
-		dowt + ::std::vformat(fmt, ::std::make_wformat_args(::std::forward<Args>(args)...));
+		dowt + ::std::vformat(fmt, ::std::make_wformat_args(args...));
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
@@ -122,7 +122,7 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void print(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
-		dout + ::std::vformat(fmt.get(), ::std::make_format_args(::std::forward<Args>(args)...));
+		dout + ::std::vformat(fmt.get(), ::std::make_format_args(args...));
 	}
 	inline void println()
 	{
@@ -131,14 +131,14 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void println(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
-		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(::std::forward<Args>(args)...));
+		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(args...));
 		print("{}{}", str, GetLn<decltype(dout)::InnerChar>(dout.LnMode()));
 	}
 
 	template <typename... Args>
 	inline void wprint(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
-		dowt + ::std::vformat(fmt.get(), ::std::make_wformat_args(::std::forward<Args>(args)...));
+		dowt + ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
 	}
 	inline void wprintln()
 	{
@@ -147,7 +147,7 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
-		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(::std::forward<Args>(args)...));
+		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
 		wprint(L"{}{}", str, GetLn<decltype(dowt)::InnerChar>(dowt.LnMode()));
 	}
 }
