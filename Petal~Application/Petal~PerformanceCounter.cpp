@@ -14,95 +14,95 @@ namespace Petal
 	}
 	void PerformanceCounter::Reset() noexcept
 	{
-		::QueryPerformanceFrequency(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_frequency));
-		::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
-		this->pt_base = this->pt_current;
-		this->pt_delta = zero;
-		this->pt_delta_paused = zero;
-		this->pt_base_paused = zero;
-		this->pt_total_paused = zero;
-		this->pt_state_paused = false;
+		::QueryPerformanceFrequency(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->frequency));
+		::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+		this->base = this->current;
+		this->delta = zero;
+		this->delta_paused = zero;
+		this->base_paused = zero;
+		this->total_paused = zero;
+		this->state_paused = false;
 	}
 	void PerformanceCounter::Count() noexcept
 	{
-		Tick prev = this->pt_current;
-		if (this->pt_state_paused == true)
+		Tick prev = this->current;
+		if (this->state_paused == true)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
-			this->pt_delta_paused = this->pt_current - prev;
-			if (this->pt_delta_paused < zero)
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->delta_paused = this->current - prev;
+			if (this->delta_paused < zero)
 			{
-				this->pt_delta = zero;
+				this->delta = zero;
 			}
 			return;
 		}
 		else
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
-			this->pt_delta = this->pt_current - prev;
-			if (this->pt_delta < zero)
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->delta = this->current - prev;
+			if (this->delta < zero)
 			{
-				this->pt_delta = zero;
+				this->delta = zero;
 			}
 			return;
 		}
 	}
 	void PerformanceCounter::Pause() noexcept
 	{
-		if (this->pt_state_paused == false)
+		if (this->state_paused == false)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
-			this->pt_base_paused = this->pt_current;
-			this->pt_delta = zero;
-			this->pt_delta_paused = zero;
-			this->pt_state_paused = true;
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->base_paused = this->current;
+			this->delta = zero;
+			this->delta_paused = zero;
+			this->state_paused = true;
 		}
 	}
 	void PerformanceCounter::Start() noexcept
 	{
-		if (this->pt_state_paused == true)
+		if (this->state_paused == true)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->pt_current));
-			this->pt_total_paused += (this->pt_current - this->pt_base_paused);
-			this->pt_delta = zero;
-			this->pt_delta_paused = zero;
-			this->pt_state_paused = false;
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->total_paused += (this->current - this->base_paused);
+			this->delta = zero;
+			this->delta_paused = zero;
+			this->state_paused = false;
 		}
 	}
 	PerformanceCounter::Tick PerformanceCounter::Frequency() const noexcept
 	{
-		return this->pt_frequency;
+		return this->frequency;
 	}
 	PerformanceCounter::Tick PerformanceCounter::TotalCounts() const noexcept
 	{
-		if (this->pt_state_paused == true)
+		if (this->state_paused == true)
 		{
-			return (this->pt_base_paused - this->pt_total_paused - this->pt_base);
+			return (this->base_paused - this->total_paused - this->base);
 		}
-		return (this->pt_current - this->pt_total_paused - this->pt_base);
+		return (this->current - this->total_paused - this->base);
 	}
 	PerformanceCounter::Tick PerformanceCounter::DeltaCounts() const noexcept
 	{
-		return this->pt_delta;
+		return this->delta;
 	}
 	PerformanceCounter::Tick PerformanceCounter::DeltaCountsPaused() const noexcept
 	{
-		return this->pt_delta_paused;
+		return this->delta_paused;
 	}
 	PerformanceCounter::Second PerformanceCounter::TotalTime() const noexcept
 	{
-		return this->TotalCounts() / static_cast<f64>(this->pt_frequency);
+		return this->TotalCounts() / static_cast<f64>(this->frequency);
 	}
 	PerformanceCounter::Second PerformanceCounter::DeltaTime() const noexcept
 	{
-		return this->DeltaCounts() / static_cast<f64>(this->pt_frequency);
+		return this->DeltaCounts() / static_cast<f64>(this->frequency);
 	}
 	PerformanceCounter::Second PerformanceCounter::DeltaTimePaused() const noexcept
 	{
-		return this->DeltaCountsPaused() / static_cast<f64>(this->pt_frequency);
+		return this->DeltaCountsPaused() / static_cast<f64>(this->frequency);
 	}
 	boolean PerformanceCounter::PauseState() const noexcept
 	{
-		return this->pt_state_paused;
+		return this->state_paused;
 	}
 }

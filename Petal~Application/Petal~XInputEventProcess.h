@@ -59,10 +59,10 @@ namespace Petal::XInput::MiddleProcess
 		XHoldProcess(XHoldProcess&&) noexcept = default;
 		~XHoldProcess() = default;
 	private:
-		Tick pt_target_count{ 1 };
-		Tick pt_total_count{};
-		boolean pt_loop_triggering{ false };
-		boolean pt_in_holding{ false };
+		Tick target_count{ 1 };
+		Tick total_count{};
+		boolean loop_triggering{ false };
+		boolean in_holding{ false };
 	};
 
 	class ButtonProcess : virtual public BasicMiddleProcess
@@ -81,7 +81,7 @@ namespace Petal::XInput::MiddleProcess
 		ButtonProcess(ButtonProcess&&) noexcept = default;
 		~ButtonProcess() = default;
 	protected:
-		Button::Type pt_buttons{ Button::A };
+		Button::Type buttons{ Button::A };
 	};
 
 	class TriggerProcess : virtual public BasicMiddleProcess
@@ -102,8 +102,8 @@ namespace Petal::XInput::MiddleProcess
 		TriggerProcess(TriggerProcess&&) noexcept = default;
 		~TriggerProcess() = default;
 	protected:
-		XInput::TriggerDimension pt_trigger_dimension{ XInput::TriggerDimension::Left };
-		TriggerValue::Type pt_target_trigger_value{ TriggerValue::threshold };
+		XInput::TriggerDimension trigger_dimension{ XInput::TriggerDimension::Left };
+		TriggerValue::Type target_trigger_value{ TriggerValue::threshold };
 	};
 
 	class StickProcess : virtual public BasicMiddleProcess
@@ -126,9 +126,9 @@ namespace Petal::XInput::MiddleProcess
 		StickProcess(StickProcess&& rhs) = default;
 		~StickProcess() = default;
 	protected:
-		XInput::StickDimension pt_stick_dimension{ XInput::StickDimension::Left };
-		XInput::DirectionDimension pt_direction_dimension{ XInput::DirectionDimension::Left };
-		StickValue::Type pt_target_stick_value{ StickValue::threshold };
+		XInput::StickDimension stick_dimension{ XInput::StickDimension::Left };
+		XInput::DirectionDimension direction_dimension{ XInput::DirectionDimension::Left };
+		StickValue::Type target_stick_value{ StickValue::threshold };
 	};
 }
 

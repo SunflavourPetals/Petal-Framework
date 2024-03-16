@@ -203,39 +203,39 @@ namespace Petal::XInput::MiddleProcess
 	// XInputXHold
 	XHoldProcess::XHoldProcess(Tick target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
-		pt_target_count{ target_count },
-		pt_loop_triggering{ loop_mode }
+		target_count{ target_count },
+		loop_triggering{ loop_mode }
 	{
 
 	}
 	void XHoldProcess::UpdateTargetCount(Tick target_count) noexcept
 	{
-		this->pt_target_count = target_count;
+		this->target_count = target_count;
 	}
 	XHoldProcess::Tick XHoldProcess::TargetCount() const noexcept
 	{
-		return this->pt_target_count;
+		return this->target_count;
 	}
 	void XHoldProcess::UpdateLoopMode(boolean loop_mode) noexcept
 	{
-		this->pt_loop_triggering = loop_mode;
+		this->loop_triggering = loop_mode;
 	}
 	boolean XHoldProcess::LoopMode() const noexcept
 	{
-		return this->pt_loop_triggering;
+		return this->loop_triggering;
 	}
 	boolean XHoldProcess::Check(const Resource& resource)
 	{
-		if (this->pt_in_holding)
+		if (this->in_holding)
 		{
 			if (this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count += resource.delta_count;
+				this->total_count += resource.delta_count;
 			}
 			else
 			{
-				this->pt_in_holding = false;
-				this->pt_total_count = 0;
+				this->in_holding = false;
+				this->total_count = 0;
 				return false;
 			}
 		}
@@ -243,20 +243,20 @@ namespace Petal::XInput::MiddleProcess
 		{
 			if (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count = 0;
-				this->pt_in_holding = true;
+				this->total_count = 0;
+				this->in_holding = true;
 			}
 			else
 			{
 				return false;
 			}
 		}
-		if (this->pt_total_count >= this->pt_target_count)
+		if (this->total_count >= this->target_count)
 		{
-			this->pt_total_count = 0;
-			if (!this->pt_loop_triggering)
+			this->total_count = 0;
+			if (!this->loop_triggering)
 			{
-				this->pt_in_holding = false;
+				this->in_holding = false;
 			}
 			return true;
 		}
@@ -266,21 +266,21 @@ namespace Petal::XInput::MiddleProcess
 	// XInputButtonProcess
 	ButtonProcess::ButtonProcess(Button::Type buttons) :
 		BasicMiddleProcess(),
-		pt_buttons{ buttons }
+		buttons{ buttons }
 	{
 
 	}
 	void ButtonProcess::UpdateButtons(Button::Type buttons) noexcept
 	{
-		this->pt_buttons = buttons;
+		this->buttons = buttons;
 	}
 	Button::Type ButtonProcess::Buttons() const noexcept
 	{
-		return this->pt_buttons;
+		return this->buttons;
 	}
 	boolean ButtonProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
-		return gamepad.Pushed(this->pt_buttons);
+		return gamepad.Pushed(this->buttons);
 	}
 	boolean ButtonProcess::LastPositive(const Controller& controller) const
 	{
@@ -294,37 +294,37 @@ namespace Petal::XInput::MiddleProcess
 	// XInputTriggerProcess
 	TriggerProcess::TriggerProcess(XInput::TriggerDimension trigger_dimension, TriggerValue::Type target_value) :
 		BasicMiddleProcess(),
-		pt_trigger_dimension{ trigger_dimension },
-		pt_target_trigger_value{ target_value }
+		trigger_dimension{ trigger_dimension },
+		target_trigger_value{ target_value }
 	{
 
 	}
 	void TriggerProcess::UpdateTargetTriggerValue(TriggerValue::Type target_value) noexcept
 	{
-		this->pt_target_trigger_value = target_value;
+		this->target_trigger_value = target_value;
 	}
 	TriggerValue::Type TriggerProcess::TargetTriggerValue() const noexcept
 	{
-		return this->pt_target_trigger_value;
+		return this->target_trigger_value;
 	}
 	void TriggerProcess::UpdateTriggerDimension(XInput::TriggerDimension dimension) noexcept
 	{
-		this->pt_trigger_dimension = dimension;
+		this->trigger_dimension = dimension;
 	}
 	TriggerDimension TriggerProcess::TriggerDimension() const noexcept
 	{
-		return this->pt_trigger_dimension;
+		return this->trigger_dimension;
 	}
 	boolean TriggerProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
-		switch (this->pt_trigger_dimension)
+		switch (this->trigger_dimension)
 		{
 		case Petal::XInput::TriggerDimension::Left:
-			if (gamepad.LeftTrigger() >= this->pt_target_trigger_value) return true;
+			if (gamepad.LeftTrigger() >= this->target_trigger_value) return true;
 			return false;
 			break;
 		case Petal::XInput::TriggerDimension::Right:
-			if (gamepad.RightTrigger() >= this->pt_target_trigger_value) return true;
+			if (gamepad.RightTrigger() >= this->target_trigger_value) return true;
 			return false;
 			break;
 		default:
@@ -344,57 +344,57 @@ namespace Petal::XInput::MiddleProcess
 	// XInputStickProcess
 	StickProcess::StickProcess(XInput::StickDimension stick_dimension, XInput::DirectionDimension direction_dimension, StickValue::Type target_value) :
 		BasicMiddleProcess(),
-		pt_stick_dimension{ stick_dimension },
-		pt_direction_dimension{ direction_dimension },
-		pt_target_stick_value{ target_value }
+		stick_dimension{ stick_dimension },
+		direction_dimension{ direction_dimension },
+		target_stick_value{ target_value }
 	{
 
 	}
 	void StickProcess::UpdateTargetStickValue(StickValue::Type target_value) noexcept
 	{
-		this->pt_target_stick_value = target_value;
+		this->target_stick_value = target_value;
 	}
 	StickValue::Type StickProcess::TargetStickValue() const noexcept
 	{
-		return this->pt_target_stick_value;
+		return this->target_stick_value;
 	}
 	void StickProcess::UpdateStickDimension(XInput::StickDimension dimension) noexcept
 	{
-		this->pt_stick_dimension = dimension;
+		this->stick_dimension = dimension;
 	}
 	StickDimension StickProcess::StickDimension() const noexcept
 	{
-		return this->pt_stick_dimension;
+		return this->stick_dimension;
 	}
 	void StickProcess::UpdateDirectionDimension(XInput::DirectionDimension dimension) noexcept
 	{
-		this->pt_direction_dimension = dimension;
+		this->direction_dimension = dimension;
 	}
 	DirectionDimension StickProcess::DirectionDimension() const noexcept
 	{
-		return this->pt_direction_dimension;
+		return this->direction_dimension;
 	}
 	boolean StickProcess::GamepadPositive(const WrappedGamepad& gamepad) const
 	{
-		switch (this->pt_stick_dimension)
+		switch (this->stick_dimension)
 		{
 		case XInput::StickDimension::Left:
-			switch (this->pt_direction_dimension)
+			switch (this->direction_dimension)
 			{
 			case Petal::XInput::DirectionDimension::Up:
-				if (gamepad.LeftStickY() >= this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickY() >= this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Down:
-				if (gamepad.LeftStickY() < -this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickY() < -this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Left:
-				if (gamepad.LeftStickX() < -this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickX() < -this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Right:
-				if (gamepad.LeftStickX() >= this->pt_target_stick_value) return true;
+				if (gamepad.LeftStickX() >= this->target_stick_value) return true;
 				return false;
 				break;
 			default:
@@ -402,22 +402,22 @@ namespace Petal::XInput::MiddleProcess
 			}
 			break;
 		case XInput::StickDimension::Right:
-			switch (this->pt_direction_dimension)
+			switch (this->direction_dimension)
 			{
 			case Petal::XInput::DirectionDimension::Up:
-				if (gamepad.RightStickY() >= this->pt_target_stick_value) return true;
+				if (gamepad.RightStickY() >= this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Down:
-				if (gamepad.RightStickY() < -this->pt_target_stick_value) return true;
+				if (gamepad.RightStickY() < -this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Left:
-				if (gamepad.RightStickX() < -this->pt_target_stick_value) return true;
+				if (gamepad.RightStickX() < -this->target_stick_value) return true;
 				return false;
 				break;
 			case Petal::XInput::DirectionDimension::Right:
-				if (gamepad.RightStickX() >= this->pt_target_stick_value) return true;
+				if (gamepad.RightStickX() >= this->target_stick_value) return true;
 				return false;
 				break;
 			default:

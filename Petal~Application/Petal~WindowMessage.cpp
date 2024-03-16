@@ -65,13 +65,13 @@ namespace Petal
 {
 	BasicResizeMessage::BasicResizeMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_client_size{ static_cast<i32>(this->LWLong()), static_cast<i32>(this->HWLong()) }
+		client_size{ static_cast<i32>(this->LWLong()), static_cast<i32>(this->HWLong()) }
 	{
 
 	}
 	const Size2DI32& BasicResizeMessage::NewClientSize() const noexcept
 	{
-		return pt_client_size;
+		return client_size;
 	}
 }
 
@@ -79,14 +79,14 @@ namespace Petal
 {
 	BasicMouseMessage::BasicMouseMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_cursor_pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) },
-		pt_key_state{ GET_KEYSTATE_WPARAM(w) }
+		cursor_pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) },
+		key_state{ GET_KEYSTATE_WPARAM(w) }
 	{
 
 	}
 	word BasicMouseMessage::VirtualKeys() const noexcept
 	{
-		return this->pt_key_state;
+		return this->key_state;
 	}
 	boolean BasicMouseMessage::LButtonDown() const noexcept
 	{
@@ -118,7 +118,7 @@ namespace Petal
 	}
 	const Position2DI32& BasicMouseMessage::CursorPosition() const noexcept
 	{
-		return this->pt_cursor_pos;
+		return this->cursor_pos;
 	}
 }
 
@@ -126,11 +126,11 @@ namespace Petal
 {
 	i16 BasicMouseWheelMessage::WheelDelta() const noexcept
 	{
-		return this->pt_wheel_delta;
+		return this->wheel_delta;
 	}
 	BasicMouseWheelMessage::BasicMouseWheelMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicMouseMessage(msg, w, l),
-		pt_wheel_delta{ GET_WHEEL_DELTA_WPARAM(w) }
+		wheel_delta{ GET_WHEEL_DELTA_WPARAM(w) }
 	{
 
 	}
@@ -224,13 +224,13 @@ namespace Petal
 {
 	ActiveMessage::ActiveMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_clicked{ w == WA_CLICKACTIVE }
+		clicked{ w == WA_CLICKACTIVE }
 	{
 
 	}
 	boolean ActiveMessage::TriggeringByClick() const noexcept
 	{
-		return this->pt_clicked;
+		return this->clicked;
 	}
 	win32hwnd ActiveMessage::Deactivated() const noexcept
 	{
@@ -276,11 +276,11 @@ namespace Petal
 {
 	const Position2DI32& MovedMessage::NewClientPosition() const noexcept
 	{
-		return this->pt_pos;
+		return this->pos;
 	}
 	MovedMessage::MovedMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) }
+		pos{ GET_X_LPARAM(l), GET_Y_LPARAM(l) }
 	{
 
 	}

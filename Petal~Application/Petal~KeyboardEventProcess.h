@@ -38,10 +38,10 @@ namespace Petal::Keyboard::MiddleProcess
 		XHoldProcess(XHoldProcess&&) noexcept = default;
 		~XHoldProcess() = default;
 	private:
-		Tick pt_target_count{ 1 };
-		Tick pt_total_count{};
-		boolean pt_loop_triggering{ false };
-		boolean pt_in_holding{ false };
+		Tick target_count{ 1 };
+		Tick total_count{};
+		boolean loop_triggering{ false };
+		boolean in_holding{ false };
 	};
 
 	class XKeyProcess : virtual public BasicMiddleProcess
@@ -60,7 +60,7 @@ namespace Petal::Keyboard::MiddleProcess
 		XKeyProcess(XKeyProcess&&) noexcept = default;
 		~XKeyProcess() = default;
 	protected:
-		VirtualKey::Type pt_key{};
+		VirtualKey::Type key{};
 	};
 }
 

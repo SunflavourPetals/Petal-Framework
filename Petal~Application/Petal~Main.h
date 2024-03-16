@@ -30,9 +30,9 @@ namespace Petal::WinMain
 #define Petal_SetMainFunc(MainFunc) \
 namespace Petal::UserEntrance \
 {   \
-	extern const fptr<int> pt_user_main{ &::MainFunc };  \
-	extern const ptrc<TChar> pt_user_main_name{ Petal_TStr(#MainFunc) };  \
-	extern const ptrc<DbgChar> pt_user_main_name_dbgc{ Petal_DbgStr(#MainFunc) };  \
+	extern const fptr<int> user_main{ &::MainFunc };  \
+	extern const ptrc<TChar> user_main_name{ Petal_TStr(#MainFunc) };  \
+	extern const ptrc<DbgChar> user_main_name_dbgc{ Petal_DbgStr(#MainFunc) };  \
 }
 #define Petal_SetMainClass(MainClass) Petal_SetMainFunc(MainClass::main)
 #define Petal_SetMainSpace(MainSpace) Petal_SetMainFunc(MainSpace::main)

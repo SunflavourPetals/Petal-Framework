@@ -66,7 +66,7 @@ namespace Petal
 		RawInputMessage(RawInputMessage&&) noexcept = default;
 		virtual ~RawInputMessage() = default;
 	private:
-		win32wprm pt_raw_input_code{};
+		win32wprm raw_input_code{};
 	};
 
 	class RawInputDeviceChangeMessage : public BasicWindowMessage
@@ -106,7 +106,7 @@ namespace Petal
 		RawInputWindow& operator= (const RawInputWindow&) = delete;
 		RawInputWindow& operator= (RawInputWindow&&) = delete;
 	private:
-		RawInputDataBuffer pt_raw_input_buffer{};
+		RawInputDataBuffer raw_input_buffer{};
 	};
 }
 

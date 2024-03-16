@@ -71,13 +71,13 @@ namespace Petal
 {
 	RawInputMessage::RawInputMessage(win32msg msg, win32wprm w, win32lprm l) :
 		BasicWindowMessage(msg, w, l),
-		pt_raw_input_code{ GET_RAWINPUT_CODE_WPARAM(w) }
+		raw_input_code{ GET_RAWINPUT_CODE_WPARAM(w) }
 	{
 
 	}
 	win32wprm RawInputMessage::RawInputCode() const noexcept
 	{
-		return this->pt_raw_input_code;
+		return this->raw_input_code;
 	}
 	boolean RawInputMessage::IsSink() const noexcept
 	{
@@ -125,7 +125,7 @@ namespace Petal
 		win32uint size{};
 		::GetRawInputData(e.HRawInput(), RID_INPUT, nullptr, &size, sizeof(Win32RawInputHeader));
 
-		auto buffer = this->pt_raw_input_buffer.WriteOnlyBuffer(size);
+		auto buffer = this->raw_input_buffer.WriteOnlyBuffer(size);
 
 		if (::GetRawInputData(e.HRawInput(), RID_INPUT, buffer.data(), &size, sizeof(Win32RawInputHeader)) != buffer.size())
 		{
@@ -133,16 +133,16 @@ namespace Petal
 		}
 		else
 		{
-			switch (this->pt_raw_input_buffer.AsWin32RawInput().header.dwType)
+			switch (this->raw_input_buffer.AsWin32RawInput().header.dwType)
 			{
 			case RIM_TYPEMOUSE:
-				this->RawMouseEvent(e, this->pt_raw_input_buffer.AsWin32RawInput(), this->pt_raw_input_buffer.RawInputSize());
+				this->RawMouseEvent(e, this->raw_input_buffer.AsWin32RawInput(), this->raw_input_buffer.RawInputSize());
 				break;
 			case RIM_TYPEKEYBOARD:
-				this->RawKeyboardEvent(e, this->pt_raw_input_buffer.AsWin32RawInput(), this->pt_raw_input_buffer.RawInputSize());
+				this->RawKeyboardEvent(e, this->raw_input_buffer.AsWin32RawInput(), this->raw_input_buffer.RawInputSize());
 				break;
 			case RIM_TYPEHID:
-				this->RawHidEvent(e, this->pt_raw_input_buffer.AsWin32RawInput(), this->pt_raw_input_buffer.RawInputSize());
+				this->RawHidEvent(e, this->raw_input_buffer.AsWin32RawInput(), this->raw_input_buffer.RawInputSize());
 				break;
 			default:
 				break;

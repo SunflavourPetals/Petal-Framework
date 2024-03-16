@@ -10,62 +10,62 @@ namespace Petal::XInput
 	}
 	boolean WrappedGamepad::Connected() const noexcept
 	{
-		return this->pt_gamepad_connected;
+		return this->gamepad_connected;
 	}
 	boolean WrappedGamepad::CheckConnection() const noexcept
 	{
 		XINPUT_STATE state{};
-		win32dword result{ ::XInputGetState(this->pt_user_index, &state) };
-		this->pt_gamepad_connected = result != ERROR_DEVICE_NOT_CONNECTED;
+		win32dword result{ ::XInputGetState(this->user_index, &state) };
+		this->gamepad_connected = result != ERROR_DEVICE_NOT_CONNECTED;
 		return this->Connected();
 	}
 	UserIndexValue::Type WrappedGamepad::UserIndex() const noexcept
 	{
-		return this->pt_user_index;
+		return this->user_index;
 	}
 	const State& WrappedGamepad::GetState() const noexcept
 	{
-		return this->pt_gamepad_state;
+		return this->gamepad_state;
 	}
 	const Gamepad& WrappedGamepad::GetGamepad() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad;
+		return this->gamepad_state.Gamepad;
 	}
 	boolean WrappedGamepad::StateChanged() const noexcept
 	{
-		return this->pt_state_changed;
+		return this->state_changed;
 	}
 	void WrappedGamepad::ClearState() noexcept
 	{
-		this->pt_gamepad_state = {};
+		this->gamepad_state = {};
 	}
 	boolean WrappedGamepad::Pushed(Button::Type buttons) const noexcept
 	{
-		return (this->pt_gamepad_state.Gamepad.wButtons & buttons) == buttons;
+		return (this->gamepad_state.Gamepad.wButtons & buttons) == buttons;
 	}
 	TriggerValue::Type WrappedGamepad::LeftTrigger() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.bLeftTrigger;
+		return this->gamepad_state.Gamepad.bLeftTrigger;
 	}
 	TriggerValue::Type WrappedGamepad::RightTrigger() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.bRightTrigger;
+		return this->gamepad_state.Gamepad.bRightTrigger;
 	}
 	StickValue::Type WrappedGamepad::LeftStickX() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.sThumbLX;
+		return this->gamepad_state.Gamepad.sThumbLX;
 	}
 	StickValue::Type WrappedGamepad::LeftStickY() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.sThumbLY;
+		return this->gamepad_state.Gamepad.sThumbLY;
 	}
 	StickValue::Type WrappedGamepad::RightStickX() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.sThumbRX;
+		return this->gamepad_state.Gamepad.sThumbRX;
 	}
 	StickValue::Type WrappedGamepad::RightStickY() const noexcept
 	{
-		return this->pt_gamepad_state.Gamepad.sThumbRY;
+		return this->gamepad_state.Gamepad.sThumbRY;
 	}
 	StickValue::Type WrappedGamepad::CalcLStickUp() const noexcept
 	{
@@ -103,9 +103,9 @@ namespace Petal::XInput
 	{
 		if (user_index <= 3 && user_index >= 0)
 		{
-			this->pt_user_index = user_index;
-			this->pt_gamepad_connected = false;
-			this->pt_state_changed = false;
+			this->user_index = user_index;
+			this->gamepad_connected = false;
+			this->state_changed = false;
 			this->ClearState();
 			return true;
 		}
@@ -113,78 +113,78 @@ namespace Petal::XInput
 	}
 	win32dword WrappedGamepad::QueryState() noexcept
 	{
-		win32dword last_state = this->pt_gamepad_state.dwPacketNumber;
-		win32dword result = ::XInputGetState(this->pt_user_index, &this->pt_gamepad_state);
+		win32dword last_state = this->gamepad_state.dwPacketNumber;
+		win32dword result = ::XInputGetState(this->user_index, &this->gamepad_state);
 		if (result == ERROR_DEVICE_NOT_CONNECTED)
 		{
-			pt_gamepad_connected = false;
-			pt_state_changed = false;
+			this->gamepad_connected = false;
+			this->state_changed = false;
 		}
 		else
 		{
-			if ((this->pt_gamepad_connected == true) && (this->pt_gamepad_state.dwPacketNumber != last_state))
+			if ((this->gamepad_connected == true) && (this->gamepad_state.dwPacketNumber != last_state))
 			{
-				this->pt_state_changed = true;
+				this->state_changed = true;
 			}
 			else
 			{
-				this->pt_state_changed = false;
+				this->state_changed = false;
 			}
-			this->pt_gamepad_connected = true;
+			this->gamepad_connected = true;
 		}
 		return result;
 	}
 	win32dword WrappedGamepad::Vibration(VibrationValue::Type left_motor_speed, VibrationValue::Type right_motor_speed) const noexcept
 	{
 		::XINPUT_VIBRATION vibration{ left_motor_speed, right_motor_speed };
-		return ::XInputSetState(this->pt_user_index, &vibration);
+		return ::XInputSetState(this->user_index, &vibration);
 	}
 	win32dword WrappedGamepad::AudioDeviceIDs(ptr<WChar> render_device_id, win32uint& render_count, ptr<WChar> capture_device_id, win32uint& capture_count) const noexcept
 	{
-		return ::XInputGetAudioDeviceIds(this->pt_user_index, render_device_id, &render_count, capture_device_id, &capture_count);
+		return ::XInputGetAudioDeviceIds(this->user_index, render_device_id, &render_count, capture_device_id, &capture_count);
 	}
 	win32dword WrappedGamepad::GetBatteryInformation(BatteryInformation& battery_info) const noexcept
 	{
-		return ::XInputGetBatteryInformation(this->pt_user_index, BATTERY_DEVTYPE_GAMEPAD, &battery_info);
+		return ::XInputGetBatteryInformation(this->user_index, BATTERY_DEVTYPE_GAMEPAD, &battery_info);
 	}
 	win32dword WrappedGamepad::GetCapabilities(Capabilities& capabilities) const noexcept
 	{
-		return ::XInputGetCapabilities(this->pt_user_index, XINPUT_FLAG_GAMEPAD, &capabilities);
+		return ::XInputGetCapabilities(this->user_index, XINPUT_FLAG_GAMEPAD, &capabilities);
 	}
 	win32dword WrappedGamepad::GetKeystroke(Keystroke& keystroke) const noexcept
 	{
-		return ::XInputGetKeystroke(this->pt_user_index, 0, &keystroke);
+		return ::XInputGetKeystroke(this->user_index, 0, &keystroke);
 	}
 	Controller::Controller(UserIndexValue::Type user_index) :
-		pt_gamepad{ user_index },
-		pt_last_gamepad{ user_index }
+		gamepad{ user_index },
+		last_gamepad{ user_index }
 	{
 
 	}
 	void Controller::ClearState() noexcept
 	{
-		this->pt_gamepad.ClearState();
+		this->gamepad.ClearState();
 	}
 	void Controller::ClearLastState() noexcept
 	{
-		this->pt_last_gamepad.ClearState();
+		this->last_gamepad.ClearState();
 	}
 	boolean Controller::UpdateUserIndex(UserIndexValue::Type user_index) noexcept
 	{
-		return this->pt_gamepad.UpdateUserIndex(user_index);
+		return this->gamepad.UpdateUserIndex(user_index);
 	}
 	const WrappedGamepad& Controller::GetWrappedGamepad() const noexcept
 	{
-		return this->pt_gamepad;
+		return this->gamepad;
 	}
 	const WrappedGamepad& Controller::GetLastWrappedGamepad() const noexcept
 	{
-		return this->pt_last_gamepad;
+		return this->last_gamepad;
 	}
 	win32dword Controller::QueryState() noexcept
 	{
-		this->pt_last_gamepad = this->pt_gamepad;
-		return this->pt_gamepad.QueryState();
+		this->last_gamepad = this->gamepad;
+		return this->gamepad.QueryState();
 	}
 	void Controller::ExecuteEventProcess(Abstract::XInputEventProcess& proc, Resource& resource)
 	{

@@ -82,21 +82,21 @@ namespace Petal
 		FrequencyController(FrequencyController&&) noexcept = default;
 		~FrequencyController() = default;
 	private:
-		static constexpr i64 pt_max_value{ static_cast<i64>((~0LLU) >> 1) };
-		static constexpr fptr<void> pt_default_sleep_fn{ [] { ::std::this_thread::sleep_for(::std::chrono::nanoseconds{ 1 }); } };
+		static constexpr i64 max_value{ static_cast<i64>((~0LLU) >> 1) };
+		static constexpr fptr<void> default_sleep_fn{ [] { ::std::this_thread::sleep_for(::std::chrono::nanoseconds{ 1 }); } };
 	private:
-		PerformanceCounter pt_performance_counter;
-		fptr<void> pt_sleep_fn{ pt_default_sleep_fn };
-		i64 pt_frame_count{}; // 帧数: 实际间隔时间内执行的次数
-		i64 pt_sleep_failure_threshold_count{ pt_max_value }; // 睡眠失效阈值，当距离 actual_delta_count 的 tick 数不足此值时，不进行睡眠，但是成员 Sleep 函数依旧返回 false
-		i64 pt_sleep_count{}; // 间隔时间内剩余的睡眠次数，每个间隔会重置
-		i64 pt_sleep_limitation{ pt_max_value }; // 目标间隔时间内允许的睡眠次数
-		i64 pt_delta_count{}; // 间隔时间
-		i64 pt_target_delta_count{}; // 目标间隔时间
-		i64 pt_actual_delta_count{}; // 经修正的目标间隔时间
-		i64 pt_statistics_count{}; // 每次统计的间隔时间
-		i64 pt_target_statistics_count{}; // 每次统计的目标间隔时间
-		i64 pt_actual_statistics_count{}; // 每次统计的实际间隔时间
+		PerformanceCounter performance_counter;
+		fptr<void> sleep_fn{ default_sleep_fn };
+		i64 frame_count{}; // 帧数: 实际间隔时间内执行的次数
+		i64 sleep_failure_threshold_count{ max_value }; // 睡眠失效阈值，当距离 actual_delta_count 的 tick 数不足此值时，不进行睡眠，但是成员 Sleep 函数依旧返回 false
+		i64 sleep_count{}; // 间隔时间内剩余的睡眠次数，每个间隔会重置
+		i64 sleep_limitation{ max_value }; // 目标间隔时间内允许的睡眠次数
+		i64 delta_count{}; // 间隔时间
+		i64 target_delta_count{}; // 目标间隔时间
+		i64 actual_delta_count{}; // 经修正的目标间隔时间
+		i64 statistics_count{}; // 每次统计的间隔时间
+		i64 target_statistics_count{}; // 每次统计的目标间隔时间
+		i64 actual_statistics_count{}; // 每次统计的实际间隔时间
 	};
 }
 

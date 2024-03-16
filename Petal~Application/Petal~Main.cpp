@@ -133,14 +133,14 @@ namespace
 		class Protection final // 保护入口函数，使其不被递归调用
 		{
 		public:
-			void Use() { this->pt_called = true; } // 设置程序状态为已进入入口函数
-			bool Used() { return this->pt_called; } // 是否已进入入口函数
+			void Use() { this->called = true; } // 设置程序状态为已进入入口函数
+			bool Used() { return this->called; } // 是否已进入入口函数
 			void VSDebugOutputWarning() // 输出警告
 			{
 				Petal_VSDbgT("[Petal] Warning: calling entry function is invalid\r\n");
 			}
 		private:
-			Petal::boolean pt_called{ false }; // 标识是否已进入入口函数
+			Petal::boolean called{ false }; // 标识是否已进入入口函数
 		};
 		Protection protection{};
 	}
@@ -201,9 +201,9 @@ namespace Petal::WinMain
 
 namespace Petal::UserEntrance
 {
-	extern const fptr<int> pt_user_main;
-	extern const ptrc<TChar> pt_user_main_name;
-	extern const ptrc<DbgChar> pt_user_main_name_dbgc;
+	extern const fptr<int> user_main;
+	extern const ptrc<TChar> user_main_name;
+	extern const ptrc<DbgChar> user_main_name_dbgc;
 }
 
 
@@ -217,7 +217,7 @@ namespace
 			{
 				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Entry point: {}\r\n"), entry_point).c_str());
 				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Arguments in Petal::{} is valid now\r\n"), main_space).c_str());
-				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal::UserEntrance::pt_user_main_name_dbgc).c_str());
+				Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] User entrance: {}\r\n"), Petal::UserEntrance::user_main_name_dbgc).c_str());
 			}
 			catch (const ::std::exception&) {}
 		}
@@ -237,7 +237,7 @@ INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd
 	PetalUnnamed::Main::arguments.InitAsInvalid();
 	PetalUnnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	PetalUnnamed::XMain::VSDebugOutput(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
-	return Petal::UserEntrance::pt_user_main();
+	return Petal::UserEntrance::user_main();
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
@@ -251,7 +251,7 @@ int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 	PetalUnnamed::Main::arguments.Init(argc, argv, envp);
 	PetalUnnamed::WinMain::arguments.InitAsInvalid();
 	PetalUnnamed::XMain::VSDebugOutput(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
-	return Petal::UserEntrance::pt_user_main();
+	return Petal::UserEntrance::user_main();
 }
 
 #else
@@ -267,7 +267,7 @@ INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_l
 	PetalUnnamed::Main::arguments.InitAsInvalid();
 	PetalUnnamed::WinMain::arguments.Init(instance, cmd_line, cmd_show);
 	PetalUnnamed::XMain::VSDebugOutput(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
-	return Petal::UserEntrance::pt_user_main();
+	return Petal::UserEntrance::user_main();
 }
 
 int main(int argc, char* argv[], char* envp[])
@@ -281,7 +281,7 @@ int main(int argc, char* argv[], char* envp[])
 	PetalUnnamed::Main::arguments.Init(argc, argv, envp);
 	PetalUnnamed::WinMain::arguments.InitAsInvalid();
 	PetalUnnamed::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
-	return Petal::UserEntrance::pt_user_main();
+	return Petal::UserEntrance::user_main();
 }
 
 #endif

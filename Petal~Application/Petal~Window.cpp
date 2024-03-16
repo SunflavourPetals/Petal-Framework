@@ -27,17 +27,17 @@ namespace Petal
 	win32bool Window::ShowNoBorder(boolean no_border_mode) noexcept
 	{
 		constexpr win32dword no_border_style{ WS_VISIBLE | WS_CLIPSIBLINGS | WS_CLIPCHILDREN | WS_POPUP };
-		if (this->pt_no_border_mode == no_border_mode)
+		if (this->no_border_mode == no_border_mode)
 		{
 			return win32_true;
 		}
-		this->pt_no_border_mode = no_border_mode;
+		this->no_border_mode = no_border_mode;
 		if (no_border_mode == true)
 		{
-			this->pt_former_style = static_cast<win32dword>(this->GWLP_Style());
+			this->former_style = static_cast<win32dword>(this->GWLP_Style());
 		}
 
-		win32dword target_style{ (no_border_mode == true) ? no_border_style : this->pt_former_style };
+		win32dword target_style{ (no_border_mode == true) ? no_border_style : this->former_style };
 
 		Win32Rect client_rect{};
 		if (this->ClientRect(client_rect) == win32_false)
@@ -227,10 +227,10 @@ namespace Petal
 		break;
 		case WM_SIZING:
 		{
-			if (this->pt_enter_size == false)
+			if (this->enter_size == false)
 			{
 				EnterSizeMessage wrapped_msg{ msg, w, l };
-				this->pt_enter_size = true;
+				this->enter_size = true;
 				this->EnterSizeEvent(wrapped_msg);
 			}
 			SizingMessage wrapped_msg{ msg, w, l };
@@ -240,10 +240,10 @@ namespace Petal
 		break;
 		case WM_MOVING:
 		{
-			if (this->pt_enter_move == false)
+			if (this->enter_move == false)
 			{
 				EnterMoveMessage wrapped_msg{ msg, w, l };
-				this->pt_enter_move = true;
+				this->enter_move = true;
 				this->EnterMoveEvent(wrapped_msg);
 			}
 			MovingMessage wrapped_msg{ msg, w, l };
@@ -253,16 +253,16 @@ namespace Petal
 		break;
 		case WM_EXITSIZEMOVE:
 		{
-			if (this->pt_enter_size == true)
+			if (this->enter_size == true)
 			{
 				ExitSizeMessage wrapped_msg{ msg, w, l };
-				this->pt_enter_size = false;
+				this->enter_size = false;
 				this->ExitSizeEvent(wrapped_msg);
 			}
-			if (this->pt_enter_move == true)
+			if (this->enter_move == true)
 			{
 				ExitMoveMessage wrapped_msg{ msg, w, l };
-				this->pt_enter_move = false;
+				this->enter_move = false;
 				this->ExitMoveEvent(wrapped_msg);
 			}
 			return 0;

@@ -161,10 +161,10 @@ namespace Petal::XInput
 		WrappedGamepad& operator=(const WrappedGamepad&) noexcept = default;
 		WrappedGamepad& operator=(WrappedGamepad&&) noexcept = default;
 	private:
-		State pt_gamepad_state{}; // XINPUT_STATE, updates after QueryState is called
-		UserIndexValue::Type pt_user_index{ 0 }; // User index, 0 to 3
-		mutable boolean pt_gamepad_connected{}; // Connection state, updates after QueryState is called
-		boolean pt_state_changed{}; // is state changing, updates after QueryState is called
+		State gamepad_state{}; // XINPUT_STATE, updates after QueryState is called
+		UserIndexValue::Type user_index{ 0 }; // User index, 0 to 3
+		mutable boolean gamepad_connected{}; // Connection state, updates after QueryState is called
+		boolean state_changed{}; // is state changing, updates after QueryState is called
 	};
 
 	class Controller final
@@ -191,8 +191,8 @@ namespace Petal::XInput
 		Controller& operator = (const Controller&) noexcept = default;
 		Controller& operator = (Controller&&) noexcept = default;
 	private:
-		WrappedGamepad pt_gamepad;
-		WrappedGamepad pt_last_gamepad;
+		WrappedGamepad gamepad;
+		WrappedGamepad last_gamepad;
 	};
 	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, i64 delta_count)
 	{

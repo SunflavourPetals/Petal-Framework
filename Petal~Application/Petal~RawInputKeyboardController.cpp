@@ -8,7 +8,7 @@ namespace Petal::Keyboard
 	}
 	void RawInputController::UpdateKeyState(VirtualKey::Type vk_code, boolean pushed) noexcept
 	{
-		this->pt_last_state.Set(vk_code, this->pt_state.Pushed(vk_code));
-		this->pt_state.Set(vk_code, pushed);
+		this->last_state.Set(vk_code, this->state.Pushed(vk_code));
+		this->state.Set(vk_code, pushed);
 	}
 }

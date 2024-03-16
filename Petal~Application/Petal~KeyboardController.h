@@ -60,7 +60,7 @@ namespace Petal::Keyboard
 		WrappedState& operator=(const WrappedState&) noexcept = default;
 		WrappedState& operator=(WrappedState&&) noexcept = default;
 	private:
-		State pt_state{ 0 };
+		State state{ 0 };
 	};
 }
 
@@ -97,8 +97,8 @@ namespace Petal::Keyboard
 		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
 		static void ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource);
 	protected:
-		WrappedState pt_state{};
-		WrappedState pt_last_state{};
+		WrappedState state{};
+		WrappedState last_state{};
 	};
 }
 
@@ -121,7 +121,7 @@ namespace Petal::Keyboard
 		Controller& operator=(const Controller&) = default;
 		Controller& operator=(Controller&&) noexcept = default;
 	private:
-		Registry pt_registry{};
+		Registry registry{};
 	};
 }
 

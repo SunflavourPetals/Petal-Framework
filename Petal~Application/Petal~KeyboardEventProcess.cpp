@@ -4,39 +4,39 @@ namespace Petal::Keyboard::MiddleProcess
 {
 	XHoldProcess::XHoldProcess(Tick target_count, boolean loop_mode) :
 		BasicMiddleProcess(),
-		pt_target_count{ target_count },
-		pt_loop_triggering{ loop_mode }
+		target_count{ target_count },
+		loop_triggering{ loop_mode }
 	{
 
 	}
 	void XHoldProcess::UpdateTargetCount(Tick target_count) noexcept
 	{
-		this->pt_target_count = target_count;
+		this->target_count = target_count;
 	}
 	XHoldProcess::Tick XHoldProcess::TargetCount() const noexcept
 	{
-		return this->pt_target_count;
+		return this->target_count;
 	}
 	void XHoldProcess::UpdateLoopMode(boolean loop_mode) noexcept
 	{
-		this->pt_loop_triggering = loop_mode;
+		this->loop_triggering = loop_mode;
 	}
 	boolean XHoldProcess::LoopMode() const noexcept
 	{
-		return this->pt_loop_triggering;
+		return this->loop_triggering;
 	}
 	boolean XHoldProcess::Check(const Resource& resource)
 	{
-		if (this->pt_in_holding)
+		if (this->in_holding)
 		{
 			if (this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count += resource.delta_count;
+				this->total_count += resource.delta_count;
 			}
 			else
 			{
-				this->pt_in_holding = false;
-				this->pt_total_count = 0;
+				this->in_holding = false;
+				this->total_count = 0;
 				return false;
 			}
 		}
@@ -44,20 +44,20 @@ namespace Petal::Keyboard::MiddleProcess
 		{
 			if (!this->LastPositive(resource.controller) && this->ThisPositive(resource.controller))
 			{
-				this->pt_total_count = 0;
-				this->pt_in_holding = true;
+				this->total_count = 0;
+				this->in_holding = true;
 			}
 			else
 			{
 				return false;
 			}
 		}
-		if (this->pt_total_count >= this->pt_target_count)
+		if (this->total_count >= this->target_count)
 		{
-			this->pt_total_count = 0;
-			if (!this->pt_loop_triggering)
+			this->total_count = 0;
+			if (!this->loop_triggering)
 			{
-				this->pt_in_holding = false;
+				this->in_holding = false;
 			}
 			return true;
 		}
@@ -66,21 +66,21 @@ namespace Petal::Keyboard::MiddleProcess
 
 	XKeyProcess::XKeyProcess(VirtualKey::Type target_key) :
 		BasicMiddleProcess(),
-		pt_key{ target_key }
+		key{ target_key }
 	{
 
 	}
 	void XKeyProcess::UpdateKey(VirtualKey::Type target_key) noexcept
 	{
-		this->pt_key = target_key;
+		this->key = target_key;
 	}
 	VirtualKey::Type XKeyProcess::Key() const noexcept
 	{
-		return this->pt_key;
+		return this->key;
 	}
 	boolean XKeyProcess::KeyPositive(const WrappedState& state) const
 	{
-		return state.Pushed(this->pt_key);
+		return state.Pushed(this->key);
 	}
 	boolean XKeyProcess::LastPositive(const BasicController& controller) const
 	{
