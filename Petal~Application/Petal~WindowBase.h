@@ -94,7 +94,6 @@ namespace Petal::IWindow
 	[[nodiscard]] auto LoadDefaultWinAppIcon() noexcept -> win32hicon;
 	[[nodiscard]] auto LoadDefaultWinAppCursor() noexcept -> win32hcursor;
 	[[nodiscard]] auto WindowLongPtr(win32hwnd hwnd, i32 index) noexcept -> win32lptr;
-	[[nodiscard]] auto WindowFromCreateEvent(win32msg msg, win32lprm l) -> ptr<Abstract::Window>;
 }
 
 namespace Petal
@@ -217,7 +216,7 @@ namespace Petal
 		auto Register(const WindowClassArgs& window_class_args = {}) -> RegisterResult;
 		auto Unregister() noexcept -> UnregisterResult;
 		auto Reset() noexcept -> void;
-		auto Clear() noexcept -> Atom;
+		auto Unbind() noexcept -> Atom;
 	public:
 		WindowClass() = default;
 		WindowClass(const WindowClass& o) = delete;

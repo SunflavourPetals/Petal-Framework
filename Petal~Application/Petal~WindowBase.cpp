@@ -117,7 +117,7 @@ namespace Petal::Abstract
 	{
 		WindowClass window_class{};
 		[[maybe_unused]] auto unused = window_class.Register();
-		return this->Create(window_class.Clear());
+		return this->Create(window_class.Unbind());
 	}
 	auto Window::Destroy() noexcept -> DestroyResult
 	{
@@ -360,7 +360,7 @@ namespace Petal
 		{
 			result.win32_error = ::GetLastError();
 
-			Petal_VSDbgT("[Petal] Failed in WindowClassSet::Register!\r\n");
+			Petal_VSDbgT("[Petal] Failed in WindowClass::Register!\r\n");
 			Petal_VSDebugOutput(::std::format(Petal_TStr("\t\tclass_name: \"{}\"\r\n"), window_class.lpszClassName).c_str());
 			Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
 			
@@ -388,7 +388,7 @@ namespace Petal
 		{
 			result.win32_error = ::GetLastError(); // noexcept
 
-			Petal_VSDbgT("[Petal] Failed in WindowClassSet::Unregister!\r\n");
+			Petal_VSDbgT("[Petal] Failed in WindowClass::Unregister!\r\n");
 			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tin class_atom: {}\r\n"), this->ClassAtom()).c_str());
 			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
 
@@ -397,7 +397,7 @@ namespace Petal
 
 		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), this->ClassAtom()).c_str());
 
-		this->Clear();
+		this->Unbind();
 
 		return result;
 	}
@@ -405,7 +405,7 @@ namespace Petal
 	{
 		WindowClass temp{ ::std::move(*this) };
 	}
-	auto WindowClass::Clear() noexcept -> Atom
+	auto WindowClass::Unbind() noexcept -> Atom
 	{
 		auto temp_atom = this->atom;
 		this->atom = {};
@@ -484,18 +484,6 @@ namespace Petal::IWindow
 	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept
 	{
 		return reinterpret_cast<win32ctstr>(static_cast<win32ulptr>(integer));
-	}
-	[[nodiscard]] ptr<Abstract::Window> WindowFromCreateEvent(win32msg msg, win32lprm l)
-	{
-		if (msg != WM_CREATE)
-		{
-			return nullptr;
-		}
-		if (ptrc<Win32CreateStruct> win_ptr{ reinterpret_cast<ptr<Win32CreateStruct>>(l) }; win_ptr)
-		{
-			return reinterpret_cast<ptr<Abstract::Window>>(win_ptr->lpCreateParams);
-		}
-		return nullptr;
 	}
 #ifdef Petal_Enable_Unicode
 	win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
