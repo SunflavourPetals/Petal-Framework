@@ -5,7 +5,6 @@ namespace App
 {
 	class AppWindow : public Petal::Window // comment
 	{
-		Petal::WindowClass window_class;
 	public:
 		AppWindow() : Window()  /* comment */
 		{
@@ -24,7 +23,10 @@ namespace App
 				Petal::ExitMessageLoop();
 			}
 		}
+	private:
+		Petal::WindowClass window_class;
 	};
+
 	int main()
 	{
 		AppWindow app{};
