@@ -18,7 +18,7 @@ namespace
 		thread_local ::Petal::ptr<::Petal::Abstract::Window> global_window{ nullptr };
 		static_assert(
 			sizeof(Petal::win32lptr) >= sizeof(Petal::ptr<Petal::Abstract::Window>),
-			"[Petal] Size of user data (WIN32 Window) is too small");
+			"[Petal] Size of user data (WIN32 Window) is too small"); // user data for at least a pointer of window object
 	}
 	namespace PetalUnnamed::IWin32
 	{
@@ -37,7 +37,7 @@ namespace Petal
 {
 	win32lres CALLBACK CommonWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
 	{
-		if (auto window_ptr = (IWindow::WindowLongPtr(window_handle, GWLP_USERDATA)))
+		if (auto window_ptr = IWindow::WindowLongPtr(window_handle, GWLP_USERDATA))
 		{
 			return reinterpret_cast<ptr<Abstract::Window>>(window_ptr)->Process(message, w_param, l_param);
 		}
