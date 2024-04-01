@@ -14,12 +14,12 @@ namespace Petal::Debug
 	class VSDebugOutputA : public Abstract::IOutputA, public Abstract::ICOutputA
 	{
 	public:
-		using CharType = typename Abstract::IOutputA::CharType;
-		using TraitsType = typename Abstract::IOutputA::TraitsType;
-		using InnerChar = typename Abstract::IOutputA::InnerChar;
-		using InnerString = typename Abstract::IOutputA::InnerString;
-		using InnerStringView = typename Abstract::IOutputA::InnerStringView;
-		using InnerCStringRef = typename Abstract::IOutputA::InnerCStringRef;
+		using typename Abstract::IOutputA::CharType;
+		using typename Abstract::IOutputA::TraitsType;
+		using typename Abstract::IOutputA::InnerChar;
+		using typename Abstract::IOutputA::InnerString;
+		using typename Abstract::IOutputA::InnerStringView;
+		using typename Abstract::IOutputA::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str) override;
 		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
@@ -34,12 +34,12 @@ namespace Petal::Debug
 	class VSDebugOutputW : public Abstract::IOutputW, public Abstract::ICOutputW
 	{
 	public:
-		using CharType = typename Abstract::IOutputW::CharType;
-		using TraitsType = typename Abstract::IOutputW::TraitsType;
-		using InnerChar = typename Abstract::IOutputW::InnerChar;
-		using InnerString = typename Abstract::IOutputW::InnerString;
-		using InnerStringView = typename Abstract::IOutputW::InnerStringView;
-		using InnerCStringRef = typename Abstract::IOutputW::InnerCStringRef;
+		using typename Abstract::IOutputW::CharType;
+		using typename Abstract::IOutputW::TraitsType;
+		using typename Abstract::IOutputW::InnerChar;
+		using typename Abstract::IOutputW::InnerString;
+		using typename Abstract::IOutputW::InnerStringView;
+		using typename Abstract::IOutputW::InnerCStringRef;
 	public:
 		virtual void Output(InnerStringView str) override;
 		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;

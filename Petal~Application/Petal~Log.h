@@ -16,12 +16,12 @@ namespace Petal
 	class BasicLog : public Abstract::IOutput<CharT, Traits>
 	{
 	public:
-		using CharType = typename Abstract::IOutput<CharT, Traits>::CharType;
-		using TraitsType = typename Abstract::IOutput<CharT, Traits>::TraitsType;
-		using InnerChar = typename Abstract::IOutput<CharT, Traits>::InnerChar;
-		using InnerString = typename Abstract::IOutput<CharT, Traits>::InnerString;
-		using InnerStringView = typename Abstract::IOutput<CharT, Traits>::InnerStringView;
-		using InnerCStringRef = typename Abstract::IOutput<CharT, Traits>::InnerCStringRef;
+		using typename Abstract::IOutput<CharT, Traits>::CharType;
+		using typename Abstract::IOutput<CharT, Traits>::TraitsType;
+		using typename Abstract::IOutput<CharT, Traits>::InnerChar;
+		using typename Abstract::IOutput<CharT, Traits>::InnerString;
+		using typename Abstract::IOutput<CharT, Traits>::InnerStringView;
+		using typename Abstract::IOutput<CharT, Traits>::InnerCStringRef;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());
@@ -44,6 +44,7 @@ namespace Petal
 		BasicLog(const BasicLog&) = delete;
 		BasicLog(BasicLog&&) = delete;
 		BasicLog& operator=(const BasicLog&) = delete;
+		explicit operator bool();
 		virtual ~BasicLog();
 	private:
 		FileStream file{};
@@ -89,6 +90,11 @@ namespace Petal
 	inline BasicLog<CharT, Traits>::~BasicLog()
 	{
 		this->Close();
+	}
+	template <typename CharT, typename Traits>
+	inline BasicLog<CharT, Traits>::operator bool()
+	{
+		return file.operator bool();
 	}
 	template <typename CharT, typename Traits>
 	inline void BasicLog<CharT, Traits>::Open(const ::std::string& file_name, const BOM::Bom& bom)
