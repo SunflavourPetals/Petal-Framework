@@ -23,7 +23,7 @@ namespace Petal
 	class RawInputDataBuffer final
 	{
 	private:
-		void Alloc(tsize size);
+		void Alloc(tsize size); // Alloc when bigger buffer is required
 	public:
 		// Call to get buffer for write only.
 		::std::span<Petal::byte> WriteOnlyBuffer(tsize size);
@@ -47,10 +47,11 @@ namespace Petal
 	public:
 		static constexpr tsize min_size{ sizeof(Win32RawInput) };
 	private:
-		ptr<Petal::byte> buffer_ptr{ nullptr };
-		tsize buffer_size{};
-		ptr<Petal::byte> raw_input_buffer{ nullptr };
-		tsize raw_input_size{};
+		ptr<Petal::byte> buffer_ptr{ nullptr }; // pointer to raw memory
+		tsize buffer_size{}; // size of raw memory
+		ptr<Petal::byte> raw_input_buffer{ nullptr }; // raw input buffer
+		tsize raw_input_size{}; // raw input size
+		::std::allocator<Petal::byte> allocator{};
 	};
 
 	class RawInputMessage : public BasicWindowMessage
@@ -92,7 +93,7 @@ namespace Petal
 	protected:
 		virtual Petal::win32lres Process(Petal::win32msg msg, Petal::win32wprm w, Petal::win32lprm l) noexcept override;
 		virtual void RawInputEvent(RawInputMessage& e) noexcept;
-		virtual void RawINputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
+		virtual void RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
 		virtual void RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
 		virtual void RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
 		virtual void RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;

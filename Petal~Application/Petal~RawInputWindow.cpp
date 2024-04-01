@@ -1,10 +1,12 @@
 #include "Petal~RawInputWindow.h"
 #include "Petal~VSDebugOutput.h"
 
+#include <memory>
+
 namespace Petal
 {
 	RawInputDataBuffer::RawInputDataBuffer() :
-		buffer_ptr{ new Petal::byte[this->min_size] },
+		buffer_ptr{ this->allocator.allocate(this->min_size) /* new Petal::byte[this->min_size] */ },
 		buffer_size{ this->min_size }
 	{
 
@@ -15,7 +17,7 @@ namespace Petal
 		this->raw_input_size = 0;
 		if (this->buffer_ptr != nullptr)
 		{
-			delete[] this->buffer_ptr;
+			this->allocator.deallocate(this->buffer_ptr, this->buffer_size);
 			this->buffer_ptr = nullptr;
 		}
 		this->buffer_size = 0;
@@ -57,9 +59,9 @@ namespace Petal
 		{
 			if (this->buffer_ptr != nullptr)
 			{
-				delete[] this->buffer_ptr;
+				this->allocator.deallocate(this->buffer_ptr, this->buffer_size);
 			}
-			this->buffer_ptr = new Petal::byte[size]{};
+			this->buffer_ptr = this->allocator.allocate(size);
 			this->buffer_size = size;
 			this->raw_input_buffer = nullptr;
 			this->raw_input_size = 0;
@@ -157,7 +159,7 @@ namespace Petal
 	void RawInputWindow::RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
 	void RawInputWindow::RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
 	void RawInputWindow::RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
-	void RawInputWindow::RawINputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept {}
+	void RawInputWindow::RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept {}
 	Petal::win32lres RawInputWindow::Process(Petal::win32msg msg, Petal::win32wprm w, Petal::win32lprm l) noexcept
 	{
 		switch (msg)
@@ -171,7 +173,7 @@ namespace Petal
 		case WM_INPUT_DEVICE_CHANGE:
 		{
 			RawInputDeviceChangeMessage message{ msg, w, l };
-			this->RawINputDeviceChangeEvent(message);
+			this->RawInputDeviceChangeEvent(message);
 		}
 		break;
 		default:
