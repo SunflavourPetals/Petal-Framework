@@ -1,9 +1,10 @@
 #include "Petal~RawInputWindow.h"
 #include "Petal~VSDebugOutput.h"
+#include "Petal~Log.h"
 
 namespace App
 {
-	class AppWindow : public Petal::RawInputWindow
+	class AppWindow : public Petal::RawInputWindow // Test raw input window
 	{
 	public:
 		void RawKeyboardEvent(
@@ -68,6 +69,12 @@ namespace App
 	int main()
 	{
 		AppWindow app{};
+		Petal::LogA log("test.txt");
+		log + "test log" + Petal::ln;
+		// Test operator+ and operator- for Petal::Debug::VSDebugOutputA/W
+		Petal::dout + "test A+ " - Petal::ln - "test A- " + Petal::ln;
+		Petal::dowt + L"test W+" - Petal::ln - L"test W-" + Petal::ln;
+
 		return Petal::MessageLoop();
 	}
 }
