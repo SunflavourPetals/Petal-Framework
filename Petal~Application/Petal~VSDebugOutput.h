@@ -9,46 +9,66 @@
 
 #include <format>
 
-namespace Petal::Debug
+namespace Petal::Abstract
 {
-	class VSDebugOutputA : public Abstract::IOutputA, public Abstract::ICOutputA
+	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
+	class VSDebugOutput : public IBOutput<CharT, Traits>
 	{
+	private:
+		using Base = IBOutput<CharT, Traits>;
 	public:
-		using typename Abstract::IOutputA::CharType;
-		using typename Abstract::IOutputA::TraitsType;
-		using typename Abstract::IOutputA::InnerChar;
-		using typename Abstract::IOutputA::InnerString;
-		using typename Abstract::IOutputA::InnerStringView;
-		using typename Abstract::IOutputA::InnerCStringRef;
+		using typename Base::CharType;
+		using typename Base::TraitsType;
+		using typename Base::StringType;
+		using typename Base::StringViewType;
+		using typename Base::CStringRefType;
+		using typename Base::CStringType;
 	public:
-		virtual void Output(InnerStringView str) override;
-		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
-		virtual LineBreakMode LnMode() noexcept override;
-		virtual LineBreakMode LnModeCStr() noexcept override;
-	public:
-		constexpr VSDebugOutputA() = default;
+		virtual void Output(StringViewType str) = 0;
+		virtual void OutputCStr(CStringType c_str) = 0;
+		virtual LineBreakMode LnMode() noexcept override { return this->line_break_mode; }
+		virtual LineBreakMode LnModeCStr() noexcept override { return this->LnMode(); }
 	public:
 		LineBreakMode line_break_mode{};
 	};
+}
 
-	class VSDebugOutputW : public Abstract::IOutputW, public Abstract::ICOutputW
+namespace Petal::Debug
+{
+	class VSDebugOutputA : public Abstract::VSDebugOutput<Char>
 	{
+	private:
+		using Base = Abstract::VSDebugOutput<Char>;
 	public:
-		using typename Abstract::IOutputW::CharType;
-		using typename Abstract::IOutputW::TraitsType;
-		using typename Abstract::IOutputW::InnerChar;
-		using typename Abstract::IOutputW::InnerString;
-		using typename Abstract::IOutputW::InnerStringView;
-		using typename Abstract::IOutputW::InnerCStringRef;
+		using typename Base::CharType;
+		using typename Base::TraitsType;
+		using typename Base::StringType;
+		using typename Base::StringViewType;
+		using typename Base::CStringRefType;
+		using typename Base::CStringType;
 	public:
-		virtual void Output(InnerStringView str) override;
-		virtual void OutputCStr(ptrc<InnerChar> c_str) noexcept override;
-		virtual LineBreakMode LnMode() noexcept override;
-		virtual LineBreakMode LnModeCStr() noexcept override;
+		virtual void Output(StringViewType str) override;
+		virtual void OutputCStr(CStringType c_str) noexcept override;
+	public:
+		constexpr VSDebugOutputA() = default;
+	};
+
+	class VSDebugOutputW : public Abstract::VSDebugOutput<WChar>
+	{
+	private:
+		using Base = Abstract::VSDebugOutput<WChar>;
+	public:
+		using typename Base::CharType;
+		using typename Base::TraitsType;
+		using typename Base::StringType;
+		using typename Base::StringViewType;
+		using typename Base::CStringRefType;
+		using typename Base::CStringType;
+	public:
+		virtual void Output(StringViewType str) override;
+		virtual void OutputCStr(CStringType c_str) noexcept override;
 	public:
 		constexpr VSDebugOutputW() = default;
-	public:
-		LineBreakMode line_break_mode{};
 	};
 }
 
@@ -78,7 +98,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::InnerChar>(dout.LnMode()));
+		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -106,7 +126,7 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
 	{
-		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::InnerChar>(dowt.LnMode()));
+		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
 	template <typename CharT, tsize char_arr_size, typename... Args>
@@ -132,7 +152,7 @@ namespace Petal::Debug
 	inline void println(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(args...));
-		print("{}{}", str, GetLn<decltype(dout)::InnerChar>(dout.LnMode()));
+		print("{}{}", str, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 	}
 
 	template <typename... Args>
@@ -148,7 +168,7 @@ namespace Petal::Debug
 	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
-		wprint(L"{}{}", str, GetLn<decltype(dowt)::InnerChar>(dowt.LnMode()));
+		wprint(L"{}{}", str, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 	}
 }
 

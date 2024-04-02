@@ -18,14 +18,13 @@ namespace Petal
 	public:
 		using typename Abstract::IOutput<CharT, Traits>::CharType;
 		using typename Abstract::IOutput<CharT, Traits>::TraitsType;
-		using typename Abstract::IOutput<CharT, Traits>::InnerChar;
-		using typename Abstract::IOutput<CharT, Traits>::InnerString;
-		using typename Abstract::IOutput<CharT, Traits>::InnerStringView;
-		using typename Abstract::IOutput<CharT, Traits>::InnerCStringRef;
+		using typename Abstract::IOutput<CharT, Traits>::StringType;
+		using typename Abstract::IOutput<CharT, Traits>::StringViewType;
+		using typename Abstract::IOutput<CharT, Traits>::CStringRefType;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
-		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());
-		void Open(const ::std::wstring& file_name, const BOM::Bom& bom = BOM::RecommendBom<InnerChar>());
+		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<CharType>());
+		void Open(const ::std::wstring& file_name, const BOM::Bom& bom = BOM::RecommendBom<CharType>());
 		void AppendOpen(const ::std::string& file_name);
 		void AppendOpen(const ::std::wstring& file_name);
 		boolean Opened() const noexcept;
@@ -33,7 +32,7 @@ namespace Petal
 		void Close();
 		void ByteWrite(ptrc<byte> data, tsize size);
 		void WriteBom(const BOM::Bom& bom);
-		virtual void Output(InnerStringView str) override;
+		virtual void Output(StringViewType str) override;
 		virtual LineBreakMode LnMode() noexcept override;
 	public:
 		BasicLog() = default;
@@ -64,25 +63,25 @@ namespace Petal
 {
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name, const BOM::Bom& bom) :
-		Abstract::IOutput<InnerChar, Traits>()
+		Abstract::IOutput<CharT, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name, const BOM::Bom& bom) :
-		Abstract::IOutput<InnerChar, Traits>()
+		Abstract::IOutput<CharT, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name) :
-		Abstract::IOutput<InnerChar, Traits>()
+		Abstract::IOutput<CharT, Traits>()
 	{
 		this->AppendOpen(file_name);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name) :
-		Abstract::IOutput<InnerChar, Traits>()
+		Abstract::IOutput<CharT, Traits>()
 	{
 		this->AppendOpen(file_name);
 	}
@@ -147,9 +146,9 @@ namespace Petal
 		this->ByteWrite(bom.Data(), bom.Size());
 	}
 	template <typename CharT, typename Traits>
-	inline void BasicLog<CharT, Traits>::Output(InnerStringView str)
+	inline void BasicLog<CharT, Traits>::Output(StringViewType str)
 	{
-		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename InnerStringView::value_type) * str.size());
+		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename StringViewType::value_type) * str.size());
 	}
 	template <typename CharT, typename Traits>
 	inline LineBreakMode BasicLog<CharT, Traits>::LnMode() noexcept
