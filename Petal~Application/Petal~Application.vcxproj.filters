@@ -143,9 +143,6 @@
     <ClCompile Include="main.cpp">
       <Filter>源文件</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~RawInputKeyboardController.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~RawInputWindow.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>

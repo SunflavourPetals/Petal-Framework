@@ -167,7 +167,6 @@
     <ClCompile Include="Petal~KeyboardEventProcess.cpp" />
     <ClCompile Include="Petal~Main.cpp" />
     <ClCompile Include="Petal~PerformanceCounter.cpp" />
-    <ClCompile Include="Petal~RawInputKeyboardController.cpp" />
     <ClCompile Include="Petal~RawInputWindow.cpp" />
     <ClCompile Include="Petal~UserEntrance.cpp" />
     <ClCompile Include="Petal~VSDebugOutput.cpp" />
