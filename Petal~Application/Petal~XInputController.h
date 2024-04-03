@@ -8,17 +8,21 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 #include "Petal~PointerTraits.h"
+#include "Petal~PerformanceCounter.h"
 
 #include <Xinput.h>
 
 namespace Petal::XInput
 {
+	using Tick = typename PerformanceCounter::Tick;
 	class WrappedGamepad;
 	class Controller;
 	struct ResourceOfController
 	{
-		const i64 delta_count{};
-		const Controller& controller;
+		using ControllerType = Controller;
+		using DeltaCountType = Tick;
+		const DeltaCountType delta_count{};
+		const ControllerType& controller;
 	};
 }
 
@@ -32,8 +36,6 @@ namespace Petal::Abstract
 		virtual boolean Check(const Resource&) = 0;
 	public:
 		XInputEventProcess() = default;
-		XInputEventProcess(const XInputEventProcess&) = default;
-		XInputEventProcess(XInputEventProcess&&) noexcept = default;
 		virtual ~XInputEventProcess() = default;
 	};
 }
@@ -125,7 +127,7 @@ namespace Petal::XInput
 	{
 	public:
 		boolean Connected() const noexcept;
-		boolean CheckConnection() const noexcept; // Check connection, and no calling function QueryState required.
+		boolean CheckConnection() const noexcept; // Check connection, and no calling function QueryState before required.
 		UserIndexValue::Type UserIndex() const noexcept;
 		const State& GetState() const noexcept;
 		const Gamepad& GetGamepad() const noexcept;
@@ -155,11 +157,7 @@ namespace Petal::XInput
 		win32dword GetKeystroke(Keystroke& keystroke) const noexcept;
 	public:
 		WrappedGamepad(UserIndexValue::Type user_index = 0);
-		WrappedGamepad(const WrappedGamepad&) = default;
-		WrappedGamepad(WrappedGamepad&&) noexcept = default;
 		~WrappedGamepad() = default;
-		WrappedGamepad& operator=(const WrappedGamepad&) noexcept = default;
-		WrappedGamepad& operator=(WrappedGamepad&&) noexcept = default;
 	private:
 		State gamepad_state{}; // XINPUT_STATE, updates after QueryState is called
 		UserIndexValue::Type user_index{ 0 }; // User index, 0 to 3
@@ -175,7 +173,7 @@ namespace Petal::XInput
 		void ClearState() noexcept;
 		void ClearLastState() noexcept;
 		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept;
-		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, i64 delta_count = 0);
+		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count = 0);
 		const WrappedGamepad& GetWrappedGamepad() const noexcept;
 		const WrappedGamepad& GetLastWrappedGamepad() const noexcept;
 	private:
@@ -185,16 +183,12 @@ namespace Petal::XInput
 	public:
 		Controller() = default;
 		Controller(UserIndexValue::Type user_index);
-		Controller(const Controller&) = default;
-		Controller(Controller&&) noexcept = default;
 		~Controller() = default;
-		Controller& operator = (const Controller&) noexcept = default;
-		Controller& operator = (Controller&&) noexcept = default;
 	private:
 		WrappedGamepad gamepad;
 		WrappedGamepad last_gamepad;
 	};
-	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, i64 delta_count)
+	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count)
 	{
 		auto result{ this->QueryState() };
 		Resource resource{ delta_count, *this };

@@ -20,25 +20,25 @@ namespace Petal::Keyboard
 	}
 }
 
-namespace Petal::Keyboard
+namespace Petal::Abstract::Keyboard
 {
-	void BasicController::ClearState() noexcept
+	void Controller::ClearState() noexcept
 	{
 		this->state = WrappedState{};
 	}
-	void BasicController::ClearLastState() noexcept
+	void Controller::ClearLastState() noexcept
 	{
 		this->last_state = WrappedState{};
 	}
-	const WrappedState& BasicController::GetState() const noexcept
+	const WrappedState& Controller::GetState() const noexcept
 	{
 		return this->state;
 	}
-	const WrappedState& BasicController::GetLastState() const noexcept
+	const WrappedState& Controller::GetLastState() const noexcept
 	{
 		return this->last_state;
 	}
-	void BasicController::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
+	void Controller::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
 	{
 		if (proc.Check(resource))
 		{
@@ -56,13 +56,5 @@ namespace Petal::Keyboard
 		{
 			this->state.Set(vk_code, (::GetAsyncKeyState(vk_code) & 0x8000) == 0x8000);
 		}
-	}
-	void Controller::Register(VirtualKey::Type key) noexcept
-	{
-		this->registry.insert(key);
-	}
-	tsize Controller::Unregister(VirtualKey::Type key) noexcept
-	{
-		return this->registry.erase(key);
 	}
 }

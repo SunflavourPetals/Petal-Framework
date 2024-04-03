@@ -99,6 +99,9 @@
     <ClInclude Include="Petal~UserEntrance.h">
       <Filter>PetalFramework\User</Filter>
     </ClInclude>
+    <ClInclude Include="Petal~XEventProcessComponents.h">
+      <Filter>PetalFramework\Header</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="Petal~Bom.cpp">

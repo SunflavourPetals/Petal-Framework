@@ -7,7 +7,7 @@
 
 namespace Petal::Keyboard
 {
-	class RawInputController final : public BasicController
+	class RawInputController final : public Abstract::Keyboard::Controller
 	{
 	protected:
 		void QueryState() noexcept override;
@@ -15,11 +15,7 @@ namespace Petal::Keyboard
 		void UpdateKeyState(VirtualKey::Type vk_code, boolean pushed) noexcept;
 	public:
 		RawInputController() = default;
-		RawInputController(const RawInputController&) = default;
-		RawInputController(RawInputController&&) noexcept = default;
 		~RawInputController() = default;
-		RawInputController& operator = (const RawInputController&) = default;
-		RawInputController& operator = (RawInputController&&) noexcept = default;
 	};
 }
 

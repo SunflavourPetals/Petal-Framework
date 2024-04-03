@@ -155,6 +155,7 @@
     <ClInclude Include="Petal~WindowBase.h" />
     <ClInclude Include="Petal~WindowMessage.h" />
     <ClInclude Include="Petal~WinTypes.h" />
+    <ClInclude Include="Petal~XEventProcessComponents.h" />
     <ClInclude Include="Petal~XInputController.h" />
     <ClInclude Include="Petal~XInputEventProcess.h" />
   </ItemGroup>

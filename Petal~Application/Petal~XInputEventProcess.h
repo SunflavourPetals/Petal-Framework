@@ -4,7 +4,7 @@
 #define Petal_Header_XInputEventProcess
 
 #include "Petal~XInputController.h"
-#include "Petal~PerformanceCounter.h"
+#include "Petal~XEventProcessComponents.h"
 
 namespace Petal::XInput
 {
@@ -29,103 +29,70 @@ namespace Petal::XInput
 
 namespace Petal::XInput::MiddleProcess
 {
-	class BasicMiddleProcess : public Abstract::XInputEventProcess
+	class BasicProcess : public Abstract::XInputEventProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const = 0;
 		virtual boolean LastPositive(const Controller& controller) const = 0;
 		virtual boolean ThisPositive(const Controller& controller) const = 0;
 	public:
-		BasicMiddleProcess() = default;
-		BasicMiddleProcess(const BasicMiddleProcess&) = default;
-		BasicMiddleProcess(BasicMiddleProcess&&) noexcept = default;
-		~BasicMiddleProcess() = default;
+		BasicProcess() = default;
+		~BasicProcess() = default;
 	};
 
-	class XHoldProcess : virtual public BasicMiddleProcess
+	class ButtonProcess : public BasicProcess
 	{
-	public:
-		using Tick = typename PerformanceCounter::Tick;
-	public:
-		virtual boolean Check(const Resource&) override;
-	public:
-		virtual void UpdateTargetCount(Tick target_count) noexcept final; // hold target_count to triggering
-		virtual Tick TargetCount() const noexcept final;
-		virtual void UpdateLoopMode(boolean loop_mode) noexcept final; // loop triggering target_count to target_count
-		virtual boolean LoopMode() const noexcept final;
-	public:
-		XHoldProcess(Tick target_count = 1, boolean loop_mode = false);
-		XHoldProcess(const XHoldProcess&) = default;
-		XHoldProcess(XHoldProcess&&) noexcept = default;
-		~XHoldProcess() = default;
+	protected:
+		boolean LastPositive(const Controller& controller) const override;
+		boolean ThisPositive(const Controller& controller) const override;
 	private:
-		Tick target_count{ 1 };
-		Tick total_count{};
-		boolean loop_triggering{ false };
-		boolean in_holding{ false };
-	};
-
-	class ButtonProcess : virtual public BasicMiddleProcess
-	{
-	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
-		virtual boolean LastPositive(const Controller& controller) const override;
-		virtual boolean ThisPositive(const Controller& controller) const override;
+		boolean GamepadPositive(const WrappedGamepad& gamepad) const { return gamepad.Pushed(this->buttons); }
 	public:
-		virtual void UpdateButtons(Button::Type buttons) noexcept final;
-		virtual Button::Type Buttons() const noexcept final;
-		virtual boolean Check(const Resource&) = 0;
-	public:
-		ButtonProcess(Button::Type buttons = Button::A);
-		ButtonProcess(const ButtonProcess&) = default;
-		ButtonProcess(ButtonProcess&&) noexcept = default;
+		ButtonProcess(Button::Type buttons = Button::A) :
+			BasicProcess(),
+			buttons{ buttons } {}
 		~ButtonProcess() = default;
-	protected:
+	public:
 		Button::Type buttons{ Button::A };
 	};
 
-	class TriggerProcess : virtual public BasicMiddleProcess
+	class TriggerProcess : public BasicProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
 		virtual boolean LastPositive(const Controller& controller) const override;
 		virtual boolean ThisPositive(const Controller& controller) const override;
+	private:
+		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
-		virtual void UpdateTargetTriggerValue(TriggerValue::Type target_value) noexcept final;
-		virtual TriggerValue::Type TargetTriggerValue() const noexcept final;
-		virtual void UpdateTriggerDimension(TriggerDimension dimension) noexcept final;
-		virtual TriggerDimension TriggerDimension() const noexcept final;
-		virtual boolean Check(const Resource&) = 0;
-	public:
-		TriggerProcess(XInput::TriggerDimension trigger_dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold);
-		TriggerProcess(const TriggerProcess&) = default;
-		TriggerProcess(TriggerProcess&&) noexcept = default;
+		TriggerProcess(
+			XInput::TriggerDimension trigger_dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold) :
+			BasicProcess(),
+			trigger_dimension{ trigger_dimension },
+			target_trigger_value{ target_value } {}
 		~TriggerProcess() = default;
-	protected:
+	public:
 		XInput::TriggerDimension trigger_dimension{ XInput::TriggerDimension::Left };
 		TriggerValue::Type target_trigger_value{ TriggerValue::threshold };
 	};
 
-	class StickProcess : virtual public BasicMiddleProcess
+	class StickProcess : public BasicProcess
 	{
 	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override;
 		virtual boolean LastPositive(const Controller& controller) const override;
 		virtual boolean ThisPositive(const Controller& controller) const override;
+	private:
+		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
-		virtual void UpdateTargetStickValue(StickValue::Type target_value) noexcept final;
-		virtual StickValue::Type TargetStickValue() const noexcept final;
-		virtual void UpdateStickDimension(XInput::StickDimension dimension) noexcept final;
-		virtual StickDimension StickDimension() const noexcept final;
-		virtual void UpdateDirectionDimension(XInput::DirectionDimension dimension) noexcept final;
-		virtual DirectionDimension DirectionDimension() const noexcept final;
-		virtual boolean Check(const Resource&) = 0;
-	public:
-		StickProcess(XInput::StickDimension stick_dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction_dimension = XInput::DirectionDimension::Left, StickValue::Type target_value = StickValue::threshold);
-		StickProcess(const StickProcess& rhs) = default;
-		StickProcess(StickProcess&& rhs) = default;
+		StickProcess(
+			XInput::StickDimension stick_dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction_dimension = XInput::DirectionDimension::Left,
+			StickValue::Type target_value = StickValue::threshold) :
+			BasicProcess(),
+			stick_dimension{ stick_dimension },
+			direction_dimension{ direction_dimension },
+			target_stick_value{ target_value } {}
 		~StickProcess() = default;
-	protected:
+	public:
 		XInput::StickDimension stick_dimension{ XInput::StickDimension::Left };
 		XInput::DirectionDimension direction_dimension{ XInput::DirectionDimension::Left };
 		StickValue::Type target_stick_value{ StickValue::threshold };
@@ -134,137 +101,189 @@ namespace Petal::XInput::MiddleProcess
 
 namespace Petal::XInput
 {
-	// ButtonProcess Derived
 	class ButtonPushProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		ButtonPushProcess(Button::Type buttons = Button::A);
+		ButtonPushProcess(Button::Type buttons = Button::A) :
+			ButtonProcess(buttons) {}
 	};
-	// ButtonProcess Derived
+
 	class ButtonReleaseProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		ButtonReleaseProcess(Button::Type buttons = Button::A);
+		ButtonReleaseProcess(Button::Type buttons = Button::A) :
+			ButtonProcess(buttons) {}
 	};
-	// ButtonProcess Derived
+
 	class ButtonPositiveProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		ButtonPositiveProcess(Button::Type buttons = Button::A);
+		ButtonPositiveProcess(Button::Type buttons = Button::A) :
+			ButtonProcess(buttons) {}
 	};
-	// ButtonProcess Derived
+
 	class ButtonNegativeProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		ButtonNegativeProcess(Button::Type buttons = Button::A);
+		ButtonNegativeProcess(Button::Type buttons = Button::A) :
+			ButtonProcess(buttons) {}
 	};
-	// ButtonProcess Derived & XHoldProcess Derived
-	class ButtonHoldProcess : public MiddleProcess::ButtonProcess, public MiddleProcess::XHoldProcess
+
+	class ButtonHoldProcess : public MiddleProcess::ButtonProcess
 	{
-	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
-		virtual boolean LastPositive(const Controller& controller) const override final;
-		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		ButtonHoldProcess(Button::Type buttons = Button::A, i64 target_count = 1, boolean loop_mode = false);
+		ButtonHoldProcess(
+			Button::Type buttons = Button::A,
+			XEventProcess::Component::Hold::Tick target_count = 1,
+			boolean loop_mode = false) :
+			ButtonProcess(buttons),
+			hold_config(target_count, loop_mode) {}
+	public:
+		XEventProcess::Component::Hold hold_config{};
+		friend class XEventProcess::Component::Hold;
 	};
-	// TriggerProcess Derived
+}
+
+namespace Petal::XInput
+{
 	class TriggerPushProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		TriggerPushProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold);
+		TriggerPushProcess(
+			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold) :
+			TriggerProcess(dimension, target_value) {}
 	};
-	// TriggerProcess Derived
+
 	class TriggerReleaseProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		TriggerReleaseProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold);
+		TriggerReleaseProcess(
+			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold) :
+			TriggerProcess(dimension, target_value) {}
 	};
-	// TriggerProcess Derived
+
 	class TriggerPositiveProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		TriggerPositiveProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold);
+		TriggerPositiveProcess(
+			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold) :
+			TriggerProcess(dimension, target_value) {}
 	};
-	// TriggerProcess Derived
+
 	class TriggerNegativeProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
-		TriggerNegativeProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold);
+		TriggerNegativeProcess(
+			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold) :
+			TriggerProcess(dimension, target_value) {}
 	};
-	// TriggerProcess Derived & XHoldProcess Derived
-	class TriggerHoldProcess : public MiddleProcess::TriggerProcess, public MiddleProcess::XHoldProcess
+
+	class TriggerHoldProcess : public MiddleProcess::TriggerProcess
 	{
-	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
-		virtual boolean LastPositive(const Controller& controller) const override final;
-		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		TriggerHoldProcess(XInput::TriggerDimension dimension = XInput::TriggerDimension::Left, TriggerValue::Type target_value = TriggerValue::threshold, i64 target_count = 1, boolean loop_mode = false);
+		TriggerHoldProcess(
+			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
+			TriggerValue::Type target_value = TriggerValue::threshold,
+			XEventProcess::Component::Hold::Tick target_count = 1,
+			boolean loop_mode = false) :
+			TriggerProcess(dimension, target_value),
+			hold_config(target_count, loop_mode) {}
+	public:
+		XEventProcess::Component::Hold hold_config{};
+		friend class XEventProcess::Component::Hold;
 	};
-	// StickProcess Derived
+}
+
+namespace Petal::XInput
+{
 	class StickPushProcess : public MiddleProcess::StickProcess
 	{
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		StickPushProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold);
+		StickPushProcess(
+			XInput::StickDimension dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
+			StickValue::Type target_value = StickValue::threshold) :
+			StickProcess(dimension, direction, target_value) {}
 	};
-	// StickProcess Derived
+
 	class StickReleaseProcess : public MiddleProcess::StickProcess
 	{
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		StickReleaseProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold);
+		StickReleaseProcess(
+			XInput::StickDimension dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
+			StickValue::Type target_value = StickValue::threshold) :
+			StickProcess(dimension, direction, target_value) {}
 	};
-	// StickProcess Derived
+
 	class StickPositiveProcess : public MiddleProcess::StickProcess
 	{
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		StickPositiveProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold);
+		StickPositiveProcess(
+			XInput::StickDimension dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
+			StickValue::Type target_value = StickValue::threshold) :
+			StickProcess(dimension, direction, target_value) {}
 	};
-	// StickProcess Derived
+
 	class StickNegativeProcess : public MiddleProcess::StickProcess
 	{
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		StickNegativeProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold);
+		StickNegativeProcess(
+			XInput::StickDimension dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
+			StickValue::Type target_value = StickValue::threshold) :
+			StickProcess(dimension, direction, target_value) {}
 	};
-	// StickProcess Derived & XHoldProcess Derived
-	class StickHoldProcess : public MiddleProcess::StickProcess, public MiddleProcess::XHoldProcess
+
+	class StickHoldProcess : public MiddleProcess::StickProcess
 	{
-	protected:
-		virtual boolean GamepadPositive(const WrappedGamepad& gamepad) const override final;
-		virtual boolean LastPositive(const Controller& controller) const override final;
-		virtual boolean ThisPositive(const Controller& controller) const override final;
 	public:
 		virtual boolean Check(const Resource&) override;
 	public:
-		StickHoldProcess(XInput::StickDimension dimension = XInput::StickDimension::Left, XInput::DirectionDimension direction = XInput::DirectionDimension::Up, StickValue::Type target_value = StickValue::threshold, i64 target_count = 1, boolean loop_mode = false);
+		StickHoldProcess(
+			XInput::StickDimension dimension = XInput::StickDimension::Left,
+			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
+			StickValue::Type target_value = StickValue::threshold,
+			XEventProcess::Component::Hold::Tick target_count = 1,
+			boolean loop_mode = false) :
+			StickProcess(dimension, direction, target_value),
+			hold_config(target_count, loop_mode) {}
+	public:
+		XEventProcess::Component::Hold hold_config{};
+		friend class XEventProcess::Component::Hold;
 	};
 }
 

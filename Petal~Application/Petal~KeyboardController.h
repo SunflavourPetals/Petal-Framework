@@ -9,21 +9,31 @@
 #include "Petal~Process.h"
 #include "Petal~VirtualKey.h"
 #include "Petal~PointerTraits.h"
+#include "Petal~PerformanceCounter.h"
 
 #include <bitset>
-#include <unordered_set>
+#include <set>
+#include <initializer_list>
 
 static_assert(::std::is_same_v<Petal::VirtualKey::Type, Petal::u8>);
+
+namespace Petal::Abstract::Keyboard
+{
+	class Controller;
+}
 
 namespace Petal::Keyboard
 {
 	constexpr tsize vk_table_size{ 256 };
+	using Tick = typename PerformanceCounter::Tick;
 	using State = ::std::bitset<vk_table_size>;
-	class BasicController;
+	class Controller;
 	struct ResourceOfController
 	{
-		const i64 delta_count{};
-		const BasicController& controller;
+		using ControllerType = Abstract::Keyboard::Controller;
+		using DeltaCountType = Tick;
+		const DeltaCountType delta_count{};
+		const ControllerType& controller;
 	};
 }
 
@@ -37,8 +47,6 @@ namespace Petal::Abstract
 		virtual boolean Check(const Resource&) = 0;
 	public:
 		KeyboardEventProcess() = default;
-		KeyboardEventProcess(const KeyboardEventProcess&) = default;
-		KeyboardEventProcess(KeyboardEventProcess&&) noexcept = default;
 		virtual ~KeyboardEventProcess() = default;
 	};
 }
@@ -54,11 +62,7 @@ namespace Petal::Keyboard
 		void Set(VirtualKey::Type vk_code, boolean pushed) noexcept;
 	public:
 		WrappedState() = default;
-		WrappedState(const WrappedState&) = default;
-		WrappedState(WrappedState&&) noexcept = default;
 		~WrappedState() = default;
-		WrappedState& operator=(const WrappedState&) noexcept = default;
-		WrappedState& operator=(WrappedState&&) noexcept = default;
 	private:
 		State state{ 0 };
 	};
@@ -78,9 +82,11 @@ namespace Petal::Concept
 	concept GenericKeyboardEventProcessPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
 }
 
-namespace Petal::Keyboard
+namespace Petal::Abstract::Keyboard
 {
-	class BasicController
+	using namespace Petal::Keyboard;
+
+	class Controller
 	{
 	public:
 		using Resource = ResourceOfController;
@@ -92,7 +98,7 @@ namespace Petal::Keyboard
 		const WrappedState& GetState() const noexcept;
 		const WrappedState& GetLastState() const noexcept;
 	public:
-		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, i64 delta_count = 0);
+		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Tick delta_count = 0);
 	private:
 		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
 		static void ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource);
@@ -104,30 +110,29 @@ namespace Petal::Keyboard
 
 namespace Petal::Keyboard
 {
-	class Controller final : public BasicController
+	class Controller final : public Abstract::Keyboard::Controller
 	{
 	public:
-		using Registry = ::std::unordered_set<typename VirtualKey::Type>;
+		using Registry = ::std::set<typename VirtualKey::Type>;
 	private:
 		void QueryState() noexcept override;
 	public:
-		void Register(VirtualKey::Type key) noexcept;
-		tsize Unregister(VirtualKey::Type key) noexcept;
+		void Register(VirtualKey::Type key) noexcept { this->registry.insert(key); }
+		void Register(::std::initializer_list<VirtualKey::Type> keys) noexcept { this->registry.insert(keys); }
+		template <typename Iterator>
+		void Register(Iterator begin, Iterator end) { this->registry.insert(begin, end); }
+		tsize Unregister(VirtualKey::Type key) noexcept { return this->registry.erase(key); }
 	public:
 		Controller() = default;
-		Controller(const Controller&) = default;
-		Controller(Controller&&) noexcept = default;
 		~Controller() = default;
-		Controller& operator=(const Controller&) = default;
-		Controller& operator=(Controller&&) noexcept = default;
 	private:
 		Registry registry{};
 	};
 }
 
-namespace Petal::Keyboard
+namespace Petal::Abstract::Keyboard
 {
-	inline void BasicController::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, i64 delta_count)
+	inline void Controller::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Keyboard::Tick delta_count)
 	{
 		this->QueryState();
 		Resource resource{ delta_count, *this };
@@ -136,11 +141,11 @@ namespace Petal::Keyboard
 			this->ExecuteEventProcess(*begin, resource);
 		}
 	}
-	inline void BasicController::ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource)
+	inline void Controller::ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource)
 	{
 		if (pointer != nullptr)
 		{
-			BasicController::ExecuteEventProcess(*pointer, resource);
+			Controller::ExecuteEventProcess(*pointer, resource);
 		}
 	}
 }
