@@ -31,7 +31,7 @@ namespace Petal::XInput::MiddleProcess
 {
 	class BasicProcess : public Abstract::XInputEventProcess
 	{
-	protected:
+	public:
 		virtual boolean LastPositive(const Controller& controller) const = 0;
 		virtual boolean ThisPositive(const Controller& controller) const = 0;
 	public:
@@ -41,7 +41,7 @@ namespace Petal::XInput::MiddleProcess
 
 	class ButtonProcess : public BasicProcess
 	{
-	protected:
+	public:
 		boolean LastPositive(const Controller& controller) const override;
 		boolean ThisPositive(const Controller& controller) const override;
 	private:
@@ -57,9 +57,9 @@ namespace Petal::XInput::MiddleProcess
 
 	class TriggerProcess : public BasicProcess
 	{
-	protected:
-		virtual boolean LastPositive(const Controller& controller) const override;
-		virtual boolean ThisPositive(const Controller& controller) const override;
+	public:
+		boolean LastPositive(const Controller& controller) const override;
+		boolean ThisPositive(const Controller& controller) const override;
 	private:
 		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
@@ -77,9 +77,9 @@ namespace Petal::XInput::MiddleProcess
 
 	class StickProcess : public BasicProcess
 	{
-	protected:
-		virtual boolean LastPositive(const Controller& controller) const override;
-		virtual boolean ThisPositive(const Controller& controller) const override;
+	public:
+		boolean LastPositive(const Controller& controller) const override;
+		boolean ThisPositive(const Controller& controller) const override;
 	private:
 		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
@@ -144,13 +144,12 @@ namespace Petal::XInput
 	public:
 		ButtonHoldProcess(
 			Button::Type buttons = Button::A,
-			XEventProcess::Component::Hold::Tick target_count = 1,
+			XEventProcessComponents::Hold::Tick target_count = 1,
 			boolean loop_mode = false) :
 			ButtonProcess(buttons),
 			hold_config(target_count, loop_mode) {}
 	public:
-		XEventProcess::Component::Hold hold_config{};
-		friend class XEventProcess::Component::Hold;
+		XEventProcessComponents::Hold hold_config{};
 	};
 }
 
@@ -203,18 +202,17 @@ namespace Petal::XInput
 	class TriggerHoldProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		TriggerHoldProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
 			TriggerValue::Type target_value = TriggerValue::threshold,
-			XEventProcess::Component::Hold::Tick target_count = 1,
+			XEventProcessComponents::Hold::Tick target_count = 1,
 			boolean loop_mode = false) :
 			TriggerProcess(dimension, target_value),
 			hold_config(target_count, loop_mode) {}
 	public:
-		XEventProcess::Component::Hold hold_config{};
-		friend class XEventProcess::Component::Hold;
+		XEventProcessComponents::Hold hold_config{};
 	};
 }
 
@@ -223,7 +221,7 @@ namespace Petal::XInput
 	class StickPushProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		StickPushProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -235,7 +233,7 @@ namespace Petal::XInput
 	class StickReleaseProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		StickReleaseProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -247,7 +245,7 @@ namespace Petal::XInput
 	class StickPositiveProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		StickPositiveProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -259,7 +257,7 @@ namespace Petal::XInput
 	class StickNegativeProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		StickNegativeProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -271,19 +269,18 @@ namespace Petal::XInput
 	class StickHoldProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		virtual boolean Check(const Resource&) override;
+		boolean Check(const Resource&) override;
 	public:
 		StickHoldProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
 			XInput::DirectionDimension direction = XInput::DirectionDimension::Up,
 			StickValue::Type target_value = StickValue::threshold,
-			XEventProcess::Component::Hold::Tick target_count = 1,
+			XEventProcessComponents::Hold::Tick target_count = 1,
 			boolean loop_mode = false) :
 			StickProcess(dimension, direction, target_value),
 			hold_config(target_count, loop_mode) {}
 	public:
-		XEventProcess::Component::Hold hold_config{};
-		friend class XEventProcess::Component::Hold;
+		XEventProcessComponents::Hold hold_config{};
 	};
 }
 

@@ -50,6 +50,7 @@ namespace Petal::Concept
 		requires ::std::is_volatile_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
 		requires ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type>;
 	};
+
 	template <typename Ty>
 	concept GenericXInputEventProcessPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::XInputEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
 }

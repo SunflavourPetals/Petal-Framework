@@ -5,14 +5,33 @@
 
 #include "Petal~PerformanceCounter.h"
 
-namespace Petal::XEventProcess::Component
+#include <type_traits>
+
+namespace Petal::Concepts
+{
+	template <typename Resource>
+	concept XEventResource = requires(Resource resource) // as (XInput|Keyboard)::ResourceOfController
+	{
+		typename Resource::ControllerType;
+		{ resource.controller } -> ::std::convertible_to<::std::add_lvalue_reference_t<::std::add_const_t<typename Resource::ControllerType>>>;
+	};
+
+	template <typename Process, typename Controller>
+	concept XEventProcess = requires(Process process, Controller controller) // as (XInput|Keyboard)::MiddleProcess::BasicProcess
+	{
+		{ process.ThisPositive(controller) } -> ::std::convertible_to<bool>;
+		{ process.LastPositive(controller) } -> ::std::convertible_to<bool>;
+	};
+}
+
+namespace Petal::XEventProcessComponents
 {
 	class Hold final
 	{
 	public:
 		using Tick = typename PerformanceCounter::Tick;
 	public:
-		template <typename Resource, typename  Process>
+		template <Concepts::XEventResource Resource, Concepts::XEventProcess<typename Resource::ControllerType> Process>
 		boolean Check(const Resource& resource, const Process& process);
 	public:
 		Hold(Tick target_count = 1, boolean loop_mode = false) :
@@ -29,7 +48,7 @@ namespace Petal::XEventProcess::Component
 		boolean in_holding{ false };
 	};
 
-	template <typename Resource, typename  Process>
+	template <Concepts::XEventResource Resource, Concepts::XEventProcess<typename Resource::ControllerType> Process>
 	inline boolean Hold::Check(const Resource& resource, const Process& process)
 	{
 		if (this->in_holding)
