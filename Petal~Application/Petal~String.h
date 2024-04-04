@@ -9,6 +9,7 @@
 #include <format>
 #include <string>
 #include <compare>
+#include <stdexcept>
 #include <type_traits>
 
 namespace Petal::EnumChar
@@ -429,7 +430,7 @@ namespace Petal
 		{
 			if (str[length] != 0)
 			{
-				throw ::std::exception{ "[Petal] exception: str is not c style string in Petal::BasicCStringRef<CharT>(const_pointer, size_type)" };
+				throw ::std::invalid_argument{ "[Petal] invalid_argument exception: str is not c style string in Petal::BasicCStringRef<CharT>(const_pointer, size_type)" };
 			}
 			this->str_ptr = str;
 			this->str_length = length;
