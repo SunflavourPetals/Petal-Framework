@@ -43,6 +43,8 @@ TString 将被定义为 `defined(Petal_Enable_Unicode) ? WString : String`(伪�
 TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则统一使用A版本(尽可能)。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
 使用宏`Petal_TStr(quote)`将字符串字面量在预处理阶段制作成 `TChar[N]` 类型的字符串字面量。  
 
+有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
+
 ### Dbg系列字符(串)类型
 
 根据宏`Petal_Enable_ForceDbgANSI`和宏`Petal_Enable_Unicode`  
@@ -59,7 +61,16 @@ C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数�
 
 ## 参考
 
-### 全局命名空间
+### 宏
+
+#### 宏 Petal_DbgStr
+
+`Petal_DbgStr("quote")` 将被制作为 `const DbgChar[N]` 类型的字符串字面量。  
+
+#### 宏 Petal_Debug_CStringRefIterator
+
+用于标志是否启用 debug 版本的 `CStringRefIterator`。  
+参见 [CStringRefIterator](#类模板-cstringrefiterator)。  
 
 #### 宏 Petal_Header_String
 
@@ -69,15 +80,11 @@ C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数�
 
 `Petal_TStr("quote")` 将被制作为 `const TChar[N]` 类型的字符串字面量。  
 
-#### 宏 Petal_DbgStr
-
-`Petal_DbgStr("quote")` 将被制作为 `const DbgChar[N]` 类型的字符串字面量。  
-
 ### 命名空间 Petal
 
 #### 类模板 BasicCStringRef
 
-`CStringRef` 比 `string_view` 具有更强约束的“字符串引用”，它必须保证 null-terminated，如果使用起始位置加长度的构造方式，当 `ptr[length]` 不为 NUL 时将抛出异常，不推荐使用这种方式构造它的实例，推荐方式如下：  
+`CStringRef` 是比 `string_view` 具有更强约束的“字符串引用”，它必须保证 null-terminated，如果使用起始位置加长度的构造方式，当 `ptr[length]` 不为 NUL 时将抛出异常，不推荐使用这种方式构造它的实例，推荐方式如下：  
 
 * 可以从使用相同类型字符的 `std::basic_string<CharT, ...>` 对象构造 `Petal::BasicCStringRef<CharT>` 对象，不抛出异常；  
 * 使用用户自定义字面量构造 `Petal::BasicCStringRef<CharT>` 对象，不抛出异常。  
@@ -86,7 +93,7 @@ C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数�
 
 提供常用操作如 `size`，`length`，`data`，`c_str`，`at`，`operato[]` 和获取迭代器等操作；  
 提供转换为标准库字符串和字符串视图的成员函数模板；  
-如果想要使用某些字符串视图的功能，推荐使用 `.view<...>()` 模板得到字符串视图再做操作(提供默认参数)；  
+如果想要使用某些字符串视图的功能，推荐使用 `.view<...>()` 函数得到字符串视图再做操作(提供默认参数)；  
 提供比较操作。  
 特化 `std::formatter` 和重载输出运算符以支持输出操作。  
 提供 `hasher`，但没有特化 `std::hash`，需要使用 `hasher` 时手动填入它，  
@@ -268,6 +275,9 @@ auto hash_val = hasher(csr);
 #### 类模板 CStringRefIterator
 
 为 `CStringRef` 系列类型提供的迭代器类型的模板，具有和标准库字符串视图相似的属性。  
+本框架使用 msvc，因此此处提供适用 msvc 的 Debug 版本并模仿其行为。  
+
+可以通过预处理器宏定义控制是否启用 debug 版本的行为，否则根据 `_ITERATOR_DEBUG_LEVEL` 自动选择，参考[预处理器文档的内容`Petal_Enable_DebugCStringRefIterator`](Preprocessor.md#Petal_Enable_DebugCStringRefIterator "预处理器文档的相应章节")。  
 
 ```C++
 template <class CharT>
@@ -426,6 +436,8 @@ Petal::dout.OutputCStr(str.c_str());
 #endif
 ```
 
+有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
+
 #### 类型别名 TCStringRef
 
 ```C++
@@ -435,6 +447,8 @@ Petal::dout.OutputCStr(str.c_str());
     using TCStringRef = CStringRef;
 #endif
 ```
+
+有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
 
 #### 类型别名 TString
 
@@ -446,6 +460,8 @@ Petal::dout.OutputCStr(str.c_str());
 #endif
 ```
 
+有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
+
 #### 类型别名 TStringView
 
 ```C++
@@ -455,6 +471,8 @@ Petal::dout.OutputCStr(str.c_str());
     using TStringView = StringView;
 #endif
 ```
+
+有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
 
 #### 类型别名 U16Char
 
@@ -555,11 +573,29 @@ auto str = L"wide char string"_csr;
 
 从字符串字面量制作相应类型的 `String` 对象。  
 
+```C++
+using namespace Petal;
+auto str = "string"_s;
+auto str = u8"u8string"_s;
+auto str = u"u16string"_s;
+auto str = U"u32string"_s;
+auto str = L"wide char string"_s;
+```
+
 ### 内联命名空间 Petal::Literals(inline)::StringViewLiterals(inline)
 
 #### 用户自定义字面量 operator""_sv
 
 从字符串字面量制作相应类型的 `StringView` 对象。  
+
+```C++
+using namespace Petal;
+auto str = "string"_sv;
+auto str = u8"u8string"_sv;
+auto str = u"u16string"_sv;
+auto str = U"u32string"_sv;
+auto str = L"wide char string"_sv;
+```
 
 ### 命名空间 Petal::TypeTraits
 
