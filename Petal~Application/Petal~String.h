@@ -83,7 +83,7 @@ namespace Petal
 		return StringToCStyleString<CharT, Traits, Alloc>(BasicStringView<CharT, Traits>{ &in_str[0], char_arr_size });
 	}
 
-#if _ITERATOR_DEBUG_LEVEL >= 1
+#if defined(Petal_Enable_DebugCStringRefIterator) && defined(_ITERATOR_DEBUG_LEVEL) && (_ITERATOR_DEBUG_LEVEL >= 1)
 #ifndef Petal_Debug_CStringRefIterator
 #define Petal_Debug_CStringRefIterator
 #endif

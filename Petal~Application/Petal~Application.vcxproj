@@ -74,7 +74,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -89,7 +89,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
     </ClCompile>
@@ -104,7 +104,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
@@ -120,7 +120,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>MaxSpeed</Optimization>
