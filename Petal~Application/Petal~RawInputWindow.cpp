@@ -8,7 +8,7 @@ namespace Petal
 	RawInputDataBuffer::RawInputDataBuffer() :
 		buffer_ptr{ static_cast<ptr<byte>>(operator new[](this->min_size * sizeof(byte))) },
 		buffer_size{ this->min_size },
-		raw_input_size{ this->min_size }
+		raw_input_size{}
 	{
 
 	}
