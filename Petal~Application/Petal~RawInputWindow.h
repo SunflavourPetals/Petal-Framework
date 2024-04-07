@@ -14,6 +14,9 @@ namespace Petal
 	using Win32RawInput = ::RAWINPUT;
 	using Win32HRawInput = ::HRAWINPUT;
 	using Win32RawInputHeader = ::RAWINPUTHEADER;
+
+	class RawInputWindow;
+
 	struct RawInputRef final
 	{
 		ptr<Win32RawInput> raw_input{ nullptr };
@@ -22,36 +25,29 @@ namespace Petal
 
 	class RawInputDataBuffer final
 	{
-	private:
-		void Alloc(tsize size); // Alloc when bigger buffer is required
 	public:
-		// Call to get buffer for write only.
-		::std::span<Petal::byte> WriteOnlyBuffer(tsize size);
-		// Invocable only after function WriteOnlyBuffer called!
-		::std::span<const Petal::byte> ReadOnlyBuffer() const noexcept;
+		// Call to get buffer for write only, and the buffer is uninitialized when size > buffer_size, invoke for ::GetRawInputData.
+		::std::span<byte> WriteOnlyBuffer(tsize size);
+		// meaningful only after ::GetRawInputData writes data to buffer, and before next calling WriteOnlyBuffer!
+		::std::span<const byte> ReadOnlyBuffer() const noexcept;
 		tsize BufferSize() const noexcept;
-		// Invocable only after function WriteOnlyBuffer called!
 		RawInputRef AsRawInput() const noexcept;
-		// Invocable only after function WriteOnlyBuffer called!
 		Win32RawInput& AsWin32RawInput() noexcept;
-		// Invocable only after function WriteOnlyBuffer called!
 		const Win32RawInput& AsWin32RawInput() const noexcept;
-		// Invocable only after function WriteOnlyBuffer called!
 		tsize RawInputSize() const noexcept;
-	public:
+	private:
 		RawInputDataBuffer();
+	public:
 		RawInputDataBuffer(const RawInputDataBuffer&) = delete;
-		RawInputDataBuffer(RawInputDataBuffer&&) noexcept = delete;
 		RawInputDataBuffer& operator=(const RawInputDataBuffer&) = delete;
 		~RawInputDataBuffer();
 	public:
 		static constexpr tsize min_size{ sizeof(Win32RawInput) };
 	private:
-		ptr<Petal::byte> buffer_ptr{ nullptr }; // pointer to raw memory
+		ptr<byte> buffer_ptr{ nullptr }; // pointer to raw memory
 		tsize buffer_size{}; // size of raw memory
-		ptr<Petal::byte> raw_input_buffer{ nullptr }; // raw input buffer
 		tsize raw_input_size{}; // raw input size
-		::std::allocator<Petal::byte> allocator{};
+		friend class RawInputWindow;
 	};
 
 	class RawInputMessage : public BasicWindowMessage
@@ -91,7 +87,7 @@ namespace Petal
 	class RawInputWindow : public Window
 	{
 	protected:
-		virtual Petal::win32lres Process(Petal::win32msg msg, Petal::win32wprm w, Petal::win32lprm l) noexcept override;
+		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
 		virtual void RawInputEvent(RawInputMessage& e) noexcept;
 		virtual void RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
 		virtual void RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;

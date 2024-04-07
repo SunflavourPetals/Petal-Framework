@@ -6,32 +6,36 @@
 namespace Petal
 {
 	RawInputDataBuffer::RawInputDataBuffer() :
-		buffer_ptr{ this->allocator.allocate(this->min_size) /* new Petal::byte[this->min_size] */ },
-		buffer_size{ this->min_size }
+		buffer_ptr{ static_cast<ptr<byte>>(operator new[](this->min_size * sizeof(byte))) },
+		buffer_size{ this->min_size },
+		raw_input_size{ this->min_size }
 	{
 
 	}
 	RawInputDataBuffer::~RawInputDataBuffer()
 	{
-		this->raw_input_buffer = nullptr;
 		this->raw_input_size = 0;
 		if (this->buffer_ptr != nullptr)
 		{
-			this->allocator.deallocate(this->buffer_ptr, this->buffer_size);
+			operator delete[](this->buffer_ptr);
 			this->buffer_ptr = nullptr;
 		}
 		this->buffer_size = 0;
 	}
-	::std::span<Petal::byte> RawInputDataBuffer::WriteOnlyBuffer(tsize size)
+	::std::span<byte> RawInputDataBuffer::WriteOnlyBuffer(tsize size)
 	{
-		this->Alloc(size);
-		this->raw_input_buffer = new(this->buffer_ptr) Petal::byte[size]{};
+		if (size > this->buffer_size) // calling WriteOnlyBuffer may change the buffer(for performance, we do not copy content to new buffer)
+		{
+			operator delete[](this->buffer_ptr); // delete decltype(buffer_ptr)(nullptr) is safe
+			this->buffer_ptr = static_cast<ptr<byte>>(operator new[](size * sizeof(byte)));
+			this->buffer_size = size;
+		}
 		this->raw_input_size = size;
-		return { this->raw_input_buffer, this->raw_input_size };
+		return { this->buffer_ptr, this->raw_input_size };
 	}
-	::std::span<const Petal::byte> RawInputDataBuffer::ReadOnlyBuffer() const noexcept
+	::std::span<const byte> RawInputDataBuffer::ReadOnlyBuffer() const noexcept
 	{
-		return ::std::span<const Petal::byte>{ this->raw_input_buffer, this->raw_input_size };
+		return ::std::span<const byte>{ this->buffer_ptr, this->raw_input_size };
 	}
 	tsize RawInputDataBuffer::BufferSize() const noexcept
 	{
@@ -43,29 +47,15 @@ namespace Petal
 	}
 	RawInputRef RawInputDataBuffer::AsRawInput() const noexcept
 	{
-		return { (reinterpret_cast<ptr<Win32RawInput>>(this->raw_input_buffer)), this->raw_input_size };
+		return { (reinterpret_cast<ptr<Win32RawInput>>(this->buffer_ptr)), this->raw_input_size };
 	}
 	Win32RawInput& RawInputDataBuffer::AsWin32RawInput() noexcept
 	{
-		return *(reinterpret_cast<ptr<Win32RawInput>>(this->raw_input_buffer));
+		return *(reinterpret_cast<ptr<Win32RawInput>>(this->buffer_ptr));
 	}
 	const Win32RawInput& RawInputDataBuffer::AsWin32RawInput() const noexcept
 	{
-		return *(reinterpret_cast<ptr<Win32RawInput>>(this->raw_input_buffer));
-	}
-	void RawInputDataBuffer::Alloc(tsize size)
-	{
-		if (size > this->buffer_size)
-		{
-			if (this->buffer_ptr != nullptr)
-			{
-				this->allocator.deallocate(this->buffer_ptr, this->buffer_size);
-			}
-			this->buffer_ptr = this->allocator.allocate(size);
-			this->buffer_size = size;
-			this->raw_input_buffer = nullptr;
-			this->raw_input_size = 0;
-		}
+		return *(reinterpret_cast<ptr<Win32RawInput>>(this->buffer_ptr));
 	}
 }
 
@@ -160,7 +150,7 @@ namespace Petal
 	void RawInputWindow::RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
 	void RawInputWindow::RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
 	void RawInputWindow::RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept {}
-	Petal::win32lres RawInputWindow::Process(Petal::win32msg msg, Petal::win32wprm w, Petal::win32lprm l) noexcept
+	win32lres RawInputWindow::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
 	{
 		switch (msg)
 		{

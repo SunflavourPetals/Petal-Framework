@@ -59,7 +59,7 @@ namespace App
 					.hwndTarget = nullptr,
 				}
 			};
-		//	RegisterRawInputDevices(rid);
+			RegisterRawInputDevices(rid);
 			Petal::Debug::println("Hello Visual Studio 2022 Community Preview");
 		}
 		~AppWindow()
@@ -78,6 +78,19 @@ namespace App
 	{
 		AppWindow app{};
 		
+		{
+			auto bp = static_cast<Petal::byte*>(operator new[](sizeof(Petal::byte) * 128));
+			for (int i = 0; i < 8; ++i)
+			{
+				for (int j = 0; j < 16; ++j)
+				{
+					Petal::Debug::print("{:3x}", bp[i * 8 + j]);
+				}
+				Petal::Debug::println();
+			}
+			operator delete[](bp);
+		}
+
 		// Petal::LogA log("test.txt");
 		// log + "test log" + Petal::ln;
 		// Test operator+ and operator- for Petal::Debug::VSDebugOutputA/W
