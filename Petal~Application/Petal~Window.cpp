@@ -140,48 +140,48 @@ namespace Petal
 	{
 		return this->MoveTo(new_pos.x, new_pos.y);
 	}
-	void Window::CreateEvent(CreateMessage& e) noexcept {}
-	void Window::ActiveEvent(ActiveMessage& e) noexcept {}
-	void Window::InactiveEvent(InactiveMessage& e) noexcept {}
-	void Window::EnterSizeEvent(EnterSizeMessage& e) noexcept {}
-	void Window::EnterMoveEvent(EnterMoveMessage& e) noexcept {}
-	void Window::SizingEvent(SizingMessage& e) noexcept {}
-	void Window::MovingEvent(MovingMessage& e) noexcept {}
-	void Window::ExitSizeEvent(ExitSizeMessage& e) noexcept {}
-	void Window::ExitMoveEvent(ExitMoveMessage& e) noexcept {}
-	void Window::ResizeEvent(ResizeMessage& e) noexcept {}
-	void Window::MaximizedEvent(MaximizedMessage& e) noexcept {}
-	void Window::MinimizedEvent(MinimizedMessage& e) noexcept {}
-	void Window::MovedEvent(MovedMessage& e) noexcept {}
-	void Window::CloseEvent(CloseMessage& e) noexcept { this->Destroy(); ExitMessageLoop(); }
-	void Window::PaintEvent(PaintMessage& e) noexcept { this->DefaultDraw(e); }
-	void Window::DestroyEvent(DestroyMessage& e) noexcept {}
-	void Window::MouseMoveEvent(MouseMoveMessage& e) noexcept {}
-	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) noexcept {}
-	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) noexcept {}
-	void Window::MouseLButtonDoubleClickEvent(MouseLButtonDoubleClickMessage& e) noexcept {}
-	void Window::MouseRButtonDownEvent(MouseRButtonDownMessage& e) noexcept {}
-	void Window::MouseRButtonUpEvent(MouseRButtonUpMessage& e) noexcept {}
-	void Window::MouseRButtonDoubleClickEvent(MouseRButtonDoubleClickMessage& e) noexcept {}
-	void Window::MouseMButtonDownEvent(MouseMButtonDownMessage& e) noexcept {}
-	void Window::MouseMButtonUpEvent(MouseMButtonUpMessage& e) noexcept {}
-	void Window::MouseMButtonDoubleClickEvent(MouseMButtonDoubleClickMessage& e) noexcept {}
-	void Window::MouseXButton1DownEvent(MouseXButton1DownMessage& e) noexcept {}
-	void Window::MouseXButton1UpEvent(MouseXButton1UpMessage& e) noexcept {}
-	void Window::MouseXButton1DoubleClickEvent(MouseXButton1DoubleClickMessage& e) noexcept {}
-	void Window::MouseXButton2DownEvent(MouseXButton2DownMessage& e) noexcept {}
-	void Window::MouseXButton2UpEvent(MouseXButton2UpMessage& e) noexcept {}
-	void Window::MouseXButton2DoubleClickEvent(MouseXButton2DoubleClickMessage& e) noexcept {}
-	void Window::MouseWheelEvent(MouseWheelMessage& e) noexcept {}
-	void Window::MouseHWheelEvent(MouseHWheelMessage& e) noexcept {}
-	void Window::KeyDownEvent(KeyDownMessage& e) noexcept {}
-	void Window::KeyUpEvent(KeyUpMessage& e) noexcept {}
-	void Window::SysKeyDownEvent(SysKeyDownMessage& e) noexcept {}
-	void Window::SysKeyUpEvent(SysKeyUpMessage& e) noexcept {}
-	void Window::CharEvent(CharMessage& e) noexcept {}
-	void Window::DeadCharEvent(DeadCharMessage& e) noexcept {}
-	void Window::SysDeadCharEvent(SysDeadCharMessage& e) noexcept {}
-	win32lres Window::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
+	void Window::CreateEvent(CreateMessage& e) {}
+	void Window::ActiveEvent(ActiveMessage& e) {}
+	void Window::InactiveEvent(InactiveMessage& e) {}
+	void Window::EnterSizeEvent(EnterSizeMessage& e) {}
+	void Window::EnterMoveEvent(EnterMoveMessage& e) {}
+	void Window::SizingEvent(SizingMessage& e) {}
+	void Window::MovingEvent(MovingMessage& e) {}
+	void Window::ExitSizeEvent(ExitSizeMessage& e) {}
+	void Window::ExitMoveEvent(ExitMoveMessage& e) {}
+	void Window::ResizeEvent(ResizeMessage& e) {}
+	void Window::MaximizedEvent(MaximizedMessage& e) {}
+	void Window::MinimizedEvent(MinimizedMessage& e) {}
+	void Window::MovedEvent(MovedMessage& e) {}
+	void Window::CloseEvent(CloseMessage& e) { this->Destroy(); ExitMessageLoop(); }
+	void Window::PaintEvent(PaintMessage& e) { this->DefaultDraw(e); }
+	void Window::DestroyEvent(DestroyMessage& e) {}
+	void Window::MouseMoveEvent(MouseMoveMessage& e) {}
+	void Window::MouseLButtonDownEvent(MouseLButtonDownMessage& e) {}
+	void Window::MouseLButtonUpEvent(MouseLButtonUpMessage& e) {}
+	void Window::MouseLButtonDoubleClickEvent(MouseLButtonDoubleClickMessage& e) {}
+	void Window::MouseRButtonDownEvent(MouseRButtonDownMessage& e) {}
+	void Window::MouseRButtonUpEvent(MouseRButtonUpMessage& e) {}
+	void Window::MouseRButtonDoubleClickEvent(MouseRButtonDoubleClickMessage& e) {}
+	void Window::MouseMButtonDownEvent(MouseMButtonDownMessage& e) {}
+	void Window::MouseMButtonUpEvent(MouseMButtonUpMessage& e) {}
+	void Window::MouseMButtonDoubleClickEvent(MouseMButtonDoubleClickMessage& e) {}
+	void Window::MouseXButton1DownEvent(MouseXButton1DownMessage& e) {}
+	void Window::MouseXButton1UpEvent(MouseXButton1UpMessage& e) {}
+	void Window::MouseXButton1DoubleClickEvent(MouseXButton1DoubleClickMessage& e) {}
+	void Window::MouseXButton2DownEvent(MouseXButton2DownMessage& e) {}
+	void Window::MouseXButton2UpEvent(MouseXButton2UpMessage& e) {}
+	void Window::MouseXButton2DoubleClickEvent(MouseXButton2DoubleClickMessage& e) {}
+	void Window::MouseWheelEvent(MouseWheelMessage& e) {}
+	void Window::MouseHWheelEvent(MouseHWheelMessage& e) {}
+	void Window::KeyDownEvent(KeyDownMessage& e) {}
+	void Window::KeyUpEvent(KeyUpMessage& e) {}
+	void Window::SysKeyDownEvent(SysKeyDownMessage& e) {}
+	void Window::SysKeyUpEvent(SysKeyUpMessage& e) {}
+	void Window::CharEvent(CharMessage& e) {}
+	void Window::DeadCharEvent(DeadCharMessage& e) {}
+	void Window::SysDeadCharEvent(SysDeadCharMessage& e) {}
+	win32lres Window::Process(win32msg msg, win32wprm w, win32lprm l)
 	{
 		switch (msg)
 		{

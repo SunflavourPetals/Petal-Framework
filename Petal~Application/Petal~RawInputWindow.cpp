@@ -112,7 +112,7 @@ namespace Petal
 
 namespace Petal
 {
-	void RawInputWindow::RawInputEvent(RawInputMessage& e) noexcept
+	void RawInputWindow::RawInputEvent(RawInputMessage& e)
 	{
 		win32uint size{};
 		::GetRawInputData(e.HRawInput(), RID_INPUT, nullptr, &size, sizeof(Win32RawInputHeader));
