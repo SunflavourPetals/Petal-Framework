@@ -24,7 +24,7 @@ namespace
 	{
 		using namespace Petal;
 		[[nodiscard]] win32atom RegisterPetalWindowClass(const Win32WindowClass& window_class) noexcept;
-		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept;
+		[[nodiscard]] win32bool UnregisterPetalWindowClass(win32word class_atom) noexcept;
 		[[nodiscard]] win32hwnd PetalCreateWindow(win32atom class_atom, Abstract::Window& window, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) noexcept;
 		[[nodiscard]] win32bool GetWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max) noexcept;
 		[[nodiscard]] win32bool PeekWinMessage(Win32Message& message, win32hwnd hwnd, win32msg filter_min, win32msg filter_max, win32msg remove) noexcept;
@@ -481,7 +481,7 @@ namespace Petal
 
 namespace Petal::IWindow
 {
-	[[nodiscard]] win32ctstr ToWinResource(word integer) noexcept
+	[[nodiscard]] win32ctstr ToWinResource(win32word integer) noexcept
 	{
 		return reinterpret_cast<win32ctstr>(static_cast<win32ulptr>(integer));
 	}
@@ -543,7 +543,7 @@ namespace
 		{
 			return ::RegisterClassExW(&window_class);
 		}
-		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept
+		[[nodiscard]] win32bool UnregisterPetalWindowClass(win32word class_atom) noexcept
 		{
 			return ::UnregisterClassW(Petal::IWindow::ToWinResource(class_atom), WinMain::HIns());
 		}
@@ -585,7 +585,7 @@ namespace
 		{
 			return ::RegisterClassExA(&window_class);
 		}
-		[[nodiscard]] win32bool UnregisterPetalWindowClass(word class_atom) noexcept
+		[[nodiscard]] win32bool UnregisterPetalWindowClass(win32word class_atom) noexcept
 		{
 			return ::UnregisterClassA(Petal::IWindow::ToWinResource(class_atom), WinMain::HIns());
 		}

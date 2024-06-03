@@ -130,12 +130,12 @@ namespace Petal
 	template <typename CharT, typename Traits>
 	inline void BasicLog<CharT, Traits>::Close()
 	{
-		if (this->file.is_open() == true) this->file.close();
+		if (this->file.is_open()) this->file.close();
 	}
 	template <typename CharT, typename Traits>
 	inline void BasicLog<CharT, Traits>::ByteWrite(ptrc<byte> data, tsize size)
 	{
-		if (this->Valid() == true && data != nullptr && size > 0)
+		if (this->Valid() && data != nullptr && size > 0)
 		{
 			this->file.write(data, size);
 		}

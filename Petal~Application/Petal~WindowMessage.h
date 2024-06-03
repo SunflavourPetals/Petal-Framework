@@ -31,10 +31,10 @@ namespace Petal
 	protected:
 		win32wprm Word() const noexcept;
 		win32lprm Long() const noexcept;
-		word HWLong() const noexcept;
-		word LWLong() const noexcept;
-		word HWWord() const noexcept;
-		word LWWord() const noexcept;
+		win32word HWLong() const noexcept;
+		win32word LWLong() const noexcept;
+		win32word HWWord() const noexcept;
+		win32word LWWord() const noexcept;
 	public:
 		BasicWindowMessage(win32msg msg, win32wprm w, win32lprm l);
 		BasicWindowMessage(const BasicWindowMessage&) = default;
@@ -85,7 +85,7 @@ namespace Petal
 			XButton2 = MK_XBUTTON2,
 		};
 	public:
-		word VirtualKeys() const noexcept;
+		win32word VirtualKeys() const noexcept;
 		boolean LButtonDown() const noexcept;
 		boolean RButtonDown() const noexcept;
 		boolean ShiftDown() const noexcept;
@@ -101,7 +101,7 @@ namespace Petal
 		virtual ~BasicMouseMessage() = default;
 	private:
 		Position2DI32 cursor_pos{};
-		word key_state{};
+		win32word key_state{};
 	};
 
 	class BasicMouseWheelMessage : public BasicMouseMessage

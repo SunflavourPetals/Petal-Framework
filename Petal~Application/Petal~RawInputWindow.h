@@ -87,12 +87,12 @@ namespace Petal
 	class RawInputWindow : public Window
 	{
 	protected:
-		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) noexcept override;
-		virtual void RawInputEvent(RawInputMessage& e) noexcept;
-		virtual void RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept;
-		virtual void RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
-		virtual void RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
-		virtual void RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept;
+		virtual win32lres Process(win32msg msg, win32wprm w, win32lprm l) override;
+		virtual void RawInputEvent(RawInputMessage& e);
+		virtual void RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e);
+		virtual void RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size);
+		virtual void RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size);
+		virtual void RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size);
 	public:
 		static win32bool RegisterRawInputDevices(::std::span<const Win32RawInputDevice> devices);
 	public:

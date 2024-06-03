@@ -90,7 +90,7 @@ namespace Petal::IWindow
 {
 	auto CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept -> win32lres;
 	auto UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept -> win32lptr;
-	[[nodiscard]] auto ToWinResource(word integer) noexcept -> win32ctstr;
+	[[nodiscard]] auto ToWinResource(win32word integer) noexcept -> win32ctstr;
 	[[nodiscard]] auto LoadDefaultWinAppIcon() noexcept -> win32hicon;
 	[[nodiscard]] auto LoadDefaultWinAppCursor() noexcept -> win32hcursor;
 	[[nodiscard]] auto WindowLongPtr(win32hwnd hwnd, i32 index) noexcept -> win32lptr;
@@ -249,7 +249,7 @@ namespace Petal::Abstract
 		using CreateResult = WindowCreatingResult;
 		using DestroyResult = WindowDestroyingResult;
 	public:
-		virtual win32lres Process(win32msg message, win32wprm w_param, win32lprm l_param) noexcept = 0;
+		virtual win32lres Process(win32msg message, win32wprm w_param, win32lprm l_param) = 0;
 	public:
 		void Bind(win32hwnd window_handle);
 		void Unbind() noexcept;

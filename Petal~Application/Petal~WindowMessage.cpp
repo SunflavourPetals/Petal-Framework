@@ -26,19 +26,19 @@ namespace Petal
 	{
 		return this->l;
 	}
-	word BasicWindowMessage::HWLong() const noexcept
+	win32word BasicWindowMessage::HWLong() const noexcept
 	{
 		return HIWORD(this->Long());
 	}
-	word BasicWindowMessage::LWLong() const noexcept
+	win32word BasicWindowMessage::LWLong() const noexcept
 	{
 		return LOWORD(this->Long());
 	}
-	word BasicWindowMessage::HWWord() const noexcept
+	win32word BasicWindowMessage::HWWord() const noexcept
 	{
 		return HIWORD(this->Word());
 	}
-	word BasicWindowMessage::LWWord() const noexcept
+	win32word BasicWindowMessage::LWWord() const noexcept
 	{
 		return LOWORD(this->Word());
 	}
@@ -84,7 +84,7 @@ namespace Petal
 	{
 
 	}
-	word BasicMouseMessage::VirtualKeys() const noexcept
+	win32word BasicMouseMessage::VirtualKeys() const noexcept
 	{
 		return this->key_state;
 	}

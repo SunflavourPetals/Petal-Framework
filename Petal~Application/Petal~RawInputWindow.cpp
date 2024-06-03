@@ -146,11 +146,11 @@ namespace Petal
 			e.DefaultProcess(this->WindowHandle());
 		}
 	}
-	void RawInputWindow::RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
-	void RawInputWindow::RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
-	void RawInputWindow::RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) noexcept {}
-	void RawInputWindow::RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) noexcept {}
-	win32lres RawInputWindow::Process(win32msg msg, win32wprm w, win32lprm l) noexcept
+	void RawInputWindow::RawMouseEvent(RawMouseMessage& e, Win32RawInput& raw_input, tsize raw_input_size) {}
+	void RawInputWindow::RawKeyboardEvent(RawKeyboardMessage& e, Win32RawInput& raw_input, tsize raw_input_size) {}
+	void RawInputWindow::RawHidEvent(RawHidMessage& e, Win32RawInput& raw_input, tsize raw_input_size) {}
+	void RawInputWindow::RawInputDeviceChangeEvent(RawInputDeviceChangeMessage& e) {}
+	win32lres RawInputWindow::Process(win32msg msg, win32wprm w, win32lprm l)
 	{
 		switch (msg)
 		{

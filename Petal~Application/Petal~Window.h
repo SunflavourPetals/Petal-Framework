@@ -112,7 +112,7 @@ namespace Petal
 	public:
 		Size2DI32 minimum_client_size{ 120, 90 };
 	private:
-		dword former_style{};
+		win32dword former_style{};
 		boolean enter_size{ false };
 		boolean enter_move{ false };
 		boolean no_border_mode{ false };

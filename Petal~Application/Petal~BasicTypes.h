@@ -32,9 +32,9 @@ namespace Petal
 	using tsize = typename ::std::size_t;
 
 	using byte = u8;
-	using word = u16;
-	using dword = u32;
-	using qword = u64;
+	using word = u16; // never using Petal::word in programming, using Petal::win32word instead.
+	using dword = u32; // never using Petal::dword in programming, using Petal::win32dword instead.
+	using qword = u64; // never using Petal::qword in programming.
 
 	// pointer to object
 	template <typename Ty> using ptr = Ty*;
