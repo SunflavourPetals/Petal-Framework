@@ -181,7 +181,7 @@ namespace Petal
 		static constexpr vk LBraces{ VK_OEM_4 }; // --------- // [{
 		static constexpr vk VerticalBar{ VK_OEM_5 }; // ----- // \|
 		static constexpr vk RBraces{ VK_OEM_6 }; // --------- // ]}
-		static constexpr vk DoubleQuote{ VK_OEM_7 }; // ----- // '"
+		static constexpr vk Quote{ VK_OEM_7 }; // ----------- // '"
 		static constexpr vk Semicolon{ Colon }; // ---------- // ;:
 		static constexpr vk Equal{ Plus }; // --------------- // =+
 		static constexpr vk Less{ Comma }; // --------------- // ,<
@@ -192,7 +192,7 @@ namespace Petal
 		static constexpr vk LBrackets{ LBraces }; // -------- // [{
 		static constexpr vk Backslash{ VerticalBar }; // ---- // \|
 		static constexpr vk RBrackets{ RBraces }; // -------- // ]}
-		static constexpr vk SingleQuote{ DoubleQuote }; // -- // '"
+		static constexpr vk SingleQuote{ Quote }; // -------- // '"
 	};
 }
 
