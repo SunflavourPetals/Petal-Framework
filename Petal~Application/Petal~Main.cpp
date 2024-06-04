@@ -209,6 +209,34 @@ namespace
 			entry_function_has_been_called = true;
 			return false;
 		}
+
+		int main(
+			Petal::win32hins instance,
+			Petal::ptrc<Petal::TChar> cmd_line,
+			Petal::win32int cmd_show,
+			Petal::ptrc<Petal::DbgChar> entry_point,
+			Petal::ptrc<Petal::DbgChar> main_space)
+		{
+			if (IsEntryFnHasBeenCalled()) return -1;
+			Main::arguments.Initialize();
+			WinMain::arguments.Initialize(instance, cmd_line, cmd_show);
+			DebugPrintMainInfo(entry_point, main_space);
+			return Petal::UserEntrance::user_main();
+		}
+
+		int main(
+			int argc,
+			Petal::ptr<Petal::TChar> argv[],
+			Petal::ptr<Petal::TChar> envp[],
+			Petal::ptrc<Petal::DbgChar> entry_point,
+			Petal::ptrc<Petal::DbgChar> main_space)
+		{
+			if (IsEntryFnHasBeenCalled()) return -1;
+			Main::arguments.Initialize(argc, argv, envp);
+			WinMain::arguments.Initialize();
+			DebugPrintMainInfo(entry_point, main_space);
+			return Petal::UserEntrance::user_main();
+		}
 	}
 }
 
@@ -216,40 +244,24 @@ namespace
 
 INT WINAPI wWinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPWSTR cmd_line, _In_ INT cmd_show)
 {
-	if (PetalUnnamed::IsEntryFnHasBeenCalled()) return -1;
-	PetalUnnamed::Main::arguments.Initialize();
-	PetalUnnamed::WinMain::arguments.Initialize(instance, cmd_line, cmd_show);
-	PetalUnnamed::DebugPrintMainInfo(Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
-	return Petal::UserEntrance::user_main();
+	return PetalUnnamed::main(instance, cmd_line, cmd_show, Petal_DbgStr("wWinMain"), Petal_DbgStr("WinMain"));
 }
 
 int wmain(int argc, wchar_t* argv[], wchar_t* envp[])
 {
-	if (PetalUnnamed::IsEntryFnHasBeenCalled()) return -1;
-	PetalUnnamed::Main::arguments.Initialize(argc, argv, envp);
-	PetalUnnamed::WinMain::arguments.Initialize();
-	PetalUnnamed::DebugPrintMainInfo(Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
-	return Petal::UserEntrance::user_main();
+	return PetalUnnamed::main(argc, argv, envp, Petal_DbgStr("wmain"), Petal_DbgStr("Main"));
 }
 
 #else
 
 INT WINAPI WinMain(_In_ HINSTANCE instance, _In_opt_ HINSTANCE, _In_ LPSTR cmd_line, _In_ INT cmd_show)
 {
-	if (PetalUnnamed::IsEntryFnHasBeenCalled()) return -1;
-	PetalUnnamed::Main::arguments.Initialize();
-	PetalUnnamed::WinMain::arguments.Initialize(instance, cmd_line, cmd_show);
-	PetalUnnamed::DebugPrintMainInfo(Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
-	return Petal::UserEntrance::user_main();
+	return PetalUnnamed::main(instance, cmd_line, cmd_show, Petal_DbgStr("WinMain"), Petal_DbgStr("WinMain"));
 }
 
 int main(int argc, char* argv[], char* envp[])
 {
-	if (PetalUnnamed::IsEntryFnHasBeenCalled()) return -1;
-	PetalUnnamed::Main::arguments.Initialize(argc, argv, envp);
-	PetalUnnamed::WinMain::arguments.Initialize();
-	PetalUnnamed::DebugPrintMainInfo(Petal_DbgStr("main"), Petal_DbgStr("Main"));
-	return Petal::UserEntrance::user_main();
+	return PetalUnnamed::main(argc, argv, envp, Petal_DbgStr("main"), Petal_DbgStr("Main"));
 }
 
 #endif
