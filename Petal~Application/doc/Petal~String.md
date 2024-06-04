@@ -40,7 +40,7 @@ achar、wchar、u8char等类型别名详见标头[Petal~BasicTypes.h](Petal~Basi
 TChar 将被定义为 `defined(Petal_Enable_Unicode) ? WChar : Char`(伪代码)。  
 TString 将被定义为 `defined(Petal_Enable_Unicode) ? WString : String`(伪代码)。  
 
-TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则统一使用A版本(尽可能)。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
+TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则尽可能统一使用A版本。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
 使用宏`Petal_TStr(quote)`将字符串字面量在预处理阶段制作成 `TChar[N]` 类型的字符串字面量。  
 
 有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
@@ -56,6 +56,8 @@ DbgString 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? String : TString;
 ### CStringRef 系列类型
 
 此标头提供了模板类 `BasicCStringRef`, 用于需要对 null-terminated 做出保证的部分字符串引用之处。  
+
+以后可能会考虑删除“CStringRef”相关的组件。  
 
 C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数，使得 `string_view` 难以和C风格接口协作，故设置了 `CStringRef` 系列类型。但是只有部分地方它能起点作用，框架也没对它做多少支持，`CStringRef` 更多是在框架内由框架使用。  
 
@@ -277,14 +279,14 @@ auto hash_val = hasher(csr);
 为 `CStringRef` 系列类型提供的迭代器类型的模板，具有和标准库字符串视图相似的属性。  
 本框架使用 msvc，因此此处提供适用 msvc 的 Debug 版本并模仿其行为。  
 
-可以通过预处理器宏定义控制是否启用 debug 版本的行为，否则根据 `_ITERATOR_DEBUG_LEVEL` 自动选择，参考[预处理器文档的内容`Petal_Enable_DebugCStringRefIterator`](Preprocessor.md#Petal_Enable_DebugCStringRefIterator "预处理器文档的相应章节")。  
+可以通过预处理器宏定义控制是否启用 debug 版本的行为，否则根据 `_ITERATOR_DEBUG_LEVEL` 自动选择是否使用 Debug 版本的代码(其中使用了宏`_STL_VERIFY`)，参考[预处理器文档的内容`Petal_Enable_DebugCStringRefIterator`](Preprocessor.md#Petal_Enable_DebugCStringRefIterator "预处理器文档的相应章节")。  
 
 ```C++
 template <class CharT>
 class CStringRefIterator;
 ```
 
-本组件尽量模拟标准库的用法，并且不推荐用户使用，这个组件通常只在框架内使用，因此不做过多说明。  
+本组件尽量模拟标准库的用法，并且不推荐用户使用，这个组件通常只在框架内使用，因此不做过多说明，未来可能考虑删除有关“CStringRef”组件相关的内容。  
 
 ```C++
 public:

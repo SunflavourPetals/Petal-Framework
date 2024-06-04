@@ -10,7 +10,7 @@
 
 ### Petal_Enable_DebugCStringRefIterator
 
-类模板 `CStringRefIterator` 模仿了 msvc 对字符串视图迭代器的 debug 行为，条件是本宏(`Petal_Enable_DebugCStringRefIterator`)被定义。  
+类模板 `CStringRefIterator` 模仿了 msvc 对字符串视图迭代器的 debug 行为(使用宏`_STL_VERIFY`)，条件是本宏(`Petal_Enable_DebugCStringRefIterator`)被定义。  
 关闭此宏以禁止该行为，如 msvc 版本不同或更新导致代码失效，取消定义该宏是好方法。  
 
 ### Petal_Enable_ForceDbgANSI
@@ -25,11 +25,10 @@
 
 框架源文件 `Petal~Main.cpp` 中定义了 C++/WIN32 的入口函数，尤其是在 WIN32 程序中，`WinMain` 系列的入口函数通常比较长，本框架简化了这些，提供了选择其他函数作为“用户入口函数”的选择。  
 
-定义此宏后，可以使用全局/命名空间中的函数作为用户入口(应当是 `int()` 类型的函数)，使用方法参见 `Petal~UserEntrance.h`、`Petal~UserEntrance.cpp` 中的描述。  
-即通常在 `Petal~UserEntrance.h` 中声明用户入口函数，在`Petal~UserEntrance.cpp` 中注册用户入口函数。通常在其他源文件定义用户入口函数(届时无法使用‘带static说明符的非成员函数’或‘无名命名空间中的函数’作为用户入口函数，因为它们具有内部链接)。  
-以上仅是通常情况及建议的使用方法，本框架不对使用方法做任何限制，若有需要，即使修改框架也是被提倡的。  
+定义此宏后，可以使用全局/命名空间作用域中的函数充当“用户入口函数”(应当是 `int()` 类型的函数)，使用方法参见 `Petal~UserEntrance.h`、`Petal~UserEntrance.cpp` 中的描述。  
+即通常在 `Petal~UserEntrance.h` 中声明用户入口函数，在`Petal~UserEntrance.cpp` 中注册用户入口函数。通常在其他源文件定义用户入口函数。
 
-若不定义此宏，`Petal~Main.h` 中将提供 `Petal_SetMainFunc`、`Petal_SetMainSpace`、`Petal_SetMainClass`、`Petal_SetDefaultMainClass` 宏用于注册用户入口函数，规定这几个宏只能在定义用户入口函数的源文件使用其中一个且仅使用一次。  
+若不定义此宏，`Petal~Main.h` 中将提供 `Petal_SetMainFunc`、`Petal_SetMainClass` 宏用于注册用户入口函数，规定这几个宏只能在一个翻译单元内使用其中一个且仅使用一次。  
 不定义宏 `Petal_Enable_PetalMain` 时，除可以使用全局/命名空间中的函数作为用户入口外，还对使用类中的静态成员函数作为用户入口函数提供了较好的支持，但是应当引入 `"Petal~Main.h"` 以使用其中的宏。  
 
 ```C++
@@ -48,9 +47,11 @@ struct Test
 Petal_SetMainClass(Test)
 ```
 
-但实际上定义 `Petal_Enable_PetalMain` 的版本也能做到。  
-
 宏的详细使用方法见 `Petal~Main.h`。  
+
+定义 `Petal_Enable_PetalMain` 宏的方便之处在于把注册用户入口函数的工作放到了一个由框架提供的专门的翻译单元中，以便我们在定义用户入口函数时不必引入头文件 `Petal~Main.h`，这两种方式形式不同，但行为相同。  
+
+以上仅是通常情况及建议的使用方法，本框架不对使用方法做任何限制，若有需要，即使修改框架也是被提倡的。  
 
 ### Petal_Enable_Unicode
 

@@ -2,11 +2,11 @@
 
 ## 概述
 
-为框架中的常用类型定义了一系列别名  
+为框架中的常用类型定义了一系列别名。  
 
 ## 参考
 
-### 全局命名空间
+### 宏
 
 #### 宏 Petal_Header_BasicTypes
 
@@ -29,12 +29,6 @@
 `using byte = u8;`  
 
 将 `byte` 定义为 `u8`，可以进行算数运算，与 c++ 的 `std::byte` 不一致。
-
-#### 类型别名 dword
-
-`using dword = u32;`  
-
-定义为 `u32`，意为 double [word](#类型别名-word)。  
 
 #### 类型别名 f32
 
@@ -120,19 +114,13 @@ void foo()
 void foo()
 {
     int number{ 123 };
-    Petal::ptr<int> int_ptr{ &number };
-    // *int_ptr = 321; // 无法直接通过解引用 int_ptr 修改所指向的对象
-    Petal::Debug::println("{}", *int_ptr);
+    Petal::ptrc<int> cint_ptr{ &number }; // 允许将 &number 赋值给 const int* 类型的对象 cint_ptr
+    // *cint_ptr = 321; // 无法通过解引用 cint_ptr 修改所指向的对象，表达式 *cint_ptr 持有类型 const int&，
+    Petal::Debug::println("{}", *cint_ptr);
 }
 ```
 
 输出 `123`。  
-
-#### 类型别名 qword
-
-`using qword = u64;`  
-
-定义为 `u64`，意为 quad [word](#类型别名-word)。  
 
 #### 类型别名 tsize
 
@@ -171,9 +159,3 @@ void foo()
 #### 类型别名 wchar
 
 `using wchar = wchar_t;`
-
-#### 类型别名 word
-
-`using word = u16;`  
-
-定义为 `u16`，与 WIN32 的 `WORD` 大小保持一致，为两个字节。  

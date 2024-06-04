@@ -3,13 +3,14 @@
 ## 概述
 
 1. 提供入口函数的参数，但在进入用户入口函数后才可能有效。  
-2. 提供封装后的模块实例句柄获取函数 `::HINSTANCE Petal::WinMain::HIns() noexcept`。  
-3. 提供封装后的命令行参数获取函数 `Petal::TCStringRef Petal::WinMain::CmdLine() noexcept`。  
+2. 提供封装后的模块实例句柄获取函数  
+   `::HINSTANCE Petal::WinMain::HIns() noexcept`。  
+3. 提供封装后的命令行参数获取函数  
+   `Petal::TCStringRef Petal::WinMain::CmdLine() noexcept`。  
 4. 未定义宏 `Petal_Enable_PetalMain` 情况下提供设置用户入口函数的宏：  
    * Petal_SetMainFunc
    * Petal_SetMainSpace
    * Petal_SetMainClass
-   * Petal_SetDefaultMainClass
 
 ### 用户入口函数
 
@@ -18,8 +19,8 @@
 
 * 用户不可以定义 `main` `wmain` `WinMain` `wWinMain` 中的任何函数；  
 * 用户不应当调用 `main` `wmain` `WinMain` `wWinMain` 中的任何函数；  
-* 用户不应当修改工程的入口函数，除非你知道这样做会对你的程序有何影响，如有需要，忽略上面两条规则。  
-* 如有需要，请自行修改 `Petal~Main.cpp` 等的代码改变程序的行为。  
+* 用户不应当修改项目的入口函数，除非你知道这样做会对你的程序有何影响，如有需要，忽略上面两条规则。  
+* 如有需要，请自行修改本框架的代码改变程序的行为。  
 
 不改变 `Petal~Main.cpp` 代码的情况下：  
 
@@ -29,27 +30,22 @@
 // 示例入口函数
 int main(int argc, char* argv[], char* envp[])
 {
-    if (PetalUnnamed::protection.Used() == true)
-    {
-        PetalUnnamed::protection.VSDebugOutputWarning();
-        return -1;
-    }
-    PetalUnnamed::protection.Use();
-    PetalUnnamed::Main::arguments.Init(argc, argv, envp);
-    PetalUnnamed::WinMain::arguments.InitAsInvalid();
-    PetalUnnamed::XMain::VSDebugOutput(Petal_DbgStr("main"), Petal_DbgStr("Main"));
-    return Petal::UserEntrance::pt_user_main();
+    if (PetalUnnamed::IsEntryFnHasBeenCalled()) return -1;
+    PetalUnnamed::Main::arguments.Initialize(argc, argv, envp);
+    PetalUnnamed::WinMain::arguments.Initialize();
+    PetalUnnamed::DebugPrintMainInfo(Petal_DbgStr("main"), Petal_DbgStr("Main"));
+    return Petal::UserEntrance::user_main();
 }
 ```
 
-1. 若入口函数为 main / wmain，则下列位于 Petal::Main 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前被赋为有效值(Petal::Main::valid 变为 true)。  
+1. 若入口函数为 main / wmain，则下列位于 Petal::Main 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前被赋为有效值(标志为 Petal::Main::valid 变为 true)。  
      * arcg: `int`  
        argv 中的元素个数  
      * argv: `ptrc<ptrc<TChar>>`  
        main / wmain 接收的参数  
      * envp: `ptrc<ptrc<TChar>>`  
        环境变量参数  
-2. 若入口函数为 WinMain / wWinMain，则下列位于 Petal::WinMain 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前或进入入口函数前被赋为有效值(Petal::WinMain::valid 变为 true)  
+2. 若入口函数为 WinMain / wWinMain，则下列位于 Petal::WinMain 的对象将在进入用户入口函数后有效，因为它们所引用的数据会在入口函数中、调用用户入口函数前或进入入口函数前被赋为有效值(标志为 Petal::WinMain::valid 变为 true)  
      * hins: `HINSTANCE`  
        当前实例句柄，在入口函数开始前需要使用 `Petal::WinMain::HIns` 获得
      * cmd_line: `ptrc<TChar>`  
@@ -57,11 +53,16 @@ int main(int argc, char* argv[], char* envp[])
      * cmd_show: `INT`  
         控制窗口的显示方式。
 
-然而即使入口函数是 main / wmain，Petal::WinMain::hins 所引用的对象仍会在进入入口函数前被赋为有效值(但是不可在进入入口函数之前使用它们)，而 HIns 和 CmdLine 函数作为对 WIN32 API 的封装则始终可用。  
+即使入口函数是 main / wmain，HIns 和 CmdLine 函数作为对 WIN32 API 的封装也始终可用。  
+
+### 多线程
+
+如果想要多线程访问 `Petal::Main` 和 `Petal::WinMain` 命名空间内对入口函数参数的引用，那么有关线程应该在进入“用户入口函数”后再处于唤醒状态，即不要依靠这两个命名空间内的 `valid` 来判断被引用的参数是否有效，原因是指令重排。  
+如在进入用户入口函数前访问这些参数是必须的，对于 WIN32 程序，访问 `Petal::Main` 和 `Petal::WinMain` 命名空间内对入口函数参数的引用并不是获取入口函数参数的唯一方法，例如使用 `Petal::WinMain::HIns` 函数获取当前程序实例代替访问 `Petal::WinMain::hins`，同样可以使用其他 WIN32 API 获取命令行参数和环境变量，请查阅 MSDN。  
 
 ## 参考
 
-### 全局命名空间
+### 宏
 
 #### 宏 Petal_Header_Main
 
@@ -69,8 +70,8 @@ int main(int argc, char* argv[], char* envp[])
 
 #### 宏 Petal_SetMainFunc
 
-当未定义宏 `Petal_Enable_PetalMain` 时被定义，用于设置用户入口函数。  
-只能在入口函数所在 `.cpp` 源文件中的全局命名空间中使用，参数不可以以`::`开始。  
+当未定义宏 `Petal_Enable_PetalMain` 时此宏被定义，用于设置用户入口函数。  
+此宏的使用只能出现在一个翻译单元内，并且只能出现在全局命名空间中。  
 此宏实际上是在 Petal::UserEntrance 命名空间里定义指向目标函数的指针，使 `Petal~Main.cpp` 中的入口函数能够调用设置的用户入口函数。  
 
 ```cpp
@@ -96,13 +97,11 @@ namespace MyProgram
     int my_main()
     {
         Petal::Debug::println("Hello world!");
-        return 0;
+        return 0; // 与 main 函数不同，此处 return 语句是必须的
     }
 }
 
 Petal_SetMainFunc(MyProgram::my_main); // 入口函数将调用 MyProgram::my_main
-
-// Petal_SetMainFunc(::MyProgram::my_main); 错误
 ```
 
 #### 宏 Petal_SetMainClass
@@ -136,42 +135,6 @@ Petal_SetMainClass(MyProgram::MyMain); // 入口函数将调用 MyProgram::MyMai
 ```
 
 参考[宏 Petal_SetMainFunc](#宏-petal_setmainfunc)。  
-
-#### 宏 Petal_SetMainSpace
-
-当未定义宏 `Petal_Enable_PetalMain` 时被定义，用于设置用户入口函数。  
-
-```cpp
-#define Petal_SetMainSpace(MainSpace) Petal_SetMainClass(MainSpace)
-```
-
-使用示例：  
-
-```cpp
-#include "Petal~Main.h"
-#include "Petal~VSDebugOutput.h"
-
-namespace MyProgram
-{
-    int main()
-    {
-        Petal::Debug::println("Hello world!");
-        return 0;
-    }
-}
-
-Petal_SetMainSpace(MyProgram); // 入口函数将调用 MyProgram::main
-```
-
-参考[宏 Petal_SetMainFunc](#宏-petal_setmainfunc)。  
-
-#### 宏 Petal_SetDefaultMainClass
-
-```cpp
-#define Petal_SetDefaultMainClass     Petal_SetMainClass(Main)
-```
-
-参考[宏 Petal_SetMainClass](#宏-petal_setmainclass)。  
 
 ### 命名空间 Petal::Main
 

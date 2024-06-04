@@ -10,7 +10,7 @@
 
 ## 参考
 
-### 全局命名空间
+### 宏
 
 #### 宏 Petal_Header_WinTypes
 
@@ -151,6 +151,8 @@
 #### 类型别名 win32msg
 
 `using win32msg = typename ::UINT;`
+
+在消息循环中，`message` 使用 `UINT` 类型，与结构体 `MSG` 不同。  
 
 #### 类型别名 win32short
 

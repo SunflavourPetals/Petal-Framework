@@ -6,7 +6,7 @@
 
 ## 参考
 
-### 全局命名空间
+### 宏
 
 #### 宏 Petal_Header_Types
 
@@ -115,9 +115,9 @@ struct Size2D
 
 `using Size2DI32 = Size2D<i32>;`
 
-#### 类型别名 Size2DT
+#### 类型别名 Size2DSz
 
-`using Size2DT = Size2D<tsize>;`
+`using Size2DSz = Size2D<tsize>;`
 
 #### 类型别名 Size2DU32
 
