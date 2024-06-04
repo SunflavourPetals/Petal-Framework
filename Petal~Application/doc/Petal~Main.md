@@ -66,7 +66,7 @@ int main(int argc, char* argv[], char* envp[])
 
 #### 宏 Petal_Header_Main
 
-指示头文件添加状态。  
+指示头文件引入情况。  
 
 #### 宏 Petal_SetMainFunc
 

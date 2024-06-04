@@ -76,7 +76,7 @@ C++ 的 `string_view` 不保证 null-terminated，即不提供 `.c_str` 函数�
 
 #### 宏 Petal_Header_String
 
-指示头文件添加状态。  
+指示头文件引入情况。  
 
 #### 宏 Petal_TStr
 
