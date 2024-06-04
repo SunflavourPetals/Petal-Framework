@@ -14,7 +14,7 @@ namespace Petal
 		Ty height{};
 		friend bool operator==(const Size2D&, const Size2D&) noexcept = default;
 	};
-	using Size2DT = Size2D<tsize>;
+	using Size2DSz = Size2D<tsize>;
 	using Size2DI32 = Size2D<i32>;
 	using Size2DU32 = Size2D<u32>;
 	using Size2DF32 = Size2D<f32>;

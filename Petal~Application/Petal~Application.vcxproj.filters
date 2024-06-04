@@ -104,9 +104,6 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Petal~Bom.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~FrequencyController.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>

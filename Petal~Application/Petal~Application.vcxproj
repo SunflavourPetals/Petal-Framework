@@ -104,7 +104,7 @@
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator</PreprocessorDefinitions>
+      <PreprocessorDefinitions>Petal_Enable_PetalMain;Petal_Enable_Unicode;Petal_Enable_VSDebugOutput;Petal_Enable_ForceDbgRemoveNUL;Petal_Enable_ForceDbgANSI;Petal_Enable_DebugCStringRefIterator;Petal_Enable_STLVerifyInDebugCSRIterator</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <LanguageStandard>stdcpp20</LanguageStandard>
       <Optimization>Disabled</Optimization>
@@ -161,7 +161,6 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
-    <ClCompile Include="Petal~Bom.cpp" />
     <ClCompile Include="Petal~FrequencyController.cpp" />
     <ClCompile Include="Petal~KeyboardController.cpp" />
     <ClCompile Include="Petal~KeyboardEventProcess.cpp" />

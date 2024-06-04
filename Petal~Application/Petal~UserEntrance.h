@@ -14,7 +14,7 @@
 #define Petal_Main_Config(MainFunc) \
 namespace Petal::UserEntrance \
 {   \
-	extern const fptr<int> user_main{ &::MainFunc };  \
+	extern const fptr<int> user_main{ &MainFunc };  \
 	extern const ptrc<TChar> user_main_name{ Petal_TStr(#MainFunc) };  \
 	extern const ptrc<DbgChar> user_main_name_dbgc{ Petal_DbgStr(#MainFunc) };  \
 }

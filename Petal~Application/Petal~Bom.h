@@ -13,25 +13,34 @@ namespace Petal::BOM
 	class Bom final
 	{
 	public:
-		ptrc<byte> Data() const noexcept;
-		tsize Size() const noexcept;
+		ptrc<byte> Data() const noexcept
+		{
+			return this->data;
+		}
+		tsize Size() const noexcept
+		{
+			return this->size;
+		}
 	public:
-		Bom(tsize size, byte b1 = 0, byte b2 = 0, byte b3 = 0, byte b4 = 0) noexcept;
+		Bom(byte b1, byte b2, byte b3, byte b4) noexcept : data{ b1, b2, b3, b4 }, size{ 4 } {}
+		Bom(byte b1, byte b2, byte b3) noexcept : data{ b1, b2, b3 }, size{ 3 } {}
+		Bom(byte b1, byte b2) noexcept : data{ b1, b2 }, size{ 2 } {}
+		Bom(byte b1) noexcept : data{ b1 }, size{ 1 } {}
+		Bom() noexcept {}
 		Bom(const Bom&) noexcept = default;
 		Bom(Bom&&) noexcept = default;
 		~Bom() = default;
 	private:
 		tsize size{ 0 };
-		byte data[4]{};
-	public:
+		byte data[8]{};
 	};
 
-	extern const Bom no_bom;
-	extern const Bom utf_8;
-	extern const Bom utf_16_le;
-	extern const Bom utf_16_be;
-	extern const Bom utf_32_le;
-	extern const Bom utf_32_be;
+	inline const Bom no_bom{};
+	inline const Bom utf_8{ 0xEFu, 0xBBu, 0xBFu };
+	inline const Bom utf_16_le{ 0xFFu, 0xFEu };
+	inline const Bom utf_16_be{ 0xFEu, 0xFFu };
+	inline const Bom utf_32_le{ 0xFFu, 0xFEu, 0x00u, 0x00u };
+	inline const Bom utf_32_be{ 0x00u, 0x00u, 0xFEu, 0xFFu };
 
 	// Recommend BOM by template parameter CharT, std::endian::native and nttp force_utf_8_with_bom.
 	// Never recommend BOM to char.

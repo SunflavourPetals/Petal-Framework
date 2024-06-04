@@ -8,8 +8,6 @@
 
 namespace Petal
 {
-	// basic types
-
 	using i8 = typename ::std::int8_t;
 	using i16 = typename ::std::int16_t;
 	using i32 = typename ::std::int32_t;
@@ -27,14 +25,9 @@ namespace Petal
 	using u16char = char16_t;
 	using u32char = char32_t;
 
-	// alias
-
 	using tsize = typename ::std::size_t;
 
 	using byte = u8;
-	using word = u16; // never using Petal::word in programming, using Petal::win32word instead.
-	using dword = u32; // never using Petal::dword in programming, using Petal::win32dword instead.
-	using qword = u64; // never using Petal::qword in programming.
 
 	// pointer to object
 	template <typename Ty> using ptr = Ty*;
