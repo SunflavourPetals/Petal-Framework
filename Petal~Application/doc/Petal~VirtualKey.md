@@ -174,7 +174,7 @@
 | `QuestionMark`            | `VK_OEM_2`                | `/` `?`                   |
 | `Tilde`                   | `VK_OEM_3`                | `` ` `` `~`               |
 | `LBraces`                 | `VK_OEM_4`                | `[` `{`                   |
-| `VerticalBar`             | `VK_OEM_5`                | `\` `|`                   |
+| `VerticalBar`             | `VK_OEM_5`                | `\` `\|`                  |
 | `RBraces`                 | `VK_OEM_6`                | `]` `}`                   |
 | `Quote`                   | `VK_OEM_7`                | `'` `"`                   |
 | `Semicolon`               | `VK_OEM_1`                | `;` `:`                   |
@@ -185,7 +185,7 @@
 | `Slash`                   | `VK_OEM_2`                | `/` `?`                   |
 | `BackQuote`               | `VK_OEM_3`                | `` ` `` `~`               |
 | `LBrackets`               | `VK_OEM_4`                | `[` `{`                   |
-| `Backslash`               | `VK_OEM_5`                | `\` `|`                   |
+| `Backslash`               | `VK_OEM_5`                | `\` `\|`                  |
 | `RBrackets`               | `VK_OEM_6`                | `]` `}`                   |
 | `SingleQuote`             | `VK_OEM_7`                | `'` `"`                   |
 
