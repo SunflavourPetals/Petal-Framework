@@ -25,13 +25,10 @@ namespace Petal::Abstract
 	public:
 		using CharType = CharT;
 		using TraitsType = Traits;
-		using StringType = BasicString<CharType, TraitsType>;
-		using StringViewType = BasicStringView<CharType, TraitsType>;
-		using CStringRefType = BasicCStringRef<CharType>;
 	public:
-		virtual void Write(StringViewType str) = 0;
+		virtual void Write(BasicStringView<CharType, TraitsType> str) = 0;
 		virtual LineBreakMode LnMode() noexcept = 0;
-		friend Output& operator<<(Output& out, typename StringViewType str)
+		friend Output& operator<<(Output& out, typename BasicStringView<CharType, TraitsType> str)
 		{
 			out.Write(str);
 			return out;
@@ -84,11 +81,8 @@ namespace Petal
 		default:
 			break;
 		}
-#ifdef WIN32
+
 		return { CRLF, LEN_CRLF };
-#else
-		return { LF, LEN_LF };
-#endif
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
 	inline void ln(Abstract::Output<CharT, Traits>& output)

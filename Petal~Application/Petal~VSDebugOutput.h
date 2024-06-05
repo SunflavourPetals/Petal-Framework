@@ -19,12 +19,9 @@ namespace Petal::Abstract
 	public:
 		using typename Base::CharType;
 		using typename Base::TraitsType;
-		using typename Base::StringType;
-		using typename Base::StringViewType;
-		using typename Base::CStringRefType;
 		using CStringType = Petal::ptrc<CharType>;
 	public:
-		virtual void Write(StringViewType str) = 0;
+		virtual void Write(BasicStringView<CharType, TraitsType> str) = 0;
 		virtual void WriteCStr(CStringType c_str) noexcept = 0;
 		virtual LineBreakMode LnMode() noexcept override { return this->line_break_mode; }
 	public:
@@ -41,12 +38,9 @@ namespace Petal::Debug
 	public:
 		using typename Base::CharType;
 		using typename Base::TraitsType;
-		using typename Base::StringType;
-		using typename Base::StringViewType;
-		using typename Base::CStringRefType;
 		using typename Base::CStringType;
 	public:
-		void Write(StringViewType str) override;
+		void Write(BasicStringView<CharType, TraitsType> str) override;
 		void WriteCStr(CStringType c_str) noexcept override;
 	public:
 		constexpr VSDebugOutputA() = default;
@@ -59,12 +53,9 @@ namespace Petal::Debug
 	public:
 		using typename Base::CharType;
 		using typename Base::TraitsType;
-		using typename Base::StringType;
-		using typename Base::StringViewType;
-		using typename Base::CStringRefType;
 		using typename Base::CStringType;
 	public:
-		void Write(StringViewType str) override;
+		void Write(BasicStringView<CharType, TraitsType> str) override;
 		void WriteCStr(CStringType c_str) noexcept override;
 	public:
 		constexpr VSDebugOutputW() = default;

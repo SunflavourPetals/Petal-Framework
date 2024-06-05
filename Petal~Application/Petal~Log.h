@@ -20,9 +20,6 @@ namespace Petal
 	public:
 		using typename Base::CharType;
 		using typename Base::TraitsType;
-		using typename Base::StringType;
-		using typename Base::StringViewType;
-		using typename Base::CStringRefType;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<CharType>());
@@ -34,7 +31,7 @@ namespace Petal
 		void Close();
 		void WriteBytes(ptrc<byte> data, tsize size);
 		void WriteBom(const BOM::Bom& bom);
-		virtual void Write(StringViewType str) override;
+		virtual void Write(BasicStringView<CharType, TraitsType> str) override;
 		virtual LineBreakMode LnMode() noexcept override;
 	public:
 		BasicLog() = default;
@@ -142,9 +139,9 @@ namespace Petal
 		this->WriteBytes(bom.Data(), bom.Size());
 	}
 	template <typename CharT, typename Traits>
-	inline void BasicLog<CharT, Traits>::Write(StringViewType str)
+	inline void BasicLog<CharT, Traits>::Write(BasicStringView<CharType, TraitsType> str)
 	{
-		this->WriteBytes(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename StringViewType::value_type) * str.size());
+		this->WriteBytes(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(CharType) * str.size());
 	}
 	template <typename CharT, typename Traits>
 	inline LineBreakMode BasicLog<CharT, Traits>::LnMode() noexcept
