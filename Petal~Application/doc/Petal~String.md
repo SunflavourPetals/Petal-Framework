@@ -37,10 +37,10 @@ achar、wchar、u8char等类型别名详见标头[Petal~BasicTypes.h](Petal~Basi
 ### T系列字符(串)类型
 
 根据宏`Petal_Enable_Unicode`  
-TChar 将被定义为 `defined(Petal_Enable_Unicode) ? WChar : Char`(伪代码)。  
-TString 将被定义为 `defined(Petal_Enable_Unicode) ? WString : String`(伪代码)。  
+`TChar` 将被定义为 `defined(Petal_Enable_Unicode) ? WChar : Char` (伪代码)。  
+`TString` 将被定义为 `defined(Petal_Enable_Unicode) ? WString : String` (伪代码)。  
 
-TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则尽可能统一使用A版本。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
+`TChar` 和 `TString` 类似于WIN32中的约定。本框架对WIN32中区分A/W版本的API的使用根据宏`Petal_Enable_Unicode`确定，不受WIN32中宏`UNICODE`及受其影响的宏、别名等如`CreateWindowEx`、`WNDCLASSEX`影响。当定义了宏`Petal_Enable_Unicode`时，统一使用W版本，否则尽可能统一使用A版本。TChar 和 TString 随宏`Petal_Enable_Unicode`被定义为不同的字符(串)类型的别名，是框架与WIN32沟通的桥梁。  
 使用宏`Petal_TStr(quote)`将字符串字面量在预处理阶段制作成 `TChar[N]` 类型的字符串字面量。  
 
 有关宏 `Petal_Enable_Unicode` 参见[文档](Preprocessor.md#petal_enable_unicode "文档相应章节")。  
@@ -48,8 +48,8 @@ TChar 和 TString 类似于WIN32中的约定。本框架对WIN32中区分A/W版�
 ### Dbg系列字符(串)类型
 
 根据宏`Petal_Enable_ForceDbgANSI`和宏`Petal_Enable_Unicode`  
-DbgChar 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? Char : TChar;  
-DbgString 将被定义为 defined(Petal_Enable_ForceDbgANSI) ? String : TString;  
+`DbgChar` 将被定义为 `defined(Petal_Enable_ForceDbgANSI) ? Char : TChar` (伪代码)  
+`DbgString` 将被定义为 `defined(Petal_Enable_ForceDbgANSI) ? String : TString` (伪代码);  
 
 用于框架内调试输出，详见[Petal~VSDebugOutput.h](Petal~VSDebugOutput.md)。  
 
