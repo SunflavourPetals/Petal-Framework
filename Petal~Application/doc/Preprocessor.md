@@ -2,6 +2,10 @@
 
 本框架尽可能少使用宏来完成功能，大部分宏用于控制要编译的代码分支、Debug输出，少部分功能的宏请参考提供它们的头文件。  
 
+本框架定义的宏都以“用下划线分隔的大驼峰字符串”作为命名风格，并且必须以 `Petal` 开头。  
+形如 `Petal_Enable_VSDebugOutput` `Petal_VSDbg`。  
+宏会污染命名空间，因此这些宏都具有这样的形式用于防止命名空间的污染，约定我们不会给本框架的宏以外的内容具有这样风格的名称。  
+
 ## 在配置属性中定义的宏
 
 在“配置属性`->`C/C++`->`预处理器`->`预处理器定义”中定义的宏，它们作用于整个项目。  
@@ -15,7 +19,9 @@
 
 ### Petal_Enable_ForceDbgANSI
 
-`OutputDebugString` 存在 A/W 两个版本，开启此宏时将一定会选择 A 版本，`Petal~String.h` 中的 `DbgChar` 别名等相关内容也将受影响，否则将根据 [宏 `Petal_Enable_Unicode`](#petal_enable_unicode) 的定义情况选择使用 A 版本 API 还是 W 版本 API。  
+宏 `Petal_VSDbg` 系列存在 A/W 两个版本，开启此宏时 `Petal_VSDbg` 将一定会选择 A 版本，`Petal~String.h` 中的 `DbgChar` 别名等相关内容也将受影响，否则将根据 [宏 `Petal_Enable_Unicode`](#petal_enable_unicode) 的定义情况选择使用 A 版本 API 还是 W 版本 API。  
+
+详见 `Petal~VSDebugOutput` 的文档。  
 
 ### Petal_Enable_ForceDbgRemoveNUL
 
@@ -47,7 +53,7 @@ struct Test
 Petal_SetMainClass(Test)
 ```
 
-宏的详细使用方法见 `Petal~Main.h`。  
+宏的详细使用方法见 `Petal~Main` 的文档。  
 
 定义 `Petal_Enable_PetalMain` 宏的方便之处在于把注册用户入口函数的工作放到了一个由框架提供的专门的翻译单元中，以便我们在定义用户入口函数时不必引入头文件 `Petal~Main.h`，这两种方式形式不同，但行为相同。  
 
@@ -56,8 +62,9 @@ Petal_SetMainClass(Test)
 ### Petal_Enable_Unicode
 
 若定义此宏，框架内的函数如果有使用 WIN32 的 API，将使用 W 版本。  
+若不定义此宏，框架内的函数如果有使用 WIN32 的 API，将尽可能使用 A 版本。
 
-若不定义此宏，框架内的函数如果有使用 WIN32 的 API，将尽可能使用 A 版本
+有一些内容有额外的规则，比如宏 `Petal_VSDbg` 同时受此宏和 [宏 `Petal_Enable_ForceDbgANSI`](#petal_enable_forcedbgansi) 影响。  
 
 ### Petal_Enable_VSDebugOutput
 
