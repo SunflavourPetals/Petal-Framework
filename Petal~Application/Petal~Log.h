@@ -13,14 +13,16 @@
 namespace Petal
 {
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
-	class BasicLog : public Abstract::IOutput<CharT, Traits>
+	class BasicLog : public Abstract::Output<CharT, Traits>
 	{
+	private:
+		using Base = Abstract::Output<CharT, Traits>;
 	public:
-		using typename Abstract::IOutput<CharT, Traits>::CharType;
-		using typename Abstract::IOutput<CharT, Traits>::TraitsType;
-		using typename Abstract::IOutput<CharT, Traits>::StringType;
-		using typename Abstract::IOutput<CharT, Traits>::StringViewType;
-		using typename Abstract::IOutput<CharT, Traits>::CStringRefType;
+		using typename Base::CharType;
+		using typename Base::TraitsType;
+		using typename Base::StringType;
+		using typename Base::StringViewType;
+		using typename Base::CStringRefType;
 		using FileStream = typename ::std::basic_ofstream<byte, ::std::char_traits<byte>>;
 	public:
 		void Open(const ::std::string& file_name, const BOM::Bom& bom = BOM::RecommendBom<CharType>());
@@ -30,9 +32,9 @@ namespace Petal
 		boolean Opened() const noexcept;
 		boolean Valid() const noexcept;
 		void Close();
-		void ByteWrite(ptrc<byte> data, tsize size);
+		void WriteBytes(ptrc<byte> data, tsize size);
 		void WriteBom(const BOM::Bom& bom);
-		virtual void Output(StringViewType str) override;
+		virtual void Write(StringViewType str) override;
 		virtual LineBreakMode LnMode() noexcept override;
 	public:
 		BasicLog() = default;
@@ -41,10 +43,9 @@ namespace Petal
 		BasicLog(const ::std::string& file_name);
 		BasicLog(const ::std::wstring& file_name);
 		BasicLog(const BasicLog&) = delete;
-		BasicLog(BasicLog&&) = delete;
 		BasicLog& operator=(const BasicLog&) = delete;
 		explicit operator bool();
-		virtual ~BasicLog();
+		virtual ~BasicLog() = default;
 	private:
 		FileStream file{};
 		LineBreakMode line_break_mode{};
@@ -63,32 +64,27 @@ namespace Petal
 {
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name, const BOM::Bom& bom) :
-		Abstract::IOutput<CharT, Traits>()
+		Abstract::Output<CharT, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name, const BOM::Bom& bom) :
-		Abstract::IOutput<CharT, Traits>()
+		Abstract::Output<CharT, Traits>()
 	{
 		this->Open(file_name, bom);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::string& file_name) :
-		Abstract::IOutput<CharT, Traits>()
+		Abstract::Output<CharT, Traits>()
 	{
 		this->AppendOpen(file_name);
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::BasicLog(const ::std::wstring& file_name) :
-		Abstract::IOutput<CharT, Traits>()
+		Abstract::Output<CharT, Traits>()
 	{
 		this->AppendOpen(file_name);
-	}
-	template <typename CharT, typename Traits>
-	inline BasicLog<CharT, Traits>::~BasicLog()
-	{
-		this->Close();
 	}
 	template <typename CharT, typename Traits>
 	inline BasicLog<CharT, Traits>::operator bool()
@@ -125,17 +121,17 @@ namespace Petal
 	template <typename CharT, typename Traits>
 	inline boolean BasicLog<CharT, Traits>::Valid() const noexcept
 	{
-		return (this->file.is_open() && this->file.good());
+		return (this->Opened() && this->file.good());
 	}
 	template <typename CharT, typename Traits>
 	inline void BasicLog<CharT, Traits>::Close()
 	{
-		if (this->file.is_open()) this->file.close();
+		this->file.close();
 	}
 	template <typename CharT, typename Traits>
-	inline void BasicLog<CharT, Traits>::ByteWrite(ptrc<byte> data, tsize size)
+	inline void BasicLog<CharT, Traits>::WriteBytes(ptrc<byte> data, tsize size)
 	{
-		if (this->Valid() && data != nullptr && size > 0)
+		if (this->Valid() && size && data)
 		{
 			this->file.write(data, size);
 		}
@@ -143,12 +139,12 @@ namespace Petal
 	template <typename CharT, typename Traits>
 	inline void BasicLog<CharT, Traits>::WriteBom(const BOM::Bom& bom)
 	{
-		this->ByteWrite(bom.Data(), bom.Size());
+		this->WriteBytes(bom.Data(), bom.Size());
 	}
 	template <typename CharT, typename Traits>
-	inline void BasicLog<CharT, Traits>::Output(StringViewType str)
+	inline void BasicLog<CharT, Traits>::Write(StringViewType str)
 	{
-		this->ByteWrite(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename StringViewType::value_type) * str.size());
+		this->WriteBytes(reinterpret_cast<ptrc<byte>>(str.data()), sizeof(typename StringViewType::value_type) * str.size());
 	}
 	template <typename CharT, typename Traits>
 	inline LineBreakMode BasicLog<CharT, Traits>::LnMode() noexcept

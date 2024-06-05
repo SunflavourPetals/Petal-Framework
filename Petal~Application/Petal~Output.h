@@ -20,7 +20,7 @@ namespace Petal
 namespace Petal::Abstract
 {
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
-	class IOutput
+	class Output
 	{
 	public:
 		using CharType = CharT;
@@ -29,138 +29,28 @@ namespace Petal::Abstract
 		using StringViewType = BasicStringView<CharType, TraitsType>;
 		using CStringRefType = BasicCStringRef<CharType>;
 	public:
-		virtual void Output(StringViewType str) = 0;
+		virtual void Write(StringViewType str) = 0;
 		virtual LineBreakMode LnMode() noexcept = 0;
+		friend Output& operator<<(Output& out, typename StringViewType str)
+		{
+			out.Write(str);
+			return out;
+		}
+		friend Output& operator<<(Output& out, const fptr<void, Output&> pfn)
+		{
+			pfn(out);
+			return out;
+		}
 	public:
-		constexpr IOutput() = default;
-		virtual ~IOutput() = default;
+		constexpr Output() = default;
+		virtual ~Output() = default;
 	};
 
-	template <typename CharT, typename Traits>
-	inline IOutput<CharT, Traits>& operator+(
-		IOutput<CharT, Traits>& out,
-		typename IOutput<CharT, Traits>::StringViewType str)
-	{
-		out.Output(str);
-		return out;
-	}
-	template <typename CharT, typename Traits>
-	inline IOutput<CharT, Traits>& operator+(
-		IOutput<CharT, Traits>& out,
-		const fptr<void, IOutput<CharT, Traits>&> pfn)
-	{
-		pfn(out);
-		return out;
-	}
-
-	using IOutputA = IOutput<Char>;
-	using IOutputW = IOutput<WChar>;
-	using IOutputU8 = IOutput<U8Char>;
-	using IOutputU16 = IOutput<U16Char>;
-	using IOutputU32 = IOutput<U32Char>;
-
-	template <typename CharT>
-	class ICOutput
-	{
-	public:
-		using CharType = CharT;
-		using CStringType = ptrc<CharType>;
-		using CStringRefType = BasicCStringRef<CharType>;
-	public:
-		virtual void OutputCStr(CStringType c_str) = 0;
-		virtual LineBreakMode LnModeCStr() noexcept = 0;
-	public:
-		constexpr ICOutput() = default;
-		virtual ~ICOutput() = default;
-	};
-
-	template <typename CharT>
-	inline ICOutput<CharT>& operator-(
-		ICOutput<CharT>& out,
-		typename ICOutput<CharT>::CStringType c_str)
-	{
-		out.OutputCStr(c_str);
-		return out;
-	}
-	template <typename CharT>
-	inline ICOutput<CharT>& operator-(
-		ICOutput<CharT>& out,
-		const fptr<void, ICOutput<CharT>&> pfn)
-	{
-		pfn(out);
-		return out;
-	}
-
-	using ICOutputA = ICOutput<Char>;
-	using ICOutputW = ICOutput<WChar>;
-	using ICOutputU8 = ICOutput<U8Char>;
-	using ICOutputU16 = ICOutput<U16Char>;
-	using ICOutputU32 = ICOutput<U32Char>;
-
-	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
-	class IBOutput : public IOutput<CharT, Traits>, public ICOutput<CharT>
-	{
-	private:
-		using Base = IOutput<CharT, Traits>;
-		using BaseC = ICOutput<CharT>;
-		static_assert(
-			::std::is_same_v<typename Base::CharType, typename BaseC::CharType>,
-			"[Petal] Different CharType in Abstract::IBOutput");
-		static_assert(
-			::std::is_same_v<typename Base::CStringRefType, typename BaseC::CStringRefType>,
-			"[Petal] Different CStringRefType in Abstract::IBOutput");
-	public:
-		using typename Base::CharType;
-		using typename Base::TraitsType;
-		using typename Base::StringType;
-		using typename Base::StringViewType;
-		using typename Base::CStringRefType;
-		using typename BaseC::CStringType;
-	public:
-		virtual void Output(StringViewType str) = 0;
-		virtual void OutputCStr(CStringType c_str) = 0;
-		virtual LineBreakMode LnMode() noexcept = 0;
-		virtual LineBreakMode LnModeCStr() noexcept = 0;
-	};
-
-	template <typename CharT, typename Traits>
-	inline IBOutput<CharT, Traits>& operator+(
-		IBOutput<CharT, Traits>& out,
-		typename IBOutput<CharT, Traits>::StringViewType str)
-	{
-		out.Output(str);
-		return out;
-	}
-	template <typename CharT, typename Traits>
-	inline IBOutput<CharT, Traits>& operator+(
-		IBOutput<CharT, Traits>& out,
-		const fptr<void, IOutput<CharT, Traits>&> pfn)
-	{
-		pfn(out);
-		return out;
-	}
-	template <typename CharT>
-	inline IBOutput<CharT>& operator-(
-		IBOutput<CharT>& out,
-		typename IBOutput<CharT>::CStringType c_str)
-	{
-		out.OutputCStr(c_str);
-		return out;
-	}
-	template <typename CharT>
-	inline IBOutput<CharT>& operator-(
-		IBOutput<CharT>& out,
-		const fptr<void, ICOutput<CharT>&> pfn)
-	{
-		pfn(out);
-		return out;
-	}
-
-	using IBOutputA = IBOutput<Char>;
-	using IBOutputW = IBOutput<WChar>;
-	using IBOutputU8 = IBOutput<U8Char>;
-	using IBOutputU16 = IBOutput<U16Char>;
-	using IBOutputU32 = IBOutput<U32Char>;
+	using IOutputA = Output<Char>;
+	using IOutputW = Output<WChar>;
+	using IOutputU8 = Output<U8Char>;
+	using IOutputU16 = Output<U16Char>;
+	using IOutputU32 = Output<U32Char>;
 }
 
 namespace Petal
@@ -201,14 +91,9 @@ namespace Petal
 #endif
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
-	inline void ln(Abstract::IOutput<CharT, Traits>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.Output({})))
+	inline void ln(Abstract::Output<CharT, Traits>& output)
 	{
-		output.Output(GetLn<CharT>(output.LnMode()).view());
-	};
-	template <typename CharT>
-	inline void ln(Abstract::ICOutput<CharT>& output) noexcept(noexcept(GetLn<CharT>({})) && noexcept(output.OutputCStr({})))
-	{
-		output.OutputCStr(GetLn<CharT>(output.LnModeCStr()).c_str());
+		output.Write(GetLn<CharT>(output.LnMode()).view());
 	};
 }
 

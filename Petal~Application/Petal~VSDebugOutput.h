@@ -12,22 +12,21 @@
 namespace Petal::Abstract
 {
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>>
-	class VSDebugOutput : public IBOutput<CharT, Traits>
+	class VSDebugOutput : public Output<CharT, Traits>
 	{
 	private:
-		using Base = IBOutput<CharT, Traits>;
+		using Base = Output<CharT, Traits>;
 	public:
 		using typename Base::CharType;
 		using typename Base::TraitsType;
 		using typename Base::StringType;
 		using typename Base::StringViewType;
 		using typename Base::CStringRefType;
-		using typename Base::CStringType;
+		using CStringType = Petal::ptrc<CharType>;
 	public:
-		virtual void Output(StringViewType str) = 0;
-		virtual void OutputCStr(CStringType c_str) = 0;
+		virtual void Write(StringViewType str) = 0;
+		virtual void WriteCStr(CStringType c_str) noexcept = 0;
 		virtual LineBreakMode LnMode() noexcept override { return this->line_break_mode; }
-		virtual LineBreakMode LnModeCStr() noexcept override { return this->LnMode(); }
 	public:
 		LineBreakMode line_break_mode{};
 	};
@@ -47,8 +46,8 @@ namespace Petal::Debug
 		using typename Base::CStringRefType;
 		using typename Base::CStringType;
 	public:
-		virtual void Output(StringViewType str) override;
-		virtual void OutputCStr(CStringType c_str) noexcept override;
+		void Write(StringViewType str) override;
+		void WriteCStr(CStringType c_str) noexcept override;
 	public:
 		constexpr VSDebugOutputA() = default;
 	};
@@ -65,8 +64,8 @@ namespace Petal::Debug
 		using typename Base::CStringRefType;
 		using typename Base::CStringType;
 	public:
-		virtual void Output(StringViewType str) override;
-		virtual void OutputCStr(CStringType c_str) noexcept override;
+		void Write(StringViewType str) override;
+		void WriteCStr(CStringType c_str) noexcept override;
 	public:
 		constexpr VSDebugOutputW() = default;
 	};
@@ -83,17 +82,19 @@ namespace Petal::Debug::V
 	template <typename... Args>
 	inline void print(StringView fmt, Args&&... args)
 	{
-		dout + ::std::vformat(fmt, ::std::make_format_args(args...));
+		dout << ::std::vformat(fmt, ::std::make_format_args(args...));
 	}
+#if 0 // remove this template
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<Char, std::remove_const_t<CharT>>
 	inline void print(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
+#endif
 	inline void println()
 	{
-		dout + ln;
+		dout << ln;
 	}
 	template <typename... Args>
 	inline void println(StringView fmt, Args&&... args)
@@ -101,27 +102,31 @@ namespace Petal::Debug::V
 		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
+#if 0 // remove this template
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<Char, std::remove_const_t<CharT>>
 	inline void println(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
+#endif
 
 	template <typename... Args>
 	inline void wprint(WStringView fmt, Args&&... args)
 	{
-		dowt + ::std::vformat(fmt, ::std::make_wformat_args(args...));
+		dowt << ::std::vformat(fmt, ::std::make_wformat_args(args...));
 	}
+#if 0 // remove this template
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
 	inline void wprint(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
+#endif
 	inline void wprintln()
 	{
-		dowt + ln;
+		dowt << ln;
 	}
 	template <typename... Args>
 	inline void wprintln(WStringView fmt, Args&&... args)
@@ -129,12 +134,14 @@ namespace Petal::Debug::V
 		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
+#if 0 // remove this template
 	template <typename CharT, tsize char_arr_size, typename... Args>
 		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
 	inline void wprintln(CharT (&fmt)[char_arr_size], Args&&... args)
 	{
 		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
 	}
+#endif
 }
 
 namespace Petal::Debug
@@ -142,11 +149,11 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void print(const ::std::format_string<Args...> fmt, Args&&... args)
 	{
-		dout + ::std::vformat(fmt.get(), ::std::make_format_args(args...));
+		dout << ::std::vformat(fmt.get(), ::std::make_format_args(args...));
 	}
 	inline void println()
 	{
-		dout + ln;
+		dout << ln;
 	}
 	template <typename... Args>
 	inline void println(const ::std::format_string<Args...> fmt, Args&&... args)
@@ -158,11 +165,11 @@ namespace Petal::Debug
 	template <typename... Args>
 	inline void wprint(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
-		dowt + ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
+		dowt << ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
 	}
 	inline void wprintln()
 	{
-		dowt + ln;
+		dowt << ln;
 	}
 	template <typename... Args>
 	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
@@ -204,8 +211,8 @@ namespace Petal::Debug
 #endif
 
 #if defined(Petal_Enable_VSDebugOutput)
-#define Petal_VSDebugOutputA(x) ::Petal::dout.OutputCStr( x )
-#define Petal_VSDebugOutputW(x) ::Petal::dowt.OutputCStr( x )
+#define Petal_VSDebugOutputA(x) ::Petal::dout.WriteCStr( x )
+#define Petal_VSDebugOutputW(x) ::Petal::dowt.WriteCStr( x )
 #else
 #define Petal_VSDebugOutputA(x)
 #define Petal_VSDebugOutputW(x)
