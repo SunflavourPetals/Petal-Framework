@@ -24,7 +24,7 @@
 一个用于枚举虚拟键码的“类枚举”。  
 
 对微软文档所列举的常用键码进行了枚举，对 OEM 相关键码的命名参考了微软文档对其用于美国标准键盘的描述。  
-当需要更详细的信息时，可以使用 WIN32 中以 `VK_` 开头的宏，它们被定义在 `WinUser.h` 这个头文件中，参考[虚拟键码的微软文档](https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes "中文页面")。  
+当需要使用未被本框架枚举的虚拟键码时，可以使用 WIN32 中以 `VK_` 开头的宏，它们被定义在 `WinUser.h` 这个头文件中，参考[虚拟键码的微软文档](https://learn.microsoft.com/zh-cn/windows/win32/inputdev/virtual-key-codes "中文页面")。  
 
 我们没有将这个类定义为 final，目的是当有需要时方便用户扩展它。  
 
