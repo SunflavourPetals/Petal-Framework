@@ -71,8 +71,16 @@ namespace Petal
 			static constexpr vk Add{ VK_ADD }; // numpad +
 			static constexpr vk Separator{ VK_SEPARATOR };
 			static constexpr vk Subtract{ VK_SUBTRACT }; // numpad -
-			static constexpr vk Decimal{ VK_DECIMAL };
+			static constexpr vk Decimal{ VK_DECIMAL }; // numpad .
 			static constexpr vk Divide{ VK_DIVIDE }; // numpad /
+		};
+		class Launch
+		{
+		public:
+			static constexpr vk Mail{ VK_LAUNCH_MAIL };
+			static constexpr vk MediaSelect{ VK_LAUNCH_MEDIA_SELECT };
+			static constexpr vk App1{ VK_LAUNCH_APP1 };
+			static constexpr vk App2{ VK_LAUNCH_APP2 };
 		};
 		static constexpr vk Backspace{ VK_BACK };
 		static constexpr vk Tab{ VK_TAB };
@@ -99,16 +107,16 @@ namespace Petal
 		static constexpr vk Insert{ VK_INSERT };
 		static constexpr vk Delete{ VK_DELETE };
 		static constexpr vk Help{ VK_HELP };
-		static constexpr vk Key0{ 0x30 }; // key 0
-		static constexpr vk Key1{ 0x31 }; // key 1
-		static constexpr vk Key2{ 0x32 }; // key 2
-		static constexpr vk Key3{ 0x33 }; // key 3
-		static constexpr vk Key4{ 0x34 }; // key 4
-		static constexpr vk Key5{ 0x35 }; // key 5
-		static constexpr vk Key6{ 0x36 }; // key 6
-		static constexpr vk Key7{ 0x37 }; // key 7
-		static constexpr vk Key8{ 0x38 }; // key 8
-		static constexpr vk Key9{ 0x39 }; // key 9
+		static constexpr vk Num0{ 0x30 }; // key 0
+		static constexpr vk Num1{ 0x31 }; // key 1
+		static constexpr vk Num2{ 0x32 }; // key 2
+		static constexpr vk Num3{ 0x33 }; // key 3
+		static constexpr vk Num4{ 0x34 }; // key 4
+		static constexpr vk Num5{ 0x35 }; // key 5
+		static constexpr vk Num6{ 0x36 }; // key 6
+		static constexpr vk Num7{ 0x37 }; // key 7
+		static constexpr vk Num8{ 0x38 }; // key 8
+		static constexpr vk Num9{ 0x39 }; // key 9
 		static constexpr vk A{ 0x41 };
 		static constexpr vk B{ 0x42 };
 		static constexpr vk C{ 0x43 };
