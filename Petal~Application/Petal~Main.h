@@ -21,8 +21,28 @@ namespace Petal::WinMain
 	extern const ptrc<TChar>& cmd_line;
 	extern const win32int& cmd_show;
 	extern const boolean& valid;
-	win32hins HIns() noexcept;
-	TCStringRef CmdLine() noexcept;
+
+	inline win32hins HIns() noexcept
+	{
+#ifdef Petal_Enable_Unicode
+		return ::GetModuleHandleW(nullptr);
+#else
+		return ::GetModuleHandleA(nullptr);
+#endif
+	}
+	inline TCStringRef CmdLine() noexcept
+	{
+		static ptrc<TChar> cmd_line
+		{
+#ifdef Petal_Enable_Unicode
+				::GetCommandLineW()
+#else
+				::GetCommandLineA()
+#endif
+	};
+		static tsize length{ ::std::char_traits<TChar>::length(cmd_line) };
+		return { cmd_line, length };
+}
 }
 
 #ifndef Petal_Enable_PetalMain

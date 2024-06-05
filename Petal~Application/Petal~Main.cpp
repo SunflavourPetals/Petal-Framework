@@ -11,7 +11,7 @@ namespace
 {
 	namespace PetalUnnamed
 	{
-		namespace Abstract
+		namespace Base
 		{
 			class EntryPointArguments
 			{
@@ -29,7 +29,7 @@ namespace
 
 		namespace Main
 		{
-			class Arguments final : public Abstract::EntryPointArguments
+			class Arguments final : public Base::EntryPointArguments
 			{
 			public:
 				constexpr const int& Argc() const noexcept
@@ -47,7 +47,10 @@ namespace
 			public:
 				constexpr Arguments() = default;
 			public:
-				constexpr void Initialize(int argc, const Petal::ptrc<Petal::TChar> argv[], const Petal::ptrc<Petal::TChar> envp[]) noexcept // 初始化为有效对象
+				constexpr void Initialize(
+					int argc,
+					const Petal::ptrc<Petal::TChar> argv[],
+					const Petal::ptrc<Petal::TChar> envp[]) noexcept
 				{
 					if (this->Initialized() == true)
 					{
@@ -78,7 +81,7 @@ namespace
 
 		namespace WinMain
 		{
-			class Arguments final : public Abstract::EntryPointArguments
+			class Arguments final : public Base::EntryPointArguments
 			{
 			public:
 				constexpr const Petal::win32hins& HIns() const noexcept
@@ -96,7 +99,10 @@ namespace
 			public:
 				constexpr Arguments() = default;
 			public:
-				constexpr void Initialize(Petal::win32hins instance_handle, Petal::ptrc<Petal::TChar> cmd_line, Petal::win32int cmd_show) noexcept // 初始化为有效对象
+				constexpr void Initialize(
+					Petal::win32hins instance_handle,
+					Petal::ptrc<Petal::TChar> cmd_line,
+					Petal::win32int cmd_show) noexcept
 				{
 					if (this->Initialized() == true)
 					{
@@ -151,27 +157,6 @@ namespace Petal::WinMain
 	const ptrc<TChar>& cmd_line{ PetalUnnamed::WinMain::arguments.CmdLine() };
 	const win32int& cmd_show{ PetalUnnamed::WinMain::arguments.CmdShow() };
 	const boolean& valid{ PetalUnnamed::WinMain::arguments.Valid() };
-	win32hins HIns() noexcept
-	{
-#ifdef Petal_Enable_Unicode
-		return ::GetModuleHandleW(nullptr);
-#else
-		return ::GetModuleHandleA(nullptr);
-#endif
-	}
-	TCStringRef CmdLine() noexcept
-	{
-		static ptrc<TChar> cmd_line
-		{
-#ifdef Petal_Enable_Unicode
-				::GetCommandLineW()
-#else
-				::GetCommandLineA()
-#endif
-		};
-		static tsize length{ ::std::char_traits<TChar>::length(cmd_line) };
-		return { cmd_line, length };
-	}
 }
 
 #ifdef Petal_Enable_PetalMain
