@@ -123,8 +123,8 @@
 | `Pause`                   | `VK_PAUSE`                | Pause 键                  |
 | `Period`                  | `VK_OEM_PERIOD`           | `.` `>`                   |
 | `Plus`                    | `VK_OEM_PLUS`             | `=` `+`                   |
-| `PrintScreen`             | `VK_SNAPSHOT`             | PrintScreen 键            |
 | `Print`                   | `VK_PRINT`                | Print 键                  |
+| `PrintScreen`             | `VK_SNAPSHOT`             | PrintScreen 键            |
 | `Q`                       | `0x51`                    | Q 键                      |
 | `QuestionMark`            | `VK_OEM_2`                | `/` `?`                   |
 | `Quote`                   | `VK_OEM_7`                | `'` `"`                   |
