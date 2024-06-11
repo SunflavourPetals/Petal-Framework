@@ -207,8 +207,8 @@ namespace Petal
 #else
 		TString number{ std::to_string(this->default_number) };
 #endif
-		this->UpdateClassName(TString{ Petal_TStr("Petal-window-class=") } + number);
-		this->default_number += 1;
+		this->UpdateClassName(Petal_TStr("-Petal-window-class-") + number);
+		this->default_number += 1; // 暂不保证并发安全
 	}
 	WindowClassArgs::WindowClassArgs(TStringView class_name)
 	{
@@ -335,14 +335,6 @@ namespace Petal
 	[[nodiscard]] auto WindowClass::ClassName() const noexcept -> const Name&
 	{
 		return this->name;
-	}
-	[[nodiscard]] auto WindowClass::ClassNameView() const noexcept -> NameView
-	{
-		return { this->name };
-	}
-	[[nodiscard]] auto WindowClass::ClassNameCRef() const noexcept -> NameCRef
-	{
-		return { this->name };
 	}
 	[[nodiscard]] auto WindowClass::Valid() const noexcept -> boolean
 	{

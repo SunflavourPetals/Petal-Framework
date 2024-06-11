@@ -117,33 +117,24 @@ namespace Petal
 		WindowClassArgs(const WindowClassArgs&) = default;
 		WindowClassArgs(WindowClassArgs&&) noexcept = default;
 		~WindowClassArgs() = default;
-	public:
-		static constexpr win32wndproc    default_window_process{ &CommonWindowProcess };
-		static constexpr win32uint       default_style{ CS_HREDRAW | CS_VREDRAW };
-		static constexpr int             default_class_extra{ 0 };
-		static constexpr int             default_window_extra{ 0 };
-		static constexpr win32hbrush     default_background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
-		static constexpr win32hicon      default_icon_sm{ nullptr };
-		static inline const win32hicon   default_icon{ IWindow::LoadDefaultWinAppIcon() };
-		static inline const win32hcursor default_cursor{ IWindow::LoadDefaultWinAppCursor() };
 	private:
-		// WIN32-RegisterClassEx requires that string Win32WindowClass::lpszClassName not be nullptr and not equal to null_tstr.
+		// WIN32-RegisterClassEx requires that string Win32WindowClass::lpszClassName not be nullptr and not equal to "" or L"".
 		// WIN32-RegisterClassEx requires class_name's length less than 256 after processing(StringToCStyleString).
 		TString class_name;
 		// When using_int_menu_res == false:
-		// If menu_name != null_tstr, method BuildWindowClass will assign menu_name.c_str() to lpszMenuName. 
-		// If menu_name == null_tstr, method BuildWindowClass will assign nullptr to lpszMenuName. 
+		// If menu_name != "" or L"", method BuildWindowClass will assign menu_name.c_str() to lpszMenuName. 
+		// If menu_name == "" or L"", method BuildWindowClass will assign nullptr to lpszMenuName. 
 		// Use StringToCStyleString to ignore NUL characters. 
 		TString menu_name;
 	public:
-		win32wndproc window_process{ default_window_process };
-		win32uint    style{ default_style };
-		int          class_extra{ default_class_extra };
-		int          window_extra{ default_window_extra };
-		win32hicon   icon{ default_icon };
-		win32hcursor cursor{ default_cursor };
-		win32hbrush  background_brush{ default_background_brush };
-		win32hicon   icon_sm{ default_icon_sm };
+		win32wndproc window_process{ &CommonWindowProcess };
+		win32uint    style{ CS_HREDRAW | CS_VREDRAW };
+		int          class_extra{ 0 };
+		int          window_extra{ 0 };
+		win32hicon   icon{ IWindow::LoadDefaultWinAppIcon() };
+		win32hcursor cursor{ IWindow::LoadDefaultWinAppCursor() };
+		win32hbrush  background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
+		win32hicon   icon_sm{ nullptr };
 		win32word    menu_resource{ 0 };
 		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building Win32WindowClass.
 		boolean      using_int_menu_resource{ false };
@@ -201,16 +192,12 @@ namespace Petal
 	public:
 		using Atom = win32atom;
 		using Name = TString;
-		using NameView = TStringView;
-		using NameCRef = TCStringRef;
 		using RegisterResult = WindowClassRegisteringResult;
 		using UnregisterResult = WindowClassUnregisteringResult;
 		using Hash = WindowClassHash;
 	public:
 		[[nodiscard]] auto ClassAtom() const noexcept -> Atom;
 		[[nodiscard]] auto ClassName() const noexcept -> const Name&;
-		[[nodiscard]] auto ClassNameView() const noexcept -> NameView;
-		[[nodiscard]] auto ClassNameCRef() const noexcept -> NameCRef;
 		[[nodiscard]] auto Valid() const noexcept -> boolean;
 		auto Register(const Win32WindowClass& window_class) -> RegisterResult;
 		auto Register(const WindowClassArgs& window_class_args = {}) -> RegisterResult;

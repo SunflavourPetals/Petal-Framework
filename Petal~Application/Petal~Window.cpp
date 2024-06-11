@@ -189,14 +189,7 @@ namespace Petal
 		{
 			CreateMessage wrapped_msg{ msg, w, l };
 			this->CreateEvent(wrapped_msg);
-			if (wrapped_msg.continue_creation == true)
-			{
-				return 0;
-			}
-			else
-			{
-				return -1;
-			}
+			return wrapped_msg.continue_creation ? 0 : -1;
 		}
 		break;
 		case WM_ACTIVATE:
