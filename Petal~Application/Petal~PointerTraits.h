@@ -141,7 +141,7 @@ namespace Petal::TypeTraits
 	Petal_Generate_RemoveAllXPtr(Raw);      // Remove all raw pointer
 	Petal_Generate_RemoveAllXPtr(Unique);   // Remove all unique pointer
 	Petal_Generate_RemoveAllXPtr(Shared);   // Remove all shared pointer
-	Petal_Generate_RemoveAllXPtr(Weak);	    // Remove all weak pointer
+	Petal_Generate_RemoveAllXPtr(Weak);     // Remove all weak pointer
 	Petal_Generate_RemoveAllXPtr(Smart);    // Remove all smart pointer
 	Petal_Generate_RemoveAllXPtr(Generic);  // Remove all any pointer
 #undef Petal_Generate_RemoveAllXPtr
