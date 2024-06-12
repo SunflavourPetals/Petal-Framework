@@ -13,31 +13,6 @@
 #include <iostream>
 #include <algorithm>
 
-namespace Test
-{
-	template <typename, typename = void>
-	struct IsUniquePointer : ::std::false_type {};
-	template <typename Ty, typename Dx>
-	struct IsUniquePointer<::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
-	template <typename Ty, typename Dx>
-	struct IsUniquePointer<const ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
-	template <typename Ty, typename Dx>
-	struct IsUniquePointer<volatile ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
-	template <typename Ty, typename Dx>
-	struct IsUniquePointer<const volatile ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
-
-	void foo()
-	{
-		using w = std::weak_ptr<int>;
-		using s = std::shared_ptr<int>;
-		using u = std::unique_ptr<int, decltype([](int* p) { Petal::Debug::println("delete > {}", *p); delete p; })> ;
-		u a(new int{ 123 });
-		Petal::Debug::println("{}", *a);
-		static_assert(IsUniquePointer<u>::value);
-		static_assert(Petal::TypeTraits::IsUniquePointer<u>::value);
-	}
-}
-
 namespace App
 {
 	using Petal::Debug::println;
@@ -49,9 +24,6 @@ namespace App
 	constexpr bool aaa<Ty*> = false;
 
 	int main() {
-		Test::foo();
-
-
 		using namespace Petal::TypeTraits;
 		bool xxx = aaa<int****>;
 		bool fff = aaa<int>;
