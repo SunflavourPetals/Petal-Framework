@@ -10,7 +10,81 @@
 #include <memory>
 #include <vector>
 
+#include <iostream>
+#include <algorithm>
+
+namespace Test
+{
+	template <typename, typename = void>
+	struct IsUniquePointer : ::std::false_type {};
+	template <typename Ty, typename Dx>
+	struct IsUniquePointer<::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
+	template <typename Ty, typename Dx>
+	struct IsUniquePointer<const ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
+	template <typename Ty, typename Dx>
+	struct IsUniquePointer<volatile ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
+	template <typename Ty, typename Dx>
+	struct IsUniquePointer<const volatile ::std::unique_ptr<Ty, Dx>> : ::std::true_type {};
+
+	void foo()
+	{
+		using w = std::weak_ptr<int>;
+		using s = std::shared_ptr<int>;
+		using u = std::unique_ptr<int, decltype([](int* p) { Petal::Debug::println("delete > {}", *p); delete p; })> ;
+		u a(new int{ 123 });
+		Petal::Debug::println("{}", *a);
+		static_assert(IsUniquePointer<u>::value);
+		static_assert(Petal::TypeTraits::IsUniquePointer<u>::value);
+	}
+}
+
 namespace App
+{
+	using Petal::Debug::println;
+	using Petal::Debug::print;
+	template <class Ty>
+	constexpr bool aaa = true;
+
+	template <class Ty>
+	constexpr bool aaa<Ty*> = false;
+
+	int main() {
+		Test::foo();
+
+
+		using namespace Petal::TypeTraits;
+		bool xxx = aaa<int****>;
+		bool fff = aaa<int>;
+
+		static_assert(IsUniquePointer<std::unique_ptr<int, std::default_delete<int>>>::value);
+		static_assert(is_unique_pointer<std::unique_ptr<int>>);
+
+		static_assert(std::is_same_v<RemoveOneRawPointer<int*>::Type, int>);
+		static_assert(std::is_same_v<RemoveOneRawPointer<int***>::Type, int**>);
+		
+		static_assert(std::is_same_v<RemoveAllRawPointer<int*>::Type, int>);
+		static_assert(std::is_same_v<RemoveAllRawPointer<int *const *const *const>::Type, int>);
+		
+		static_assert(std::is_same_v<RemoveOneUniquePointer<std::unique_ptr<int>>::Type, int>);
+		static_assert(std::is_same_v<RemoveOneUniquePointer<std::unique_ptr<const std::unique_ptr<int>>>::Type, const std::unique_ptr<int>>);
+
+		static_assert(std::is_same_v<RemoveAllUniquePointer<std::unique_ptr<int>>::Type, int>);
+		static_assert(std::is_same_v<RemoveAllUniquePointer<std::unique_ptr<const std::unique_ptr<int>>>::Type, int>);
+
+		static_assert(std::is_same_v<RemoveOneSharedPointer<std::shared_ptr<int>>::Type, int>);
+		static_assert(std::is_same_v<RemoveOneSharedPointer<std::shared_ptr<const std::shared_ptr<int>>>::Type, const std::shared_ptr<int>>);
+
+		static_assert(std::is_same_v<RemoveOneWeakPointer<std::weak_ptr<int>>::Type, int>);
+		static_assert(std::is_same_v<RemoveOneWeakPointer<std::weak_ptr<const std::weak_ptr<int>>>::Type, const std::weak_ptr<int>>);
+		
+		static_assert(std::is_same_v<RemoveAllAnyPointer<const std::weak_ptr<const volatile std::unique_ptr<std::shared_ptr<int*const>*const*>***>****>::Type, int>);
+		return 0;
+	}
+}
+
+
+
+namespace App2
 {
 	class AppWindow : public Petal::RawInputWindow // Test raw input window
 	{
@@ -21,7 +95,7 @@ namespace App
 			Petal::tsize raw_input_size) noexcept
 			override
 		{
-			Petal::Debug::println("KEYBOARD");
+			Petal::Debug::println("KEYBOARD VK {:x}", raw_input.data.keyboard.VKey);
 		}
 		void RawHidEvent(
 			Petal::RawHidMessage& e,
@@ -76,27 +150,9 @@ namespace App
 
 	int main()
 	{
-		AppWindow app{};
 		
-		{
-			auto bp = static_cast<Petal::byte*>(operator new[](sizeof(Petal::byte) * 128));
-			for (int i = 0; i < 8; ++i)
-			{
-				for (int j = 0; j < 16; ++j)
-				{
-					Petal::Debug::print("{:3x}", bp[i * 8 + j]);
-				}
-				Petal::Debug::println();
-			}
-			operator delete[](bp);
-		}
 
-		// Petal::LogA log("test.txt");
-		// log + "test log" + Petal::ln;
-		// Test operator+ and operator- for Petal::Debug::VSDebugOutputA/W
-		// Petal::dout + "test A+ " - Petal::ln - "test A- " + Petal::ln;
-		// Petal::dowt + L"test W+" - Petal::ln - L"test W-" + Petal::ln;
-
+		AppWindow app{};
 		volatile bool not_end{ true };
 
 		std::thread t([](volatile bool& not_end) {
@@ -172,11 +228,24 @@ namespace App
 				KReleaseA() : KeyReleaseProcess(Petal::VirtualKey::A) {}
 			};
 
-			kv.push_back(std::make_unique<KPushA>());
-			kv.push_back(std::make_unique<KHoldA>());
-			kv.push_back(std::make_unique<KReleaseA>());
+			static auto tester = Petal::VirtualKey::Numpad::Separator;
 
-			kc.Register({ Petal::VirtualKey::A, Petal::VirtualKey::B });
+			class KPushTest : public Petal::Keyboard::KeyPushProcess
+			{
+			public:
+				void Execution(const decltype(kc)::Resource& r) override
+				{
+					Petal::Debug::println("按下了 TEST 键(键盘)!");
+				}
+				KPushTest() : KeyPushProcess(tester) {}
+			};
+
+		//	kv.push_back(std::make_unique<KPushA>());
+		//	kv.push_back(std::make_unique<KHoldA>());
+		//	kv.push_back(std::make_unique<KReleaseA>());
+			kv.push_back(std::make_unique<KPushTest>());
+
+			kc.Register({ Petal::VirtualKey::A, Petal::VirtualKey::B, tester });
 
 			counter.Count();
 
@@ -188,7 +257,7 @@ namespace App
 				kc.Update(kv.begin(), kv.end(), counter.DeltaCounts());
 			}
 			Petal::Debug::println("input thread: exit");
-			},
+		},
 			::std::ref(not_end));
 
 		Petal::MessageLoop();

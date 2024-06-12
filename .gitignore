@@ -1,7 +1,10 @@
-# My rules
+# My rules.
 
+# backup
 [Bb]ackup/
-__*
+
+# ignore main.cpp, and it's used most of the time for testing.
+Petal~Application/main.cpp
 
 # Created by https://www.toptal.com/developers/gitignore/api/visualstudio,c++
 # Edit at https://www.toptal.com/developers/gitignore?templates=visualstudio,c++
