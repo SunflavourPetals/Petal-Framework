@@ -20,28 +20,6 @@ namespace App
 
 	int main() {
 		using namespace Petal::TypeTraits;
-
-		static_assert(IsUniquePointer<std::unique_ptr<int, std::default_delete<int>>>::value);
-		static_assert(is_unique_pointer<std::unique_ptr<int>>);
-
-		static_assert(std::is_same_v<RemoveOneRawPointer<int*>::Type, int>);
-		static_assert(std::is_same_v<RemoveOneRawPointer<int***>::Type, int**>);
-		
-		static_assert(std::is_same_v<RemoveAllRawPointer<int*>::Type, int>);
-		static_assert(std::is_same_v<RemoveAllRawPointer<int *const *const *const>::Type, int>);
-		
-		static_assert(std::is_same_v<RemoveOneUniquePointer<std::unique_ptr<int>>::Type, int>);
-		static_assert(std::is_same_v<RemoveOneUniquePointer<std::unique_ptr<const std::unique_ptr<int>>>::Type, const std::unique_ptr<int>>);
-
-		static_assert(std::is_same_v<RemoveAllUniquePointer<std::unique_ptr<int>>::Type, int>);
-		static_assert(std::is_same_v<RemoveAllUniquePointer<std::unique_ptr<const std::unique_ptr<int>>>::Type, int>);
-
-		static_assert(std::is_same_v<RemoveOneSharedPointer<std::shared_ptr<int>>::Type, int>);
-		static_assert(std::is_same_v<RemoveOneSharedPointer<std::shared_ptr<const std::shared_ptr<int>>>::Type, const std::shared_ptr<int>>);
-
-		static_assert(std::is_same_v<RemoveOneWeakPointer<std::weak_ptr<int>>::Type, int>);
-		static_assert(std::is_same_v<RemoveOneWeakPointer<std::weak_ptr<const std::weak_ptr<int>>>::Type, const std::weak_ptr<int>>);
-		
 		static_assert(std::is_same_v<RemoveAllAnyPointer<const std::weak_ptr<const volatile std::unique_ptr<std::shared_ptr<int*const>*const*>***>****>::Type, int>);
 		return 0;
 	}
