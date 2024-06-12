@@ -25,6 +25,7 @@ namespace App
 
 	int main() {
 		using namespace Petal::TypeTraits;
+
 		bool xxx = aaa<int****>;
 		bool fff = aaa<int>;
 
