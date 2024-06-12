@@ -20,7 +20,9 @@ namespace App
 
 	int main() {
 		using namespace Petal::TypeTraits;
+		
 		static_assert(std::is_same_v<RemoveAllAnyPointer<const std::weak_ptr<const volatile std::unique_ptr<std::shared_ptr<int*const>*const*>***>****>::Type, int>);
+
 		return 0;
 	}
 }
