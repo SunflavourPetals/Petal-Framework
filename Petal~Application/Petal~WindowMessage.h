@@ -28,7 +28,7 @@ namespace Petal
 	{
 	public:
 		win32msg Message() const noexcept;
-	protected:
+	public:
 		win32wprm Word() const noexcept;
 		win32lprm Long() const noexcept;
 		win32word HWLong() const noexcept;
