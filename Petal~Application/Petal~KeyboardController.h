@@ -74,12 +74,11 @@ namespace Petal::Concept
 	concept GenericKeyboardEventProcessIterator = requires
 	{
 		typename ::std::iterator_traits<Ty>::value_type;
-		requires ::std::is_const_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
-		requires ::std::is_volatile_v<typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type> == false;
-		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<typename Ty::value_type>::Type>;
+		requires ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllAnyPointerType<typename Ty::value_type>>;
+		::std::declval<typename TypeTraits::RemoveAllAnyPointerType<typename Ty::value_type>>().Execution(::std::declval<const Abstract::KeyboardEventProcess::Resource&>());
 	};
 	template <typename Ty>
-	concept GenericKeyboardEventProcessPointer = TypeTraits::is_generic_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllGenericPointer<Ty>::Type>;
+	concept GenericKeyboardEventProcessPointer = TypeTraits::is_any_pointer<Ty> && ::std::is_base_of_v<Abstract::KeyboardEventProcess, typename TypeTraits::RemoveAllAnyPointerType<Ty>>;
 }
 
 namespace Petal::Abstract::Keyboard
