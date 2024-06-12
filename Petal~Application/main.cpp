@@ -17,17 +17,9 @@ namespace App
 {
 	using Petal::Debug::println;
 	using Petal::Debug::print;
-	template <class Ty>
-	constexpr bool aaa = true;
-
-	template <class Ty>
-	constexpr bool aaa<Ty*> = false;
 
 	int main() {
 		using namespace Petal::TypeTraits;
-
-		bool xxx = aaa<int****>;
-		bool fff = aaa<int>;
 
 		static_assert(IsUniquePointer<std::unique_ptr<int, std::default_delete<int>>>::value);
 		static_assert(is_unique_pointer<std::unique_ptr<int>>);
@@ -54,8 +46,6 @@ namespace App
 		return 0;
 	}
 }
-
-
 
 namespace App2
 {
