@@ -3,7 +3,22 @@
 #ifndef Petal_Header_PointerTraits
 #define Petal_Header_PointerTraits
 
+#include <type_traits>
 #include <memory>
+
+namespace Petal::TypeTraits::Impl
+{
+	template <typename Ty, typename Dx = void>
+	struct IsUniquePtr : std::false_type {};
+	template <typename Ty, typename Dx>
+	struct IsUniquePtr<::std::unique_ptr<Ty, Dx>> : std::true_type { };
+	template <typename Ty, typename Dx>
+	struct IsUniquePtr<const ::std::unique_ptr<Ty, Dx>> : std::true_type { };
+	template <typename Ty, typename Dx>
+	struct IsUniquePtr<volatile ::std::unique_ptr<Ty, Dx>> : std::true_type { };
+	template <typename Ty, typename Dx>
+	struct IsUniquePtr<const volatile ::std::unique_ptr<Ty, Dx>> : std::true_type { };
+}
 
 namespace Petal::TypeTraits
 {
@@ -17,20 +32,12 @@ namespace Petal::TypeTraits
 
 	// unique pointer
 
-	template <typename>
-	struct IsUniquePointer : ::std::false_type {};
 	template <typename Ty>
-	struct IsUniquePointer<::std::unique_ptr<Ty>> : ::std::true_type {};
-	template <typename Ty>
-	struct IsUniquePointer<const ::std::unique_ptr<Ty>> : ::std::true_type {};
-	template <typename Ty>
-	struct IsUniquePointer<volatile ::std::unique_ptr<Ty>> : ::std::true_type {};
-	template <typename Ty>
-	struct IsUniquePointer<const volatile ::std::unique_ptr<Ty>> : ::std::true_type {};
+	struct IsUniquePointer : std::bool_constant<Impl::IsUniquePtr<Ty>::value> {};
 
 	template <typename Ty>
 	constexpr bool is_unique_pointer{ IsUniquePointer<Ty>::value };
-
+	
 	// shared pointer
 
 	template <typename>
@@ -71,13 +78,13 @@ namespace Petal::TypeTraits
 	template <typename Ty>
 	struct IsSmartPointer : ::std::bool_constant<is_smart_pointer<Ty>> {};
 
-	// generic pointer
+	// any pointer
 
 	template <typename Ty>
-	constexpr bool is_generic_pointer{ is_smart_pointer<Ty> || is_raw_pointer<Ty> };
+	constexpr bool is_any_pointer{ is_smart_pointer<Ty> || is_raw_pointer<Ty> };
 
 	template <typename Ty>
-	struct IsGenericPointer : ::std::bool_constant<is_generic_pointer<Ty>> {};
+	struct IsAnyPointer : ::std::bool_constant<is_any_pointer<Ty>> {};
 }
 
 namespace Petal::Concept
@@ -98,7 +105,7 @@ namespace Petal::Concept
 	concept SmartPointer = TypeTraits::is_smart_pointer<Ty>;
 
 	template <typename Ty>
-	concept GenericPointer = TypeTraits::is_generic_pointer<Ty>;
+	concept AnyPointer = TypeTraits::is_any_pointer<Ty>;
 }
 
 namespace Petal::TypeTraits
@@ -127,7 +134,7 @@ namespace Petal::TypeTraits
 	Petal_Generate_RemoveOneXPtr(Shared);   // Remove one shared pointer
 	Petal_Generate_RemoveOneXPtr(Weak);     // Remove one weak pointer
 	Petal_Generate_RemoveOneXPtr(Smart);    // Remove one smart pointer
-	Petal_Generate_RemoveOneXPtr(Generic);  // Remove one any pointer
+	Petal_Generate_RemoveOneXPtr(Any);      // Remove one any pointer
 #undef Petal_Generate_RemoveOneXPtr
 
 #define Petal_Generate_RemoveAllXPtr(X) \
@@ -143,7 +150,7 @@ namespace Petal::TypeTraits
 	Petal_Generate_RemoveAllXPtr(Shared);   // Remove all shared pointer
 	Petal_Generate_RemoveAllXPtr(Weak);     // Remove all weak pointer
 	Petal_Generate_RemoveAllXPtr(Smart);    // Remove all smart pointer
-	Petal_Generate_RemoveAllXPtr(Generic);  // Remove all any pointer
+	Petal_Generate_RemoveAllXPtr(Any);      // Remove all any pointer
 #undef Petal_Generate_RemoveAllXPtr
 }
 
