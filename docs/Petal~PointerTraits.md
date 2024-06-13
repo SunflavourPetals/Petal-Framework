@@ -108,6 +108,10 @@ void foo()
 }
 ```
 
+`is_any_pointer` 被定义为 `is_smart_pointer<Ty> || is_raw_pointer<Ty>`，当特化 `IsAnyPointer` 和 `is_any_pointer` 为其添加新内容时，`PointerElement` 和 `PointerElementType` 也应该对其进行特化，以支持添加的新内容，否则 `RemoveOneXPointer | RemoveOneXPointerType` 和 `RemoveAllXPointer | RemoveAllXPointerType` 将可能错误。  
+
+对 `is_smart_pointer` 特化以添加内容，只要存在成员类型或成员类型别名 `element_type` 就无需特化 `PointerElement` 和 `PointerElementType`，否则不应该特化`IsSmartPointer` 和 `is_smart_pointer`。  
+
 ### 依赖关系
 
 1. `IsXPointer | is_x_pointer`
@@ -214,52 +218,176 @@ void foo()
 
 #### 类模板 PointerElement
 
+模板参数 `Ty`。  
+
+当类型满足概念 [`SmartPointer`](#概念-smartpointer) 时：  
+成员类型 `Type` 为 `Ty::element_type`。  
+
+当类型满足概念 [`RawPointer`](#概念-rawpointer) 时：  
+成员类型 `Type` 为 `std::remove_pointer_t<Ty>`。  
+
+否则成员类型 `Type` 未声明。  
+
 #### 别名模板 PointerElementType
+
+类型操作 [`PointerElement`](#类模板-pointerelement) 的辅助别名模板。  
+当模板参数不满足概念 [`SmartPointer`](#概念-smartpointer) 或 [`RawPointer`](#概念-rawpointer) 时，将发生错误。  
 
 #### 类模板 RemoveAllAnyPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`AnyPointer`](#概念-anypointer) 类型直到得到的类型不再符合该概念的类型。  
+
+示例：  
+
+```C++
+#include "Petal~PointerTraits.h"
+
+template <typename T>
+struct MyData
+{
+    T data{};
+};
+
+template <typename T>
+using MyDataPtr = MyData<T>*;
+
+void foo2()
+{
+    static_assert(
+        std::is_same_v<
+            Petal::TypeTraits::RemoveAllAnyPointer<
+                const volatile std::unique_ptr<
+                    MyDataPtr<int*>
+                >
+                *const
+                *volatile
+            >::Type,
+            MyData<int*>
+        >
+    );
+}
+```
+
+步骤：  
+
+1. `const volatile std::unique_ptr<MyDataPtr<int*>> *const *volatile` 移除裸指针 `*volatile`
+2. `const volatile std::unique_ptr<MyDataPtr<int*>> *const` 移除裸指针 `*const`
+3. `const volatile std::unique_ptr<MyDataPtr<int*>>` 移除 `const volatile std::unique_ptr<>`
+4. `MyDataPtr<int*>` = `MyData<int*> *` 移除 `*`
+5. `MyData<int*>` 不符合概念 [`AnyPointer`](#概念-anypointer)，得到结果
+
 #### 别名模板 RemoveAllAnyPointerType
+
+类型操作 [`RemoveAllAnyPointer`](#类模板-removeallanypointer) 的辅助变量模板。  
 
 #### 类模板 RemoveAllRawPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`RawPointer`](#概念-anypointer) 类型直到得到的类型不再符合该概念的类型。  
+
 #### 别名模板 RemoveAllRawPointerType
+
+类型操作 [`RemoveAllRawPointer`](#类模板-removeallrawpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveAllSharedPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`SharedPointer`](#概念-sharedpointer) 类型直到得到的类型不再符合该概念的类型。  
+
 #### 别名模板 RemoveAllSharedPointerType
+
+类型操作 [`RemoveAllSharedPointer`](#类模板-removeallsharedpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveAllSmartPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`SmartPointer`](#概念-smartpointer) 类型直到得到的类型不再符合该概念的类型。  
+
 #### 别名模板 RemoveAllSmartPointerType
+
+类型操作 [`RemoveAllSmartPointer`](#类模板-removeallsmartpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveAllUniquePointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`UniquePointer`](#概念-uniquepointer) 类型直到得到的类型不再符合该概念的类型。  
+
 #### 别名模板 RemoveAllUniquePointerType
+
+类型操作 [`RemoveAllUniquePointer`](#类模板-removealluniquepointer) 的辅助变量模板。  
 
 #### 类模板 RemoveAllWeakPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 循环去除顶层符合概念 [`WeakPointer`](#概念-weakpointer) 类型直到得到的类型不再符合该概念的类型。  
+
 #### 别名模板 RemoveAllWeakPointerType
+
+类型操作 [`RemoveAllWeakPointer`](#类模板-removeallweakpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneAnyPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`AnyPointer`](#概念-anypointer) 类型的类型。  
+
 #### 别名模板 RemoveOneAnyPointerType
+
+类型操作 [`RemoveOneAnyPointer`](#类模板-removeoneanypointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneRawPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`RawPointer`](#概念-rawpointer) 类型的类型。  
+
 #### 别名模板 RemoveOneRawPointerType
+
+类型操作 [`RemoveOneRawPointer`](#类模板-removeonerawpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneSharedPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`SharedPointer`](#概念-sharedpointer) 类型的类型。  
+
 #### 别名模板 RemoveOneSharedPointerType
+
+类型操作 [`RemoveOneSharedPointer`](#类模板-removeonesharedpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneSmartPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`SmartPointer`](#概念-smartpointer) 类型的类型。  
+
 #### 别名模板 RemoveOneSmartPointerType
+
+类型操作 [`RemoveOneSmartPointer`](#类模板-removeonesmartpointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneUniquePointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`UniquePointer`](#概念-uniquepointer) 类型的类型。  
+
 #### 别名模板 RemoveOneUniquePointerType
+
+类型操作 [`RemoveOneUniquePointer`](#类模板-removeoneuniquepointer) 的辅助变量模板。  
 
 #### 类模板 RemoveOneWeakPointer
 
+模板参数 `Ty`。  
+
+成员类型 `Type` 为模板参数 `Ty` 去除一层符合概念 [`WeakPointer`](#概念-weakpointer) 类型的类型。  
+
 #### 别名模板 RemoveOneWeakPointerType
+
+类型操作 [`RemoveOneWeakPointer`](#类模板-removeoneweakpointer) 的辅助变量模板。  
