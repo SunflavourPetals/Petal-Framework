@@ -42,8 +42,14 @@ namespace Petal::XInput::MiddleProcess
 	class ButtonProcess : public BasicProcess
 	{
 	public:
-		boolean LastPositive(const Controller& controller) const override;
-		boolean ThisPositive(const Controller& controller) const override;
+		boolean LastPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetLastWrappedGamepad());
+		}
+		boolean ThisPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetWrappedGamepad());
+		}
 	private:
 		boolean GamepadPositive(const WrappedGamepad& gamepad) const { return gamepad.Pushed(this->buttons); }
 	public:
@@ -58,8 +64,14 @@ namespace Petal::XInput::MiddleProcess
 	class TriggerProcess : public BasicProcess
 	{
 	public:
-		boolean LastPositive(const Controller& controller) const override;
-		boolean ThisPositive(const Controller& controller) const override;
+		boolean LastPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetLastWrappedGamepad());
+		}
+		boolean ThisPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetWrappedGamepad());
+		}
 	private:
 		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
@@ -78,8 +90,14 @@ namespace Petal::XInput::MiddleProcess
 	class StickProcess : public BasicProcess
 	{
 	public:
-		boolean LastPositive(const Controller& controller) const override;
-		boolean ThisPositive(const Controller& controller) const override;
+		boolean LastPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetLastWrappedGamepad());
+		}
+		boolean ThisPositive(const Controller& controller) const override
+		{
+			return GamepadPositive(controller.GetWrappedGamepad());
+		}
 	private:
 		boolean GamepadPositive(const WrappedGamepad& gamepad) const;
 	public:
@@ -104,7 +122,10 @@ namespace Petal::XInput
 	class ButtonPushProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (!LastPositive(resource.controller) && ThisPositive(resource.controller));
+		}
 	public:
 		ButtonPushProcess(Button::Type buttons = Button::A) :
 			ButtonProcess(buttons) {}
@@ -113,7 +134,10 @@ namespace Petal::XInput
 	class ButtonReleaseProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (LastPositive(resource.controller) && !ThisPositive(resource.controller));
+		}
 	public:
 		ButtonReleaseProcess(Button::Type buttons = Button::A) :
 			ButtonProcess(buttons) {}
@@ -122,7 +146,7 @@ namespace Petal::XInput
 	class ButtonPositiveProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return ThisPositive(resource.controller); }
 	public:
 		ButtonPositiveProcess(Button::Type buttons = Button::A) :
 			ButtonProcess(buttons) {}
@@ -131,7 +155,7 @@ namespace Petal::XInput
 	class ButtonNegativeProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return !ThisPositive(resource.controller); }
 	public:
 		ButtonNegativeProcess(Button::Type buttons = Button::A) :
 			ButtonProcess(buttons) {}
@@ -140,7 +164,7 @@ namespace Petal::XInput
 	class ButtonHoldProcess : public MiddleProcess::ButtonProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return hold_config.Check(resource, *this); }
 	public:
 		ButtonHoldProcess(
 			Button::Type buttons = Button::A,
@@ -158,7 +182,10 @@ namespace Petal::XInput
 	class TriggerPushProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (!LastPositive(resource.controller) && ThisPositive(resource.controller));
+		}
 	public:
 		TriggerPushProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
@@ -169,7 +196,10 @@ namespace Petal::XInput
 	class TriggerReleaseProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (LastPositive(resource.controller) && !ThisPositive(resource.controller));
+		}
 	public:
 		TriggerReleaseProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
@@ -180,7 +210,7 @@ namespace Petal::XInput
 	class TriggerPositiveProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return ThisPositive(resource.controller); }
 	public:
 		TriggerPositiveProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
@@ -191,7 +221,7 @@ namespace Petal::XInput
 	class TriggerNegativeProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return !ThisPositive(resource.controller); }
 	public:
 		TriggerNegativeProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
@@ -202,7 +232,7 @@ namespace Petal::XInput
 	class TriggerHoldProcess : public MiddleProcess::TriggerProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return hold_config.Check(resource, *this); }
 	public:
 		TriggerHoldProcess(
 			XInput::TriggerDimension dimension = XInput::TriggerDimension::Left,
@@ -221,7 +251,10 @@ namespace Petal::XInput
 	class StickPushProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (!LastPositive(resource.controller) && ThisPositive(resource.controller));
+		}
 	public:
 		StickPushProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -233,7 +266,10 @@ namespace Petal::XInput
 	class StickReleaseProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (LastPositive(resource.controller) && !ThisPositive(resource.controller));
+		}
 	public:
 		StickReleaseProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -245,7 +281,7 @@ namespace Petal::XInput
 	class StickPositiveProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return ThisPositive(resource.controller); }
 	public:
 		StickPositiveProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -257,7 +293,7 @@ namespace Petal::XInput
 	class StickNegativeProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return !ThisPositive(resource.controller); }
 	public:
 		StickNegativeProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -269,7 +305,7 @@ namespace Petal::XInput
 	class StickHoldProcess : public MiddleProcess::StickProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return hold_config.Check(resource, *this); }
 	public:
 		StickHoldProcess(
 			XInput::StickDimension dimension = XInput::StickDimension::Left,
@@ -283,5 +319,85 @@ namespace Petal::XInput
 		XEventProcessComponents::Hold hold_config{};
 	};
 }
+
+// Implementation
+
+namespace Petal::XInput::MiddleProcess
+{
+	inline boolean TriggerProcess::GamepadPositive(const WrappedGamepad& gamepad) const
+	{
+		switch (this->trigger_dimension)
+		{
+		case Petal::XInput::TriggerDimension::Left:
+			if (gamepad.LeftTrigger() >= this->target_trigger_value) return true;
+			return false;
+			break;
+		case Petal::XInput::TriggerDimension::Right:
+			if (gamepad.RightTrigger() >= this->target_trigger_value) return true;
+			return false;
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+	
+	inline boolean StickProcess::GamepadPositive(const WrappedGamepad& gamepad) const
+	{
+		switch (this->stick_dimension)
+		{
+		case XInput::StickDimension::Left:
+			switch (this->direction_dimension)
+			{
+			case Petal::XInput::DirectionDimension::Up:
+				if (gamepad.LeftStickY() >= this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Down:
+				if (gamepad.LeftStickY() < -this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Left:
+				if (gamepad.LeftStickX() < -this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Right:
+				if (gamepad.LeftStickX() >= this->target_stick_value) return true;
+				return false;
+				break;
+			default:
+				break;
+			}
+			break;
+		case XInput::StickDimension::Right:
+			switch (this->direction_dimension)
+			{
+			case Petal::XInput::DirectionDimension::Up:
+				if (gamepad.RightStickY() >= this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Down:
+				if (gamepad.RightStickY() < -this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Left:
+				if (gamepad.RightStickX() < -this->target_stick_value) return true;
+				return false;
+				break;
+			case Petal::XInput::DirectionDimension::Right:
+				if (gamepad.RightStickX() >= this->target_stick_value) return true;
+				return false;
+				break;
+			default:
+				break;
+			}
+			break;
+		default:
+			break;
+		}
+		return false;
+	}
+}
+
 
 #endif // !Petal_Header_XInputEventProcess

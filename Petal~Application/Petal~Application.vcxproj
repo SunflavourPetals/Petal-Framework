@@ -171,8 +171,6 @@
     <ClCompile Include="Petal~Window.cpp" />
     <ClCompile Include="Petal~WindowBase.cpp" />
     <ClCompile Include="Petal~WindowMessage.cpp" />
-    <ClCompile Include="Petal~XInputController.cpp" />
-    <ClCompile Include="Petal~XInputEventProcess.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

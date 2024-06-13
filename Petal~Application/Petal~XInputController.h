@@ -165,8 +165,8 @@ namespace Petal::XInput
 	public:
 		using Resource = ResourceOfController;
 	public:
-		void ClearState() noexcept { this->gamepad.ClearState(); }
-		void ClearLastState() noexcept { this->last_gamepad.ClearState(); }
+		void ClearState() noexcept { gamepad.ClearState(); }
+		void ClearLastState() noexcept { last_gamepad.ClearState(); }
 		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept { return gamepad.UpdateUserIndex(user_index); }
 		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count = 0);
 		const WrappedGamepad& GetWrappedGamepad() const noexcept { return gamepad; }

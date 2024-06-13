@@ -122,12 +122,6 @@
     <ClCompile Include="Petal~WindowMessage.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~XInputController.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Petal~XInputEventProcess.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~KeyboardController.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
