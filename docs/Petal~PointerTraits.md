@@ -116,11 +116,11 @@ void foo()
 4. `RemoveOneXPointer | RemoveOneXPointerType`
 5. `RemoveAllXPointer | RemoveAllXPointerType`
 
-`1` 依赖 标准库
-`2` 依赖 `1`
-`3` 依赖 `2`
-`4` 依赖 `3`
-`5` 依赖 `4`
+`1` 依赖 标准库  
+`2` 依赖 `1`  
+`3` 依赖 `2`，符合智能指针概念时依赖其成员类型别名 `element_type`，符合裸指针概念时依赖标准库 `remove_pointer_t`  
+`4` 依赖 `3`  
+`5` 依赖 `4`  
 
 ## 参考
 
