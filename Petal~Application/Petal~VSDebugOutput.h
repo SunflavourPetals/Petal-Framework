@@ -4,6 +4,7 @@
 #define Petal_Header_VSDebugOutput
 
 #include "Petal~BasicTypes.h"
+#include "Petal~WinTypes.h"
 #include "Petal~String.h"
 #include "Petal~Output.h"
 
@@ -64,8 +65,8 @@ namespace Petal::Debug
 
 namespace Petal
 {
-	extern constinit Debug::VSDebugOutputA dout;
-	extern constinit Debug::VSDebugOutputW dowt;
+	inline constinit Debug::VSDebugOutputA dout;
+	inline constinit Debug::VSDebugOutputW dowt;
 }
 
 namespace Petal::Debug::V
@@ -235,5 +236,36 @@ namespace Petal::Debug
 #define Petal_VSDbg(x) Petal_VSDebugOutput(x)
 #define Petal_VSDbgT(x) Petal_VSDebugOutputT(x)
 #endif
+
+namespace Petal::Debug
+{
+	inline void VSDebugOutputA::Write(BasicStringView<CharType, TraitsType> str)
+	{
+		BasicString<CharType, TraitsType> c_str{ str.data(), str.size() };
+#ifdef Petal_Enable_ForceDbgRemoveNUL
+		this->WriteCStr(StringToCStyleString(c_str).c_str());
+#else
+		this->WriteCStr(c_str.c_str());
+#endif
+	}
+	inline void VSDebugOutputA::WriteCStr(CStringType c_str) noexcept
+	{
+		::OutputDebugStringA(c_str);
+	}
+
+	inline void VSDebugOutputW::Write(BasicStringView<CharType, TraitsType> str)
+	{
+		BasicString<CharType, TraitsType> c_str{ str.data(), str.size() };
+#ifdef Petal_Enable_ForceDbgRemoveNUL
+		this->WriteCStr(StringToCStyleString(c_str).c_str());
+#else
+		this->WriteCStr(c_str.c_str());
+#endif
+	}
+	inline void VSDebugOutputW::WriteCStr(CStringType c_str) noexcept
+	{
+		::OutputDebugStringW(c_str);
+	}
+}
 
 #endif // !Petal_Header_VSDebugOutput

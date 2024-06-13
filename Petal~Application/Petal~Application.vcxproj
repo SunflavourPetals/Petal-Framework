@@ -168,7 +168,6 @@
     <ClCompile Include="Petal~PerformanceCounter.cpp" />
     <ClCompile Include="Petal~RawInputWindow.cpp" />
     <ClCompile Include="Petal~UserEntrance.cpp" />
-    <ClCompile Include="Petal~VSDebugOutput.cpp" />
     <ClCompile Include="Petal~Window.cpp" />
     <ClCompile Include="Petal~WindowBase.cpp" />
     <ClCompile Include="Petal~WindowMessage.cpp" />
