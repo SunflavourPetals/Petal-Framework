@@ -65,8 +65,8 @@ namespace Petal::Debug
 
 namespace Petal
 {
-	inline constinit Debug::VSDebugOutputA dout;
-	inline constinit Debug::VSDebugOutputW dowt;
+	inline constinit Debug::VSDebugOutputA dout{};
+	inline constinit Debug::VSDebugOutputW dowt{};
 }
 
 namespace Petal::Debug::V
