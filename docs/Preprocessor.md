@@ -12,6 +12,10 @@
 
 注：是否有作用只与宏是否被定义有关，与宏被定义的值无关，例如即使 `Petal_Enable_PetalMain` 被定义为 `FALSE`，它仍将发挥作用。  
 
+### Petal_Enable_BindWindowLifeCycle
+
+当定义此宏时，将 `Petal::Window` 对象所管理的窗口的生命周期绑定到该 C++ 对象的生命周期，当对象被销毁时销毁窗口，否则当对象被销毁时，该对象放弃对窗口的管理，届时窗口的行为将仅依赖 WIN32 的 `DefWindowProcA/W`。  
+
 ### Petal_Enable_DebugCStringRefIterator
 
 类模板 `CStringRefIterator` 模仿了 msvc 对字符串视图迭代器的 debug 行为(使用宏`_STL_VERIFY`)，条件是本宏(`Petal_Enable_DebugCStringRefIterator`)被定义。  
