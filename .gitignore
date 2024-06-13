@@ -1,7 +1,6 @@
 # backup
 [Bb]ackup/
-# ignore main.cpp, and it's used most of the time for testing.
-Petal~Application/main.cpp
+
 .vs/
 */x64
 */x86
