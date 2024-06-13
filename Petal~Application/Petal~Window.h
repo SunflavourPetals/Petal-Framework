@@ -107,7 +107,15 @@ namespace Petal
 	public:
 		Window() = default;
 		Window(const Window&) = delete;
-		virtual ~Window() = default;
+		virtual ~Window()
+		{
+#ifdef Petal_Enable_BindWindowLifeCycle
+			if (this->Valid())
+			{
+				this->Destroy();
+			}
+#endif
+		}
 		Window& operator= (const Window&) = delete;
 	public:
 		Size2DI32 minimum_client_size{ 120, 90 };

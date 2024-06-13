@@ -37,6 +37,13 @@ namespace Petal
 {
 	win32lres CALLBACK CommonWindowProcess(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param)
 	{
+		// https://learn.microsoft.com/zh-cn/windows/win32/api/winuser/nf-winuser-getwindowlongptra
+		// 如上文档所述，每个 Window 的 User data 会被初始化为 0，当使用本框架的 Window 类管理窗口时，
+		// User data 由框架使用，用户不应该去修改 User data，这将可能引发错误。
+		// 有关线程安全：
+		//     PetalUnnamed::global_window 是 thread_local 的，
+		//     而每次调用 Create 窗口函数，必须先完成一系列消息处理尤其是 Create 消息才会返回，
+		//     在处理这些消息时，PetalUnnamed::global_window 已经被利用，因此是线程安全的。
 		if (auto window_ptr = IWindow::WindowLongPtr(window_handle, GWLP_USERDATA))
 		{
 			return reinterpret_cast<ptr<Abstract::Window>>(window_ptr)->Process(message, w_param, l_param);
@@ -90,6 +97,11 @@ namespace Petal::Abstract
 	}
 	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> CreateResult
 	{
+		if (this->Valid() && !this->Destroy())
+		{
+			throw ::std::exception{ "[Petal] Failed in destroy window and can not create a new window to bind (Petal::Abstract::Window) object" };
+		}
+
 		CreateResult result{};
 
 		PetalUnnamed::global_window = this;
@@ -117,7 +129,7 @@ namespace Petal::Abstract
 	{
 		WindowClass window_class{};
 		[[maybe_unused]] auto unused = window_class.Register();
-		return this->Create(window_class.Unbind());
+		return this->Create(window_class.Unbind(), args, interpret_args_size_as_client_size);
 	}
 	auto Window::Destroy() noexcept -> DestroyResult
 	{
@@ -301,11 +313,7 @@ namespace Petal
 	}
 	[[nodiscard]] constexpr Size2DI32 WindowCreatingArgs::WindowSize(boolean interpret_size_as_client_size) const noexcept
 	{
-		if (interpret_size_as_client_size)
-		{
-			return this->WindowSize<true>();
-		}
-		return this->WindowSize<false>();
+		return interpret_size_as_client_size ? WindowSize<true>() : WindowSize<false>();
 	}
 }
 

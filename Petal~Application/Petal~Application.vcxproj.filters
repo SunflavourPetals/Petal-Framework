@@ -116,9 +116,6 @@
     <ClCompile Include="Petal~Window.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~WindowBase.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~WindowMessage.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
@@ -136,6 +133,9 @@
     </ClCompile>
     <ClCompile Include="Petal~UserEntrance.cpp">
       <Filter>PetalFramework\User</Filter>
+    </ClCompile>
+    <ClCompile Include="Petal~WindowBase.cpp">
+      <Filter>PetalFramework\Source</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>
