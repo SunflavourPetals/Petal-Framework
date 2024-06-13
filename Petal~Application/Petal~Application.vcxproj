@@ -162,15 +162,11 @@
   <ItemGroup>
     <ClCompile Include="main.cpp" />
     <ClCompile Include="Petal~FrequencyController.cpp" />
-    <ClCompile Include="Petal~KeyboardController.cpp" />
-    <ClCompile Include="Petal~KeyboardEventProcess.cpp" />
     <ClCompile Include="Petal~Main.cpp" />
-    <ClCompile Include="Petal~PerformanceCounter.cpp" />
     <ClCompile Include="Petal~RawInputWindow.cpp" />
     <ClCompile Include="Petal~UserEntrance.cpp" />
     <ClCompile Include="Petal~Window.cpp" />
     <ClCompile Include="Petal~WindowBase.cpp" />
-    <ClCompile Include="Petal~WindowMessage.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

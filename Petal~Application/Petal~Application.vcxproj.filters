@@ -110,19 +110,7 @@
     <ClCompile Include="Petal~Main.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
-    <ClCompile Include="Petal~PerformanceCounter.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
     <ClCompile Include="Petal~Window.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Petal~WindowMessage.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Petal~KeyboardController.cpp">
-      <Filter>PetalFramework\Source</Filter>
-    </ClCompile>
-    <ClCompile Include="Petal~KeyboardEventProcess.cpp">
       <Filter>PetalFramework\Source</Filter>
     </ClCompile>
     <ClCompile Include="main.cpp">

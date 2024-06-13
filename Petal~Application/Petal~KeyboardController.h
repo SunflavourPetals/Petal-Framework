@@ -56,10 +56,10 @@ namespace Petal::Keyboard
 	class WrappedState final
 	{
 	public:
-		const State& GetState() const noexcept;
-		void ClearState() noexcept;
-		boolean Pushed(VirtualKey::Type vk_code) const noexcept;
-		void Set(VirtualKey::Type vk_code, boolean pushed) noexcept;
+		const State& GetState() const noexcept { return state; }
+		void ClearState() noexcept { state = State{ 0 }; }
+		boolean Pushed(VirtualKey::Type vk_code) const noexcept { return state[vk_code]; }
+		void Set(VirtualKey::Type vk_code, boolean pushed) noexcept { this->state[vk_code] = pushed; }
 	public:
 		WrappedState() = default;
 		~WrappedState() = default;
@@ -92,10 +92,10 @@ namespace Petal::Abstract::Keyboard
 	protected:
 		virtual void QueryState() noexcept = 0;
 	public:
-		void ClearState() noexcept;
-		void ClearLastState() noexcept;
-		const WrappedState& GetState() const noexcept;
-		const WrappedState& GetLastState() const noexcept;
+		void ClearState() noexcept { state = WrappedState{}; }
+		void ClearLastState() noexcept { last_state = WrappedState{}; }
+		const WrappedState& GetState() const noexcept { return state; }
+		const WrappedState& GetLastState() const noexcept { return last_state; }
 	public:
 		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Tick delta_count = 0);
 	private:
@@ -116,11 +116,11 @@ namespace Petal::Keyboard
 	private:
 		void QueryState() noexcept override;
 	public:
-		void Register(VirtualKey::Type key) noexcept { this->registry.insert(key); }
-		void Register(::std::initializer_list<VirtualKey::Type> keys) noexcept { this->registry.insert(keys); }
+		void Register(VirtualKey::Type key) noexcept { registry.insert(key); }
+		void Register(::std::initializer_list<VirtualKey::Type> keys) noexcept { registry.insert(keys); }
 		template <typename Iterator>
-		void Register(Iterator begin, Iterator end) { this->registry.insert(begin, end); }
-		tsize Unregister(VirtualKey::Type key) noexcept { return this->registry.erase(key); }
+		void Register(Iterator begin, Iterator end) { registry.insert(begin, end); }
+		tsize Unregister(VirtualKey::Type key) noexcept { return registry.erase(key); }
 	public:
 		Controller() = default;
 		~Controller() = default;
@@ -131,6 +131,13 @@ namespace Petal::Keyboard
 
 namespace Petal::Abstract::Keyboard
 {
+	inline void Controller::ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource)
+	{
+		if (proc.Check(resource))
+		{
+			proc.Execution(resource);
+		}
+	}
 	inline void Controller::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Keyboard::Tick delta_count)
 	{
 		this->QueryState();
@@ -148,5 +155,18 @@ namespace Petal::Abstract::Keyboard
 		}
 	}
 }
+
+namespace Petal::Keyboard
+{
+	inline void Controller::QueryState() noexcept
+	{
+		this->last_state = this->state;
+		for (const auto& vk_code : this->registry)
+		{
+			this->state.Set(vk_code, (::GetAsyncKeyState(vk_code) & 0x8000) == 0x8000);
+		}
+	}
+}
+
 
 #endif // !Petal_Header_KeyboardController

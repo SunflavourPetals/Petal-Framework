@@ -23,8 +23,14 @@ namespace Petal::Keyboard::MiddleProcess
 	class XKeyProcess : virtual public BasicProcess
 	{
 	public:
-		boolean LastPositive(const Controller& controller) const override;
-		boolean ThisPositive(const Controller& controller) const override;
+		boolean LastPositive(const Controller& controller) const override
+		{
+			return KeyPositive(controller.GetLastState());
+		}
+		boolean ThisPositive(const Controller& controller) const override
+		{
+			return KeyPositive(controller.GetState());
+		}
 	private:
 		boolean KeyPositive(const WrappedState& state) const { return state.Pushed(this->key); }
 	public:
@@ -42,7 +48,10 @@ namespace Petal::Keyboard
 	class KeyPushProcess : public MiddleProcess::XKeyProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (!LastPositive(resource.controller) && this->ThisPositive(resource.controller));
+		}
 	public:
 		KeyPushProcess(VirtualKey::Type target_key) :
 			XKeyProcess(target_key) {}
@@ -50,7 +59,10 @@ namespace Petal::Keyboard
 	class KeyReleaseProcess : public MiddleProcess::XKeyProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{
+			return (LastPositive(resource.controller) && !this->ThisPositive(resource.controller));
+		}
 	public:
 		KeyReleaseProcess(VirtualKey::Type target_key) :
 			XKeyProcess(target_key) {}
@@ -58,7 +70,7 @@ namespace Petal::Keyboard
 	class KeyPositiveProcess : public MiddleProcess::XKeyProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return ThisPositive(resource.controller); }
 	public:
 		KeyPositiveProcess(VirtualKey::Type target_key) :
 			XKeyProcess(target_key) {}
@@ -66,7 +78,7 @@ namespace Petal::Keyboard
 	class KeyNegativeProcess : public MiddleProcess::XKeyProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override { return !ThisPositive(resource.controller); }
 	public:
 		KeyNegativeProcess(VirtualKey::Type target_key) :
 			XKeyProcess(target_key) {}
@@ -74,7 +86,8 @@ namespace Petal::Keyboard
 	class KeyHoldProcess : public MiddleProcess::XKeyProcess
 	{
 	public:
-		boolean Check(const Resource&) override;
+		boolean Check(const Resource& resource) override
+		{ return hold_config.Check(resource, *this); }
 	public:
 		KeyHoldProcess(
 			VirtualKey::Type target_key,

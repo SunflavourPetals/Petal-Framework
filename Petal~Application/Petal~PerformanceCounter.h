@@ -4,6 +4,7 @@
 #define Petal_Header_PerformanceCounter
 
 #include "Petal~BasicTypes.h"
+#include "Petal~WinTypes.h"
 
 namespace Petal
 {
@@ -40,6 +41,109 @@ namespace Petal
 		Tick total_paused{}; // The total duration of pause
 		boolean state_paused{ false }; // Pause state of this performance
 	};
+}
+
+// Implementation
+
+namespace Petal
+{
+	inline PerformanceCounter::PerformanceCounter() noexcept
+	{
+		this->Reset();
+	}
+	inline void PerformanceCounter::Reset() noexcept
+	{
+		::QueryPerformanceFrequency(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->frequency));
+		::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+		this->base = this->current;
+		this->delta = 0;
+		this->delta_paused = 0;
+		this->base_paused = 0;
+		this->total_paused = 0;
+		this->state_paused = false;
+	}
+	inline void PerformanceCounter::Count() noexcept
+	{
+		Tick prev = this->current;
+		if (this->state_paused == true)
+		{
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->delta_paused = this->current - prev;
+			if (this->delta_paused < 0)
+			{
+				this->delta = 0;
+			}
+			return;
+		}
+		else
+		{
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->delta = this->current - prev;
+			if (this->delta < 0)
+			{
+				this->delta = 0;
+			}
+			return;
+		}
+	}
+	inline void PerformanceCounter::Pause() noexcept
+	{
+		if (this->state_paused == false)
+		{
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->base_paused = this->current;
+			this->delta = 0;
+			this->delta_paused = 0;
+			this->state_paused = true;
+		}
+	}
+	inline void PerformanceCounter::Start() noexcept
+	{
+		if (this->state_paused == true)
+		{
+			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->total_paused += (this->current - this->base_paused);
+			this->delta = 0;
+			this->delta_paused = 0;
+			this->state_paused = false;
+		}
+	}
+	inline PerformanceCounter::Tick PerformanceCounter::Frequency() const noexcept
+	{
+		return this->frequency;
+	}
+	inline PerformanceCounter::Tick PerformanceCounter::TotalCounts() const noexcept
+	{
+		if (this->state_paused == true)
+		{
+			return (this->base_paused - this->total_paused - this->base);
+		}
+		return (this->current - this->total_paused - this->base);
+	}
+	inline PerformanceCounter::Tick PerformanceCounter::DeltaCounts() const noexcept
+	{
+		return this->delta;
+	}
+	inline PerformanceCounter::Tick PerformanceCounter::DeltaCountsPaused() const noexcept
+	{
+		return this->delta_paused;
+	}
+	inline PerformanceCounter::Second PerformanceCounter::TotalTime() const noexcept
+	{
+		return this->TotalCounts() / static_cast<f64>(this->frequency);
+	}
+	inline PerformanceCounter::Second PerformanceCounter::DeltaTime() const noexcept
+	{
+		return this->DeltaCounts() / static_cast<f64>(this->frequency);
+	}
+	inline PerformanceCounter::Second PerformanceCounter::DeltaTimePaused() const noexcept
+	{
+		return this->DeltaCountsPaused() / static_cast<f64>(this->frequency);
+	}
+	inline boolean PerformanceCounter::PauseState() const noexcept
+	{
+		return this->state_paused;
+	}
 }
 
 #endif // !Petal_Header_PerformanceCounter
