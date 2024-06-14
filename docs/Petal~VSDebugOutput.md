@@ -36,12 +36,17 @@ void foo(std::string s, std::string_view sv)
 
     dout << "Hello world" << ln;
 
+
+    dout.Write(s);
+    dout.Write(sv);
+    dout << ln;
+
     dout.WriteCStr(s.c_str());
-    
     dout.WriteCStr(std::string{ sv }.c_str());
     // string_view 不保证 null-terminated，
     // 因此需要构造一个 std::string，
     // 它保证 null-terminated 并给出了 c_str 接口。
+    dout << ln;
 }
 ```
 
@@ -62,6 +67,8 @@ void foo()
 
     dout.WirteCStr(s.c_str());
     // 输出结果为 "abc" (不带引号)
+    // 期待的参数应为 C 风格字符串，由于 s 中存在空字符，
+    // 输出内容被空字符切断了，因此仅输出了 "abc"
     ln(dout);
 
     dout.Write(s);
