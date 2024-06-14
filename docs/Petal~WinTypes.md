@@ -6,8 +6,7 @@
 
 由框架内部使用，暂未服务本框架不使用的 WIN32 类型。  
 
-本头文件引入 `<Windows.h>` 但是做了部分特殊处理，在引入前定义宏 `NOMINMAX`、`WIN32_LEAN_AND_MEAN`，并在引入后取消宏定义(若该宏定义是引入前由本框架定义)。  
-无论怎样，取消宏 `CreateEvent` 的定义，定义宏 `WIN32CreateEvent` 替代它。  
+本头文件引入 `<Windows.h>` 但是做了两个特殊处理，在引入前定义宏 `NOMINMAX`、`WIN32_LEAN_AND_MEAN`，并在引入后取消宏定义(若该宏定义是引入前由本框架定义)。  
 
 ## 参考
 

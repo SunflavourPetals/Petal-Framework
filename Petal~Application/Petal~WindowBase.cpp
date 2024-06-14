@@ -8,10 +8,6 @@
 #include <format>
 #include <mutex>
 
-#ifdef CreateEvent
-#undef CreateEvent
-#endif
-
 namespace
 {
 	namespace PetalUnnamed

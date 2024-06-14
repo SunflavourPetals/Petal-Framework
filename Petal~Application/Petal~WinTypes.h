@@ -21,14 +21,6 @@
 #undef WIN32_LEAN_AND_MEAN
 #endif
 
-#ifdef UNICODE
-#define WIN32CreateEvent  CreateEventW
-#else
-#define WIN32CreateEvent  CreateEventA
-#endif
-
-#undef CreateEvent
-
 namespace Petal
 {
 	using win32short = typename ::SHORT;

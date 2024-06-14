@@ -10,10 +10,6 @@
 
 #include <optional>
 
-#ifdef CreateEvent
-#undef CreateEvent
-#endif
-
 namespace Petal
 {
 	enum class WindowShowCode : int
@@ -61,7 +57,7 @@ namespace Petal
 	public:
 		virtual win32lres Process(win32msg message, win32wprm w_param, win32lprm l_param) override;
 	protected:
-		virtual void CreateEvent(CreateMessage& e) {}
+		virtual void CreatingEvent(CreatingMessage& e) {}
 		virtual void ActiveEvent(ActiveMessage& e) {}
 		virtual void InactiveEvent(InactiveMessage& e) {}
 		virtual void EnterSizeEvent(EnterSizeMessage& e) {}

@@ -95,7 +95,7 @@ namespace App
 	{
 		AppWindow app{};
 		volatile bool not_end{ true };
-
+		
 		std::thread* test_threads[100]{};
 		for (int i = 0; i < 100; ++i) // IT WILL MAKE 100 WINDOWS, DO NOT RUN THIS CODE, IT'S JUST FOR TEST!
 		{

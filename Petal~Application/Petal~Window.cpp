@@ -40,8 +40,8 @@ namespace Petal
 		{
 		case WM_CREATE:
 		{
-			CreateMessage wrapped_msg{ msg, w, l };
-			this->CreateEvent(wrapped_msg);
+			CreatingMessage wrapped_msg{ msg, w, l };
+			this->CreatingEvent(wrapped_msg);
 			return wrapped_msg.continue_creation ? 0 : -1;
 		}
 		break;

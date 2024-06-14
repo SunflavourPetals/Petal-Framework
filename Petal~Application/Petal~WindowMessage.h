@@ -177,7 +177,7 @@ namespace Petal
 
 namespace Petal
 {
-	class CreateMessage : public BasicWindowMessage
+	class CreatingMessage : public BasicWindowMessage
 	{
 	public:
 		const Win32CreateStruct& CreateStruct() const noexcept
@@ -185,11 +185,11 @@ namespace Petal
 			return *reinterpret_cast<ptr<Win32CreateStruct>>(Long());
 		}
 	public:
-		CreateMessage(win32msg msg, win32wprm w, win32lprm l) :
+		CreatingMessage(win32msg msg, win32wprm w, win32lprm l) :
 			BasicWindowMessage(msg, w, l) {}
-		CreateMessage(const CreateMessage&) = default;
-		CreateMessage(CreateMessage&&) noexcept = default;
-		virtual ~CreateMessage() = default;
+		CreatingMessage(const CreatingMessage&) = default;
+		CreatingMessage(CreatingMessage&&) noexcept = default;
+		virtual ~CreatingMessage() = default;
 	public:
 		boolean continue_creation{ true };
 	};
