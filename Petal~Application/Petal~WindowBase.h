@@ -8,6 +8,8 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 
+#include <utility>
+
 namespace Petal
 {
 	class WindowClassArgs;
@@ -104,16 +106,16 @@ namespace Petal
 		using RegisterResult = WindowClassRegisteringResult;
 	public:
 		[[nodiscard]] Win32WindowClass BuildWindowClass() const noexcept;
-		[[nodiscard]] const TString& ClassName() const noexcept;
-		[[nodiscard]] const TString& MenuName() const noexcept;
-		void UpdateClassName(TStringView class_name) noexcept(noexcept(StringToCStyleString(class_name)));
-		void UpdateMenuName(TStringView menu_name) noexcept(noexcept(StringToCStyleString(menu_name)));
-		void UsingMenuName(TStringView menu_name) noexcept(noexcept(::std::declval<WindowClassArgs>().UpdateMenuName(menu_name)));
+		[[nodiscard]] const TString& ClassName() const noexcept { return class_name; }
+		[[nodiscard]] const TString& MenuName() const noexcept { return menu_name; }
+		void UpdateClassName(TStringView new_class_name) { class_name = StringToCStyleString(new_class_name); }
+		void UpdateMenuName(TStringView new_menu_name) { menu_name = StringToCStyleString(new_menu_name); }
+		void UsingMenuName(TStringView menu_name);
 		void UsingMenuResource(win32word menu_resource) noexcept;
 		void EnableDoubleClickMessage(boolean enable = true) noexcept;
 	public:
 		WindowClassArgs();
-		WindowClassArgs(TStringView class_name);
+		WindowClassArgs(TStringView class_name) { UpdateClassName(class_name); }
 		WindowClassArgs(const WindowClassArgs&) = default;
 		WindowClassArgs(WindowClassArgs&&) noexcept = default;
 		~WindowClassArgs() = default;
@@ -149,11 +151,14 @@ namespace Petal
 	class WindowCreatingArgs final
 	{
 	public:
-		void UpdateTitle(TStringView new_title);
-		[[nodiscard]] const TString& Title() const noexcept;
+		void UpdateTitle(TStringView new_title) { window_title = StringToCStyleString(new_title); }
+		[[nodiscard]] const TString& Title() const noexcept { return window_title; }
 		template <boolean interpret_size_as_client_size = true>
 		[[nodiscard]] constexpr Size2DI32 WindowSize() const noexcept;
-		[[nodiscard]] constexpr Size2DI32 WindowSize(boolean interpret_size_as_client_size) const noexcept;
+		[[nodiscard]] constexpr Size2DI32 WindowSize(boolean interpret_size_as_client_size) const noexcept
+		{
+			return interpret_size_as_client_size ? WindowSize<true>() : WindowSize<false>();
+		}
 	public:
 		WindowCreatingArgs() = default;
 		WindowCreatingArgs(
@@ -163,7 +168,16 @@ namespace Petal
 			win32dword    style     = default_style,
 			win32dword    ex_style  = default_ex_style,
 			win32hmenu    menu      = default_menu,
-			ptr<void>     user_data = nullptr);
+			ptr<void>     user_data = nullptr) :
+			position{ position },
+			size{ size },
+			ex_style{ ex_style },
+			style{ style },
+			menu{ menu },
+			user_data{ user_data }
+		{
+			UpdateTitle(title);
+		}
 		WindowCreatingArgs(const WindowCreatingArgs&) = default;
 		WindowCreatingArgs(WindowCreatingArgs&&) noexcept = default;
 		~WindowCreatingArgs() = default;
@@ -196,21 +210,33 @@ namespace Petal
 		using UnregisterResult = WindowClassUnregisteringResult;
 		using Hash = WindowClassHash;
 	public:
-		[[nodiscard]] auto ClassAtom() const noexcept -> Atom;
-		[[nodiscard]] auto ClassName() const noexcept -> const Name&;
-		[[nodiscard]] auto Valid() const noexcept -> boolean;
+		[[nodiscard]] auto ClassAtom() const noexcept -> Atom { return atom; }
+		[[nodiscard]] auto ClassName() const noexcept -> const Name& { return name; }
+		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom(); }
 		auto Register(const Win32WindowClass& window_class) -> RegisterResult;
 		auto Register(const WindowClassArgs& window_class_args = {}) -> RegisterResult;
 		auto Unregister() noexcept -> UnregisterResult;
-		auto Reset() noexcept -> void;
-		auto Unbind() noexcept -> Atom;
+		auto Reset() noexcept -> void { WindowClass temp{ ::std::move(*this) }; }
+		auto Unbind() noexcept -> Atom
+		{
+			name = Name{};
+			return ::std::exchange(atom, Atom{});
+		}
 	public:
 		WindowClass() = default;
 		WindowClass(const WindowClass& o) = delete;
-		WindowClass(WindowClass&& o) noexcept;
-		~WindowClass() noexcept;
+		WindowClass(WindowClass&& o) noexcept
+		{
+			::std::swap(this->atom, o.atom);
+			::std::swap(this->name, o.name);
+		}
+		~WindowClass() noexcept { if (Valid()) Unregister(); }
 		WindowClass& operator=(const WindowClass& o) = delete;
-		WindowClass& operator=(WindowClass&& o) noexcept;
+		WindowClass& operator=(WindowClass&& o) noexcept
+		{
+			::std::swap(*this, o);
+			return *this;
+		}
 	private:
 		Name name{};
 		Atom atom{};
@@ -222,9 +248,16 @@ namespace Petal
 		using KeyTy = WindowClass;
 		using ResultTy = ::std::size_t;
 		[[nodiscard]] ResultTy operator() (const KeyTy& o) const
-			noexcept(noexcept(WindowClassHash::HashValue({})));
+			noexcept(noexcept(WindowClassHash::HashValue({})))
+		{
+			return HashValue(o);
+		}
 		[[nodiscard]] static ResultTy HashValue(const KeyTy& o)
-			noexcept(noexcept(::std::declval<::std::hash<win32atom>>()({})));
+			noexcept(noexcept(::std::declval<::std::hash<win32atom>>()({})))
+		{
+			::std::hash<win32atom> hasher{};
+			return hasher(o.ClassAtom());
+		}
 	};
 }
 
@@ -240,8 +273,8 @@ namespace Petal::Abstract
 	public:
 		void Bind(win32hwnd window_handle);
 		void Unbind() noexcept;
-		[[nodiscard]] auto WindowHandle() const noexcept -> win32hwnd;
-		[[nodiscard]] auto Valid() const noexcept -> boolean;
+		[[nodiscard]] auto WindowHandle() const noexcept -> win32hwnd { return window_handle; }
+		[[nodiscard]] auto Valid() const noexcept -> boolean { return WindowHandle() != nullptr; }
 		auto Create(
 			win32atom class_atom,
 			const WindowCreatingArgs& args = {},
@@ -251,25 +284,73 @@ namespace Petal::Abstract
 			boolean interpret_args_size_as_client_size = true) -> CreateResult;
 		auto Destroy() noexcept -> DestroyResult;
 	protected:
-		[[nodiscard]] auto WindowLongPtr(int index) const noexcept -> win32lptr;
-		[[nodiscard]] auto UpdateWindowLongPtr(int index, win32lptr val) const noexcept -> win32lptr;
-		[[nodiscard]] auto GWLP_Id() const noexcept -> win32lptr;
-		[[nodiscard]] auto GWLP_Style() const noexcept -> win32dword;
-		[[nodiscard]] auto GWLP_ExStyle() const noexcept -> win32dword;
-		[[nodiscard]] auto GWLP_UserData() const noexcept -> win32lptr;
-		[[nodiscard]] auto GWLP_HInstance() const noexcept -> win32hins;
-		[[nodiscard]] auto GWLP_WindowProcess() const noexcept -> win32wndproc;
-		[[nodiscard]] auto GWLP_ParentWindowHandle() const noexcept -> win32hwnd;
+		[[nodiscard]] auto WindowLongPtr(int index) const noexcept -> win32lptr
+		{
+			return IWindow::WindowLongPtr(WindowHandle(), index);
+		}
+		[[nodiscard]] auto UpdateWindowLongPtr(int index, win32lptr val) const noexcept -> win32lptr
+		{
+			return IWindow::UpdateWindowLongPtr(WindowHandle(), index, val);
+		}
+		[[nodiscard]] auto GWLP_Id() const noexcept -> win32lptr
+		{
+			return WindowLongPtr(GWLP_ID);
+		}
+		[[nodiscard]] auto GWLP_Style() const noexcept -> win32dword
+		{
+			return static_cast<win32dword>(WindowLongPtr(GWL_STYLE));
+		}
+		[[nodiscard]] auto GWLP_ExStyle() const noexcept -> win32dword
+		{
+			return static_cast<win32dword>(WindowLongPtr(GWL_EXSTYLE));
+		}
+		[[nodiscard]] auto GWLP_UserData() const noexcept -> win32lptr
+		{
+			return WindowLongPtr(GWLP_USERDATA);
+		}
+		[[nodiscard]] auto GWLP_HInstance() const noexcept -> win32hins
+		{
+			return reinterpret_cast<win32hins>(WindowLongPtr(GWLP_HINSTANCE));
+		}
+		[[nodiscard]] auto GWLP_WindowProcess() const noexcept -> win32wndproc
+		{
+			return reinterpret_cast<win32wndproc>(WindowLongPtr(GWLP_WNDPROC));
+		}
+		[[nodiscard]] auto GWLP_ParentWindowHandle() const noexcept -> win32hwnd
+		{
+			return reinterpret_cast<win32hwnd>(WindowLongPtr(GWLP_HWNDPARENT));
+		}
 	public:
 		Window() = default;
 		Window(const Window&) = delete;
 		Window(Window&&) noexcept = delete;
-		virtual ~Window();
+		virtual ~Window() { Unbind(); }
 		Window& operator= (const Window&) = delete;
 		Window& operator= (Window&&) = delete;
 	private:
 		win32hwnd window_handle{};
 	};
+}
+
+// Implementation
+
+namespace Petal
+{
+	inline void WindowClassArgs::UsingMenuName(TStringView menu_name)
+	{
+		this->UpdateMenuName(menu_name);
+		this->using_int_menu_resource = false;
+	}
+	inline void WindowClassArgs::UsingMenuResource(win32word menu_resource) noexcept
+	{
+		this->menu_resource = menu_resource;
+		this->using_int_menu_resource = true;
+	}
+	inline void WindowClassArgs::EnableDoubleClickMessage(boolean enable) noexcept
+	{
+		constexpr decltype(this->style) full{ ~(static_cast<decltype(this->style)>(0)) };
+		enable ? style |= CS_DBLCLKS : style &= (full ^ CS_DBLCLKS);
+	}
 }
 
 namespace Petal
@@ -292,6 +373,57 @@ namespace Petal
 		}
 		return this->size;
 	}
+}
+
+namespace Petal::IWindow
+{
+	inline [[nodiscard]] win32ctstr ToWinResource(win32word integer) noexcept
+	{
+		return reinterpret_cast<win32ctstr>(static_cast<win32ulptr>(integer));
+	}
+#ifdef Petal_Enable_Unicode
+	inline win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
+	{
+		return ::DefWindowProcW(window_handle, message, w_param, l_param);
+	}
+	inline [[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept
+	{
+		return ::LoadIconW(nullptr, reinterpret_cast<win32tstr>(IDI_APPLICATION));
+	}
+	inline [[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept
+	{
+		return ::LoadCursorW(nullptr, reinterpret_cast<win32tstr>(IDC_ARROW));
+	}
+	inline [[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
+	{
+		return ::GetWindowLongPtrW(hwnd, index);
+	}
+	inline win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
+	{
+		return ::SetWindowLongPtrW(hwnd, index, lptr);
+	}
+#else
+	inline win32lres CALLBACK SystemDefWndProc(win32hwnd window_handle, win32msg message, win32wprm w_param, win32lprm l_param) noexcept
+	{
+		return ::DefWindowProcA(window_handle, message, w_param, l_param);
+	}
+	inline [[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept
+	{
+		return ::LoadIconA(nullptr, reinterpret_cast<win32tstr>(IDI_APPLICATION));
+	}
+	inline [[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept
+	{
+		return ::LoadCursorA(nullptr, reinterpret_cast<win32tstr>(IDC_ARROW));
+	}
+	inline [[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
+	{
+		return ::GetWindowLongPtrA(hwnd, index);
+	}
+	inline win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
+	{
+		return ::SetWindowLongPtrA(hwnd, index, lptr);
+	}
+#endif
 }
 
 #endif // !Petal_Header_WindowManger
