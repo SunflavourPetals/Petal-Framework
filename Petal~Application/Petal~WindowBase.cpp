@@ -17,7 +17,7 @@ namespace
 			sizeof(Petal::win32lptr) >= sizeof(Petal::ptr<Petal::Abstract::Window>),
 			"[Petal] Size of user data (WIN32 Window) is too small"); // User data for at least a pointer of window object
 		
-		Petal::tsize window_class_number{ 0 }; // Number the unnamed window class. Defualt window class name depend on it.
+		volatile Petal::tsize window_class_number{ 0 }; // Number the unnamed window class. Defualt window class name depend on it.
 		::std::mutex window_class_number_mutex{};
 	}
 	namespace PetalUnnamed::IWin32
