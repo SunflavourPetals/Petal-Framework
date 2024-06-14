@@ -76,14 +76,6 @@ namespace Petal::Debug::V
 	{
 		dout << ::std::vformat(fmt, ::std::make_format_args(args...));
 	}
-#if 0 // remove this template
-	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<Char, std::remove_const_t<CharT>>
-	inline void print(CharT (&fmt)[char_arr_size], Args&&... args)
-	{
-		print(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-#endif
 	inline void println()
 	{
 		dout << ln;
@@ -94,28 +86,12 @@ namespace Petal::Debug::V
 		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
-#if 0 // remove this template
-	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<Char, std::remove_const_t<CharT>>
-	inline void println(CharT (&fmt)[char_arr_size], Args&&... args)
-	{
-		println(StringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-#endif
 
 	template <typename... Args>
 	inline void wprint(WStringView fmt, Args&&... args)
 	{
 		dowt << ::std::vformat(fmt, ::std::make_wformat_args(args...));
 	}
-#if 0 // remove this template
-	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
-	inline void wprint(CharT (&fmt)[char_arr_size], Args&&... args)
-	{
-		wprint(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-#endif
 	inline void wprintln()
 	{
 		dowt << ln;
@@ -126,14 +102,6 @@ namespace Petal::Debug::V
 		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
 	}
-#if 0 // remove this template
-	template <typename CharT, tsize char_arr_size, typename... Args>
-		requires std::is_same_v<WChar, std::remove_const_t<CharT>>
-	inline void wprintln(CharT (&fmt)[char_arr_size], Args&&... args)
-	{
-		wprintln(WStringView{ fmt, char_arr_size }, ::std::forward<Args>(args)...);
-	}
-#endif
 }
 
 namespace Petal::Debug
@@ -237,15 +205,17 @@ namespace Petal::Debug
 #define Petal_VSDbgT(x) Petal_VSDebugOutputT(x)
 #endif
 
+// Implementation
+
 namespace Petal::Debug
 {
 	inline void VSDebugOutputA::Write(BasicStringView<CharType, TraitsType> str)
 	{
 		BasicString<CharType, TraitsType> c_str{ str.data(), str.size() };
 #ifdef Petal_Enable_ForceDbgRemoveNUL
-		this->WriteCStr(StringToCStyleString(c_str).c_str());
+		WriteCStr(StringToCStyleString(c_str).c_str());
 #else
-		this->WriteCStr(c_str.c_str());
+		WriteCStr(c_str.c_str());
 #endif
 	}
 	inline void VSDebugOutputA::WriteCStr(CStringType c_str) noexcept
@@ -257,9 +227,9 @@ namespace Petal::Debug
 	{
 		BasicString<CharType, TraitsType> c_str{ str.data(), str.size() };
 #ifdef Petal_Enable_ForceDbgRemoveNUL
-		this->WriteCStr(StringToCStyleString(c_str).c_str());
+		WriteCStr(StringToCStyleString(c_str).c_str());
 #else
-		this->WriteCStr(c_str.c_str());
+		WriteCStr(c_str.c_str());
 #endif
 	}
 	inline void VSDebugOutputW::WriteCStr(CStringType c_str) noexcept

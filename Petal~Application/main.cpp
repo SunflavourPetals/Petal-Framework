@@ -95,20 +95,6 @@ namespace App
 	{
 		AppWindow app{};
 		volatile bool not_end{ true };
-		
-		std::thread* test_threads[100]{};
-		for (int i = 0; i < 100; ++i) // IT WILL MAKE 100 WINDOWS, DO NOT RUN THIS CODE, IT'S JUST FOR TEST!
-		{
-			test_threads[i] = new std::thread([]() {
-				Petal::Window w;
-				Petal::WindowClass c;
-				c.Register();
-				Petal::Debug::wprintln(L"window class name \"{}\", atom {}", c.ClassName(), c.ClassAtom());
-				w.Create(c.ClassAtom());
-				w.Show();
-				Petal::MessageLoop();
-			});
-		}
 
 		std::thread t([](volatile bool& not_end) {
 			Petal::Debug::println("input thread: begin");
@@ -220,12 +206,6 @@ namespace App
 		not_end = false;
 
 		t.join();
-
-		for (int i = 0; i < 100; ++i)
-		{
-			test_threads[i]->join();
-			delete test_threads[i];
-		}
 
 		return 0;
 	}

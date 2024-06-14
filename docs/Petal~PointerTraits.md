@@ -128,6 +128,12 @@ void foo()
 
 ## 参考
 
+### 宏
+
+#### 宏 Petal_Header_PointerTraits
+
+指示头文件引入情况。  
+
 ### 命名空间 Petal::Concepts
 
 #### 概念 AnyPointer

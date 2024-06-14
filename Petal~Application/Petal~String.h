@@ -53,17 +53,14 @@ namespace Petal
 		using InnerString = BasicString<CharT, Traits, Alloc>;
 		constexpr InnerChar null_char = InnerChar(EnumChar::null);
 		InnerString c_str;
-		c_str.resize(in_str.size(), null_char);
-		auto it_c = c_str.begin();
+		c_str.reserve(in_str.size());
 		for (const auto& e : in_str)
 		{
 			if (e != null_char)
 			{
-				(*it_c) = e;
-				++it_c;
+				c_str.push_back(e);
 			}
 		}
-		c_str.erase(it_c, c_str.end());
 		return c_str;
 	}
 	template <typename CharT, typename Traits = ::std::char_traits<CharT>, typename Alloc = ::std::allocator<CharT>>
