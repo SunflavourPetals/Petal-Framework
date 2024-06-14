@@ -140,9 +140,6 @@ namespace Petal
 		win32word    menu_resource{ 0 };
 		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building Win32WindowClass.
 		boolean      using_int_menu_resource{ false };
-	private:
-		static tsize default_number; // for unnamed instance
-		friend class WindowClassSet;
 	};
 }
 

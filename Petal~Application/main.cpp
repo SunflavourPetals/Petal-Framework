@@ -1,11 +1,3 @@
-#include "Petal~RawInputWindow.h"
-#include "Petal~VSDebugOutput.h"
-#include "Petal~Log.h"
-#include "Petal~XInputController.h"
-#include "Petal~XInputEventProcess.h"
-#include "Petal~KeyboardController.h"
-#include "Petal~KeyboardEventProcess.h"
-
 #include "Petal~BasicTypes.h"
 #include "Petal~Bom.h"
 #include "Petal~FrequencyController.h"
@@ -34,46 +26,6 @@
 #include <thread>
 #include <memory>
 #include <vector>
-
-#include <iostream>
-#include <algorithm>
-
-struct MyPtr
-{
-	using element_type = int;
-	element_type* data{};
-	~MyPtr() { delete data; }
-};
-
-template <>
-struct Petal::TypeTraits::IsSmartPointer<MyPtr> : std::true_type {};
-template <>
-constexpr bool Petal::TypeTraits::is_smart_pointer<MyPtr>{ Petal::TypeTraits::IsSmartPointer<MyPtr>::value };
-
-
-
-void foo()
-{
-	using namespace Petal::TypeTraits;
-	static_assert(std::is_same_v<RemoveAllAnyPointerType<MyPtr>, int>);
-}
-
-namespace App2
-{
-	using Petal::Debug::println;
-	using Petal::Debug::print;
-
-	void foo(char*) { println("char*"); }
-	void foo(std::string_view) { println("str view"); }
-
-	int main() {
-		using namespace Petal::TypeTraits;
-		foo((char*)"");
-		static_assert(std::is_same_v<RemoveAllAnyPointer<const std::weak_ptr<const volatile std::unique_ptr<std::shared_ptr<int*const>*const*>***>****>::Type, int>);
-
-		return 0;
-	}
-}
 
 namespace App
 {
@@ -143,6 +95,20 @@ namespace App
 	{
 		AppWindow app{};
 		volatile bool not_end{ true };
+
+		std::thread* test_threads[100]{};
+		for (int i = 0; i < 100; ++i) // IT WILL MAKE 100 WINDOWS, DO NOT RUN THIS CODE, IT'S JUST FOR TEST!
+		{
+			test_threads[i] = new std::thread([]() {
+				Petal::Window w;
+				Petal::WindowClass c;
+				c.Register();
+				Petal::Debug::wprintln(L"window class name \"{}\", atom {}", c.ClassName(), c.ClassAtom());
+				w.Create(c.ClassAtom());
+				w.Show();
+				Petal::MessageLoop();
+			});
+		}
 
 		std::thread t([](volatile bool& not_end) {
 			Petal::Debug::println("input thread: begin");
@@ -254,6 +220,12 @@ namespace App
 		not_end = false;
 
 		t.join();
+
+		for (int i = 0; i < 100; ++i)
+		{
+			test_threads[i]->join();
+			delete test_threads[i];
+		}
 
 		return 0;
 	}

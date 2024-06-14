@@ -6,6 +6,7 @@
 #include <exception>
 #include <utility>
 #include <format>
+#include <mutex>
 
 #ifdef CreateEvent
 #undef CreateEvent
@@ -18,7 +19,10 @@ namespace
 		thread_local ::Petal::ptr<::Petal::Abstract::Window> global_window{ nullptr };
 		static_assert(
 			sizeof(Petal::win32lptr) >= sizeof(Petal::ptr<Petal::Abstract::Window>),
-			"[Petal] Size of user data (WIN32 Window) is too small"); // user data for at least a pointer of window object
+			"[Petal] Size of user data (WIN32 Window) is too small"); // User data for at least a pointer of window object
+		
+		Petal::tsize window_class_number{ 0 }; // Number the unnamed window class. Defualt window class name depend on it.
+		::std::mutex window_class_number_mutex{};
 	}
 	namespace PetalUnnamed::IWin32
 	{
@@ -145,16 +149,17 @@ namespace Petal::Abstract
 
 namespace Petal
 {
-	tsize WindowClassArgs::default_number = 0;
+	
 	WindowClassArgs::WindowClassArgs()
 	{
+		const ::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_class_number_mutex);
 #if defined Petal_Enable_Unicode
-		TString number{ std::to_wstring(this->default_number) };
+		TString number{ std::to_wstring(PetalUnnamed::window_class_number) };
 #else
-		TString number{ std::to_string(this->default_number) };
+		TString number{ std::to_string(PetalUnnamed::window_class_number) };
 #endif
-		this->UpdateClassName(Petal_TStr("-Petal-window-class-") + number);
-		this->default_number += 1; // 暂不保证并发安全
+		this->UpdateClassName(Petal_TStr("Petal-window-class-") + number);
+		PetalUnnamed::window_class_number += 1;
 	}
 	[[nodiscard]] Win32WindowClass WindowClassArgs::BuildWindowClass() const noexcept
 	{
