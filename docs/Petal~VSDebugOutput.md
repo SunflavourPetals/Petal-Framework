@@ -12,11 +12,11 @@
 
 `VSDebugOutput` 是一个接口类模板，接口有二：  
 
-1. `Write` 参数为 `std::basic_string_view<CharType>`， 用于输出字符串；  
+1. `Write` 参数为 `std::basic_string_view<CharType>`， 用于输出字符串，继承自 `Output`；  
 2. `WriteCStr` 参数为 `const CharType*`，用于输出 C 风格字符串(需要用户保证 null-terminated)。  
 
-`VSDebugOutputA` 和 `VSDebugOutputW` 封装对 VS 输出窗口进行 Debug 输出的函数 `OutputDebugStringA/W`，派生自 `VSDebugOutput<CharType>`.  
-对 `VSDebugOutputA/W` 的基类 `Petal::Abstract::Output` 有重载的 `operator<<` 使用 `Write` 接口进行输出。  
+`VSDebugOutputA` 和 `VSDebugOutputW` 封装对 VS 输出窗口进行 Debug 输出的函数 `OutputDebugStringA/W`，派生自 `VSDebugOutput<Char/WChar>`.  
+对 `VSDebugOutputA/W` 的基类 `Petal::Abstract::Output` 有重载的 `operator<<` 使用 `Write` 接口进行输出，但是只有关于输出字符串功能的重载。  
 
 `dout` 是持有 `VSDebugOutputA` 类型的对象。  
 `dowt` 是持有 `VSDebugOutputW` 类型的对象。  
@@ -36,6 +36,8 @@ void foo(std::string s, std::string_view sv)
 
     dout << "Hello world" << ln;
 
+    // dout << 1; // 没有这个重载
+    dout << std::format("{}", 1) << ln;
 
     dout.Write(s);
     dout.Write(sv);
@@ -68,12 +70,13 @@ void foo()
     dout.WirteCStr(s.c_str());
     // 输出结果为 "abc" (不带引号)
     // 期待的参数应为 C 风格字符串，由于 s 中存在空字符，
-    // 输出内容被空字符切断了，因此仅输出了 "abc"
+    // 输出内容被空字符切断了，因此仅输出了 "abc"。
     ln(dout);
 
     dout.Write(s);
     // 按接口的意愿，效果应为输出 "abcdef" (不带引号，下同)('\0'不可见)
-    // 实际输出结果为 "abcdef" 或 "abc"
+    // 实际输出结果为 "abcdef" 或 "abc"，
+    // 原因见下方有关 Petal_Enable_ForceDbgRemoveNUL 的说明。
     ln(dout);
 
     char non_null_term[3] = { 's', 'r', 'r' }; // 不以空结尾的"字符串"
@@ -102,6 +105,43 @@ void foo()
 当预处理器定义宏 [`Petal_Enable_ForceDbgRemoveNUL`](./Preprocessor.md#Petal_Enable_ForceDbgRemoveNUL) 时，`dout/dowt` 及同类型对象输出前会剔除待输出文本的副本的空字符以保证正确的输出效果。否则它在输出字符串时将字符串解释为 C 风格字符串，输出效果则和 `WriteCStr` 接口一致。  
 
 建议始终定义这个宏，以保证正确的输出效果。  
+
+#### print 和 println 函数模板
+
+可见 `Output` 及 `VSDebugOutput` 这些接口模板都没有输出字符串外的输出接口，为了输出整数、浮点数等数据，我们需要将其转化为字符串再进行输出。`Petal::Debug` 和 `Petal::Debug::V` 中有 `print` `println` `wprint` 和 `wprintln` 模板，使用 C++20 `format` 库进行格式化，这样就方便我们输出字符串外的内容了。  
+
+`Petal::Debug` 中的 print 系列函数使用 `basic_format_string<CharType>` 作为格式参数，需要格式字符串为编译时常量，`Petal::Debug::V` 中的 print 系列函数使用 `basic_string_view<CharType>` 作为格式参数。  
+
+示例：  
+
+```C++
+#include "Petal~VSDebugOutput.h"
+void foo()
+{
+    using namespace Petal::Debug;
+    
+    print("Hello{}", ' ');
+    print("world{}", '!');
+    println();
+
+    println("Hello world!");
+
+    println("{} {} {}", 1, 2, 3);
+
+    std::string fmt = "{} {} {}";
+
+    V::println(fmt, 1, 2, 3);
+}
+```
+
+输出：  
+
+```output
+Hello world!
+Hello world!
+1 2 3
+1 2 3
+```
 
 文档其余部分暂未完成！
 
