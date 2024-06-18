@@ -425,8 +425,14 @@ void foo(const TChar* tstr, LPCTSTR win32_tstr)
 
 参数：  
 
+重载一，函数模板  
+
 * `fmt: const std::basic_format_string<CharT, std::type_identity_t<Args>...>` 格式串参数，需要编译时常量；  
 * `args: Args&&...` 待格式化输出的对象，需要支持 `formatter`；  
+* 返回值：无。  
+
+重载二，`void println()`  
+
 * 返回值：无。  
 
 示例参见[概述](#print-和-println-函数)。  
@@ -455,12 +461,18 @@ void foo(const TChar* tstr, LPCTSTR win32_tstr)
 
 #### 函数 println (namespace Petal::Debug::V)
 
-使用 C++20 `format` 库 和 [`dout`](#命名空间局部对象-dout)、[`dowt`](#命名空间局部对象-dowt) 进行格式化行输出，有对 `char` 和 `wchar_t` 的重载。该函数实例化自可变参数模板 `println`。  
+使用 C++20 `format` 库 和 [`dout`](#命名空间局部对象-dout)、[`dowt`](#命名空间局部对象-dowt) 进行格式化行输出，有对 `char` 和 `wchar_t` 的重载。该函数重载可以实例化自可变参数模板 `println`。  
 
 参数：  
 
+重载一，函数模板  
+
 * `fmt: std::basic_string_view<CharT>` 格式串参数；  
 * `args: Args&&...` 待格式化输出的对象，需要支持 `formatter`；  
+* 返回值：无。  
+
+重载二，`void println()`  
+
 * 返回值：无。  
 
 示例参见[概述](#print-和-println-函数)。  
