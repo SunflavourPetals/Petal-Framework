@@ -76,6 +76,11 @@ namespace Petal::Debug::V
 	{
 		dout << ::std::vformat(fmt, ::std::make_format_args(args...));
 	}
+	template <typename... Args>
+	inline void print(WStringView fmt, Args&&... args)
+	{
+		dowt << ::std::vformat(fmt, ::std::make_wformat_args(args...));
+	}
 	inline void println()
 	{
 		dout << ln;
@@ -86,18 +91,8 @@ namespace Petal::Debug::V
 		auto fmt_ln = ::std::format("{}{}", fmt, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
-
 	template <typename... Args>
-	inline void wprint(WStringView fmt, Args&&... args)
-	{
-		dowt << ::std::vformat(fmt, ::std::make_wformat_args(args...));
-	}
-	inline void wprintln()
-	{
-		dowt << ln;
-	}
-	template <typename... Args>
-	inline void wprintln(WStringView fmt, Args&&... args)
+	inline void println(WStringView fmt, Args&&... args)
 	{
 		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 		wprint(fmt_ln, ::std::forward<Args>(args)...);
@@ -111,6 +106,11 @@ namespace Petal::Debug
 	{
 		dout << ::std::vformat(fmt.get(), ::std::make_format_args(args...));
 	}
+	template <typename... Args>
+	inline void print(const ::std::wformat_string<Args...> fmt, Args&&... args)
+	{
+		dowt << ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
+	}
 	inline void println()
 	{
 		dout << ln;
@@ -121,18 +121,8 @@ namespace Petal::Debug
 		auto str = ::std::vformat(fmt.get(), ::std::make_format_args(args...));
 		print("{}{}", str, GetLn<decltype(dout)::CharType>(dout.LnMode()));
 	}
-
 	template <typename... Args>
-	inline void wprint(const ::std::wformat_string<Args...> fmt, Args&&... args)
-	{
-		dowt << ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
-	}
-	inline void wprintln()
-	{
-		dowt << ln;
-	}
-	template <typename... Args>
-	inline void wprintln(const ::std::wformat_string<Args...> fmt, Args&&... args)
+	inline void println(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
 		wprint(L"{}{}", str, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));

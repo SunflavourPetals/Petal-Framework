@@ -102,9 +102,16 @@ void foo()
 
 作为输出的接口的纯虚函数。  
 
+参数：
+
+* [`str: BasicStringView<CharType, TraitsType>`](./Petal~String.md#类型别名模板-basicstringview) 待输出字符串。  
+* 返回值：无。  
+
 ###### Output 成员函数 LnMode
 
 作为获取换行格式的纯虚函数。  
+
+该函数无参数，返回值为 [`LineBreakMode`](./Petal~Output.md#枚举类-linebreakmode) 类型。  
 
 ##### Output 相关非成员函数
 

@@ -93,9 +93,15 @@ namespace App
 
 	int main()
 	{
+#ifdef UNICODE
+		using TC = WCHAR;
+#else
+		using TC = char;
+#endif
+		static_assert(std::is_same_v<::LPCTSTR, const TC*>); // test
 		AppWindow app{};
 		volatile bool not_end{ true };
-
+		
 		std::thread t([](volatile bool& not_end) {
 			Petal::Debug::println("input thread: begin");
 
