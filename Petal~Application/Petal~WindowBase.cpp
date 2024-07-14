@@ -112,9 +112,8 @@ namespace Petal::Abstract
 	}
 	auto Window::Create(const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> CreateResult
 	{
-		WindowClass window_class{};
-		[[maybe_unused]] auto unused = window_class.Register();
-		return this->Create(window_class.Unbind(), args, interpret_args_size_as_client_size);
+		WindowClass window_class = WindowClassRegister{}.Register();
+		return this->Create(window_class.ClassAtom(), args, interpret_args_size_as_client_size);
 	}
 	auto Window::Destroy() noexcept -> DestroyResult
 	{
@@ -145,7 +144,65 @@ namespace Petal::Abstract
 
 namespace Petal
 {
-	
+	WindowClassRegister::WindowClassRegister(int) : Win32WindowClass
+	{
+		.cbSize = sizeof(Win32WindowClass),
+		.style = CS_HREDRAW | CS_VREDRAW,
+		.lpfnWndProc = &CommonWindowProcess,
+		.cbClsExtra = 0,
+		.cbWndExtra = 0,
+		.hInstance = WinMain::HIns(),
+		.hIcon = IWindow::LoadDefaultWinAppIcon(),
+		.hCursor = IWindow::LoadDefaultWinAppCursor(),
+		.hbrBackground = reinterpret_cast<win32hbrush>(COLOR_WINDOW),
+		.lpszMenuName = nullptr,
+		.lpszClassName = nullptr,
+		.hIconSm = nullptr } {}
+	WindowClassRegister::WindowClassRegister() : WindowClassRegister(0)
+	{
+		DefaultWindowClassName();
+	}
+	WindowClassRegister::WindowClassRegister(TStringView class_name) : WindowClassRegister(0)
+	{
+		ClassName(class_name);
+	}
+	void WindowClassRegister::DefaultWindowClassName()
+	{
+		TString number{};
+		{
+			const ::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_class_number_mutex);
+#if defined Petal_Enable_Unicode
+			number = std::to_wstring(PetalUnnamed::window_class_number);
+#else
+			number = std::to_string(PetalUnnamed::window_class_number);
+#endif
+			PetalUnnamed::window_class_number += 1;
+		}
+		ClassName(Petal_TStr("Petal-window-class-") + number);
+	}
+	auto WindowClassRegister::Register() -> Result
+	{
+		Result result{};
+
+		result.class_atom = PetalUnnamed::IWin32::RegisterPetalWindowClass(Self());
+
+		if (result.class_atom == 0)
+		{
+			result.win32_error = ::GetLastError();
+
+			Petal_VSDbgT("[Petal] Failed in WindowClassRegister::Register!\r\n");
+			Petal_VSDebugOutput(::std::format(Petal_TStr("\t\tclass_name: \"{}\"\r\n"), this->class_name).c_str());
+			Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
+
+			return result;
+		}
+
+		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered\r\n"), result.class_atom).c_str());
+
+		return result;
+	}
+
+	/*
 	WindowClassArgs::WindowClassArgs()
 	{
 		const ::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_class_number_mutex);
@@ -175,10 +232,12 @@ namespace Petal
 		window_class.hIconSm = this->icon_sm;
 		return window_class;
 	}
+	*/
 }
 
 namespace Petal
 {
+	/*
 	auto WindowClass::Register(const Win32WindowClass& window_class) -> RegisterResult
 	{
 		this->Reset();
@@ -209,6 +268,7 @@ namespace Petal
 	{
 		return this->Register(window_class_args.BuildWindowClass());
 	}
+	*/
 	auto WindowClass::Unregister() noexcept -> UnregisterResult
 	{
 		UnregisterResult result{};
@@ -324,7 +384,7 @@ namespace
 			(
 				args.ex_style,
 				Petal::IWindow::ToWinResource(class_atom),
-				args.Title().c_str(),
+				args.window_title.CStr(),
 				args.style,
 				args.position.x,
 				args.position.y,

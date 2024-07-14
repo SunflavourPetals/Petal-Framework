@@ -8,6 +8,9 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 
+// WindowClassBuilder 需要 WinMain::HIns
+#include "Petal~Main.h"
+
 #include <utility>
 
 namespace Petal
@@ -100,46 +103,95 @@ namespace Petal::IWindow
 
 namespace Petal
 {
-	class WindowClassArgs final
+	class WindowClassRegister : private Win32WindowClass
 	{
-	public:
-		using RegisterResult = WindowClassRegisteringResult;
-	public:
-		[[nodiscard]] Win32WindowClass BuildWindowClass() const noexcept;
-		[[nodiscard]] const TString& ClassName() const noexcept { return class_name; }
-		[[nodiscard]] const TString& MenuName() const noexcept { return menu_name; }
-		void UpdateClassName(TStringView new_class_name) { class_name = StringToCStyleString(new_class_name); }
-		void UpdateMenuName(TStringView new_menu_name) { menu_name = StringToCStyleString(new_menu_name); }
-		void UsingMenuName(TStringView menu_name);
-		void UsingMenuResource(win32word menu_resource) noexcept;
-		void EnableDoubleClickMessage(boolean enable = true) noexcept;
-	public:
-		WindowClassArgs();
-		WindowClassArgs(TStringView class_name) { UpdateClassName(class_name); }
-		WindowClassArgs(const WindowClassArgs&) = default;
-		WindowClassArgs(WindowClassArgs&&) noexcept = default;
-		~WindowClassArgs() = default;
 	private:
-		// WIN32-RegisterClassEx requires that string Win32WindowClass::lpszClassName not be nullptr and not equal to "" or L"".
-		// WIN32-RegisterClassEx requires class_name's length less than 256 after processing(StringToCStyleString).
-		TString class_name;
-		// When using_int_menu_res == false:
-		// If menu_name != "" or L"", method BuildWindowClass will assign menu_name.c_str() to lpszMenuName. 
-		// If menu_name == "" or L"", method BuildWindowClass will assign nullptr to lpszMenuName. 
-		// Use StringToCStyleString to ignore NUL characters. 
-		TString menu_name;
+		using SelfRef = WindowClassRegister&;
+		using Result = WindowClassRegisteringResult;
+		SelfRef Self() noexcept { return *this; }
 	public:
-		win32wndproc window_process{ &CommonWindowProcess };
-		win32uint    style{ CS_HREDRAW | CS_VREDRAW };
-		int          class_extra{ 0 };
-		int          window_extra{ 0 };
-		win32hicon   icon{ IWindow::LoadDefaultWinAppIcon() };
-		win32hcursor cursor{ IWindow::LoadDefaultWinAppCursor() };
-		win32hbrush  background_brush{ reinterpret_cast<win32hbrush>(COLOR_WINDOW) };
-		win32hicon   icon_sm{ nullptr };
-		win32word    menu_resource{ 0 };
-		// Switch to fill WindowClass::lpszMenuName by menu_resource but not string menu_name when building Win32WindowClass.
-		boolean      using_int_menu_resource{ false };
+		Result Register();
+		SelfRef Size(win32uint size) noexcept
+		{
+			cbSize = size;
+			return Self();
+		}
+		SelfRef Style(win32uint style) noexcept
+		{
+			this->style = style;
+			return Self();
+		}
+		SelfRef WindowProcess(win32wndproc window_process) noexcept
+		{
+			lpfnWndProc = window_process;
+			return Self();
+		}
+		SelfRef ClassExtra(int class_extra) noexcept
+		{
+			cbClsExtra = class_extra;
+			return Self();
+		}
+		SelfRef WindowExtra(int window_extra) noexcept
+		{
+			cbWndExtra = window_extra;
+			return Self();
+		}
+		SelfRef Instance(win32hins instance) noexcept
+		{
+			hInstance = instance;
+			return Self();
+		}
+		SelfRef Icon(win32hicon icon) noexcept
+		{
+			hIcon = icon;
+			return Self();
+		}
+		SelfRef Cursor(win32hcursor cursor) noexcept
+		{
+			hCursor = cursor;
+			return Self();
+		}
+		SelfRef Background(win32hbrush background_brush) noexcept
+		{
+			hbrBackground = background_brush;
+			return Self();
+		}
+		SelfRef IconSm(win32hicon icon_sm) noexcept
+		{
+			hIconSm = icon_sm;
+			return Self();
+		}
+		SelfRef ClassName(TStringView class_name) noexcept
+		{
+			this->class_name = StringToCStyleString(class_name);
+			lpszClassName = this->class_name.c_str();
+			return Self();
+		}
+		SelfRef MenuName(TStringView menu_name) noexcept
+		{
+			this->menu_name = StringToCStyleString(menu_name);
+			lpszMenuName = this->menu_name.c_str();
+			return Self();
+		}
+		SelfRef MenuName(::std::nullptr_t) noexcept
+		{
+			lpszMenuName = nullptr;
+			return Self();
+		}
+		SelfRef MenuName(win32word menu_resource) noexcept
+		{
+			lpszMenuName = IWindow::ToWinResource(menu_resource);
+			return Self();
+		}
+	public:
+		WindowClassRegister();
+		WindowClassRegister(TStringView class_name);
+	private:
+		WindowClassRegister(int);
+		void DefaultWindowClassName();
+	private:
+		TString class_name{};
+		TString menu_name{};
 	};
 }
 
@@ -148,8 +200,21 @@ namespace Petal
 	class WindowCreatingArgs final
 	{
 	public:
-		void UpdateTitle(TStringView new_title) { window_title = StringToCStyleString(new_title); }
-		[[nodiscard]] const TString& Title() const noexcept { return window_title; }
+		class TitleString
+		{
+		public:
+			TitleString() = default;
+			TitleString(TStringView window_title) { UpdateString(window_title); }
+			TitleString& operator=(TStringView window_title) { UpdateString(window_title); }
+			ptrc<TChar> CStr() const noexcept { return string.c_str(); }
+		private:
+			void UpdateString(TStringView str) { string = StringToCStyleString(str); }
+		private:
+			TString string;
+		};
+	public:
+		static constexpr auto DefaultPosition() -> Position2DI32 { return { CW_USEDEFAULT, CW_USEDEFAULT }; }
+		static constexpr auto DefaultSize() -> Size2DI32 { return { CW_USEDEFAULT, CW_USEDEFAULT }; }
 		template <boolean interpret_size_as_client_size = true>
 		[[nodiscard]] constexpr Size2DI32 WindowSize() const noexcept;
 		[[nodiscard]] constexpr Size2DI32 WindowSize(boolean interpret_size_as_client_size) const noexcept
@@ -157,41 +222,12 @@ namespace Petal
 			return interpret_size_as_client_size ? WindowSize<true>() : WindowSize<false>();
 		}
 	public:
-		WindowCreatingArgs() = default;
-		WindowCreatingArgs(
-			TStringView   title,
-			Size2DI32     size      = default_size,
-			Position2DI32 position  = default_position,
-			win32dword    style     = default_style,
-			win32dword    ex_style  = default_ex_style,
-			win32hmenu    menu      = default_menu,
-			ptr<void>     user_data = nullptr) :
-			position{ position },
-			size{ size },
-			ex_style{ ex_style },
-			style{ style },
-			menu{ menu },
-			user_data{ user_data }
-		{
-			UpdateTitle(title);
-		}
-		WindowCreatingArgs(const WindowCreatingArgs&) = default;
-		WindowCreatingArgs(WindowCreatingArgs&&) noexcept = default;
-		~WindowCreatingArgs() = default;
-	public:
-		static constexpr Position2DI32 default_position{ CW_USEDEFAULT, CW_USEDEFAULT };
-		static constexpr Size2DI32     default_size{ CW_USEDEFAULT, CW_USEDEFAULT };
-		static constexpr win32dword    default_ex_style{ 0L };
-		static constexpr win32dword    default_style{ WS_OVERLAPPEDWINDOW };
-		static constexpr win32hmenu    default_menu{ nullptr };
-	private:
-		TString window_title{ Petal_TStr("Petal~Window") };
-	public:
-		Position2DI32 position{ default_position };
-		Size2DI32     size{ default_size };
-		win32dword    ex_style{ default_ex_style };
-		win32dword    style{ default_style };
-		win32hmenu    menu{ default_menu };
+		TitleString   window_title{ Petal_TStr("Petal~Window") };
+		Position2DI32 position{ DefaultPosition() };
+		Size2DI32     size{ DefaultSize() };
+		win32dword    ex_style{ 0 };
+		win32dword    style{ WS_OVERLAPPEDWINDOW };
+		win32hmenu    menu{ nullptr };
 		ptr<void>     user_data{ nullptr };
 	};
 }
@@ -201,42 +237,37 @@ namespace Petal
 	class WindowClass
 	{
 	public:
-		using Atom = win32atom;
-		using Name = TString;
 		using RegisterResult = WindowClassRegisteringResult;
 		using UnregisterResult = WindowClassUnregisteringResult;
 		using Hash = WindowClassHash;
 	public:
-		[[nodiscard]] auto ClassAtom() const noexcept -> Atom { return atom; }
-		[[nodiscard]] auto ClassName() const noexcept -> const Name& { return name; }
+		[[nodiscard]] auto ClassAtom() const noexcept -> win32atom { return atom; }
 		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom(); }
-		auto Register(const Win32WindowClass& window_class) -> RegisterResult;
-		auto Register(const WindowClassArgs& window_class_args = {}) -> RegisterResult;
 		auto Unregister() noexcept -> UnregisterResult;
 		auto Reset() noexcept -> void { WindowClass temp{ ::std::move(*this) }; }
-		auto Unbind() noexcept -> Atom
+		auto Unbind() noexcept -> win32atom
 		{
-			name = Name{};
-			return ::std::exchange(atom, Atom{});
+			return ::std::exchange(atom, win32atom{});
 		}
 	public:
 		WindowClass() = default;
-		WindowClass(const WindowClass& o) = delete;
+		WindowClass(win32atom atom) : atom{ atom } {}
+		WindowClass(RegisterResult result) :
+			atom{ result.win32_error == win32_no_error ? result.class_atom : win32atom{} } {}
+		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&& o) noexcept
 		{
-			::std::swap(this->atom, o.atom);
-			::std::swap(this->name, o.name);
+			o.atom = ::std::exchange(this->atom, o.atom);
 		}
 		~WindowClass() noexcept { if (Valid()) Unregister(); }
-		WindowClass& operator=(const WindowClass& o) = delete;
+		WindowClass& operator=(const WindowClass&) = delete;
 		WindowClass& operator=(WindowClass&& o) noexcept
 		{
-			::std::swap(*this, o);
+			o.atom = ::std::exchange(this->atom, o.atom);
 			return *this;
 		}
 	private:
-		Name name{};
-		Atom atom{};
+		win32atom atom{};
 	};
 
 	class WindowClassHash final
@@ -333,31 +364,12 @@ namespace Petal::Abstract
 
 namespace Petal
 {
-	inline void WindowClassArgs::UsingMenuName(TStringView menu_name)
-	{
-		this->UpdateMenuName(menu_name);
-		this->using_int_menu_resource = false;
-	}
-	inline void WindowClassArgs::UsingMenuResource(win32word menu_resource) noexcept
-	{
-		this->menu_resource = menu_resource;
-		this->using_int_menu_resource = true;
-	}
-	inline void WindowClassArgs::EnableDoubleClickMessage(boolean enable) noexcept
-	{
-		constexpr decltype(this->style) full{ ~(static_cast<decltype(this->style)>(0)) };
-		enable ? style |= CS_DBLCLKS : style &= (full ^ CS_DBLCLKS);
-	}
-}
-
-namespace Petal
-{
 	template <boolean interpret_size_as_client_size>
 	[[nodiscard]] constexpr Size2DI32 WindowCreatingArgs::WindowSize() const noexcept
 	{
 		if constexpr (interpret_size_as_client_size)
 		{
-			if (this->size == WindowCreatingArgs::default_size)
+			if (this->size == WindowCreatingArgs::DefaultSize())
 			{
 				return this->size;
 			}

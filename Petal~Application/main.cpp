@@ -50,7 +50,7 @@ namespace App
 		}
 		AppWindow() : RawInputWindow()
 		{
-			window_class.Register();
+			window_class = Petal::WindowClassRegister{}.Register();
 			Create(window_class.ClassAtom());
 			UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
 			Show();
