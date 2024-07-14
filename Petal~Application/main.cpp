@@ -50,16 +50,24 @@ namespace App
 		}
 		AppWindow() : RawInputWindow()
 		{
-			window_class = Petal::WindowClassRegister{Petal_TStr("abc")}.Register();
-			Create(window_class.ClassAtom());
-			UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
-			Petal::Win32WindowClass wc{};
-			Petal::TString ts;
-			ts = Petal_TStr("abc");
-			if (Petal::IWindow::WindowClassInfo(Petal::WinMain::HIns(), ts.c_str(), wc))
+			window_class = Petal::WindowClassRegister{Petal_TStr("MyApp")}.Register();
+			Create(window_class.ClassAtom(), Petal::WindowCreatingArgs{
+				.window_title = Petal_TStr("Hello Visual Studio 2022 Community Preview")
+			});
+		//	UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
+			
+			// for test vvv
 			{
-				Petal::Debug::println(L"success {} {} {}", (void*)wc.lpszClassName, (void*)ts.c_str(), (void*)Petal_TStr("abc"));
+				Petal::WindowClass window_class = Petal::WindowClassRegister{ Petal_TStr("abc") }.Register();
+				Petal::Win32WindowClass wc{};
+				Petal::TString ts;
+				ts = Petal_TStr("abc");
+				if (Petal::IWindow::WindowClassInfo(Petal::WinMain::HIns(), ts.c_str(), wc))
+				{
+					Petal::Debug::println(L"success {} {} {}", (void*)wc.lpszClassName, (void*)ts.c_str(), (void*)Petal_TStr("abc"));
+				}
 			}
+			// for test ^^^
 
 			Show();
 			UpdateWindow();
