@@ -95,7 +95,7 @@ namespace Petal::Debug::V
 	inline void println(WStringView fmt, Args&&... args)
 	{
 		auto fmt_ln = ::std::format(L"{}{}", fmt, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
-		wprint(fmt_ln, ::std::forward<Args>(args)...);
+		print(fmt_ln, ::std::forward<Args>(args)...);
 	}
 }
 
@@ -125,7 +125,7 @@ namespace Petal::Debug
 	inline void println(const ::std::wformat_string<Args...> fmt, Args&&... args)
 	{
 		auto str = ::std::vformat(fmt.get(), ::std::make_wformat_args(args...));
-		wprint(L"{}{}", str, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
+		print(L"{}{}", str, GetLn<decltype(dowt)::CharType>(dowt.LnMode()));
 	}
 }
 

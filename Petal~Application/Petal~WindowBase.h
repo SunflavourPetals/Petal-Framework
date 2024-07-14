@@ -8,10 +8,8 @@
 #include "Petal~String.h"
 #include "Petal~Process.h"
 
-// WindowClassBuilder 需要 WinMain::HIns
-#include "Petal~Main.h"
-
 #include <utility>
+#include <optional>
 
 namespace Petal
 {
@@ -99,6 +97,7 @@ namespace Petal::IWindow
 	[[nodiscard]] auto LoadDefaultWinAppIcon() noexcept -> win32hicon;
 	[[nodiscard]] auto LoadDefaultWinAppCursor() noexcept -> win32hcursor;
 	[[nodiscard]] auto WindowLongPtr(win32hwnd hwnd, i32 index) noexcept -> win32lptr;
+	[[nodiscard]] auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool;
 }
 
 namespace Petal
@@ -241,6 +240,7 @@ namespace Petal
 		using UnregisterResult = WindowClassUnregisteringResult;
 		using Hash = WindowClassHash;
 	public:
+		[[nodiscard]] auto ClassInfo() const noexcept -> ::std::optional<Win32WindowClass>;
 		[[nodiscard]] auto ClassAtom() const noexcept -> win32atom { return atom; }
 		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom(); }
 		auto Unregister() noexcept -> UnregisterResult;
@@ -407,6 +407,10 @@ namespace Petal::IWindow
 	{
 		return ::GetWindowLongPtrW(hwnd, index);
 	}
+	inline [[nodiscard]] auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
+	{
+		return ::GetClassInfoExW(hins, window_class, &out);
+	}
 	inline win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
 	{
 		return ::SetWindowLongPtrW(hwnd, index, lptr);
@@ -427,6 +431,10 @@ namespace Petal::IWindow
 	inline [[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
 	{
 		return ::GetWindowLongPtrA(hwnd, index);
+	}
+	inline [[nodiscard]] auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
+	{
+		return ::GetClassInfoExA(hins, window_class, &out);
 	}
 	inline win32lptr UpdateWindowLongPtr(win32hwnd hwnd, i32 index, win32lptr lptr) noexcept
 	{

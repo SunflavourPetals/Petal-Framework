@@ -237,38 +237,15 @@ namespace Petal
 
 namespace Petal
 {
-	/*
-	auto WindowClass::Register(const Win32WindowClass& window_class) -> RegisterResult
+	[[nodiscard]] auto WindowClass::ClassInfo() const noexcept -> ::std::optional<Win32WindowClass>
 	{
-		this->Reset();
-
-		RegisterResult result{};
-
-		result.class_atom = PetalUnnamed::IWin32::RegisterPetalWindowClass(window_class);
-
-		if (result.class_atom == 0)
+		::std::optional<Win32WindowClass> result = ::std::make_optional<Win32WindowClass>();
+		if (IWindow::WindowClassInfo(WinMain::HIns(), IWindow::ToWinResource(ClassAtom()), *result) == win32_false)
 		{
-			result.win32_error = ::GetLastError();
-
-			Petal_VSDbgT("[Petal] Failed in WindowClass::Register!\r\n");
-			Petal_VSDebugOutput(::std::format(Petal_TStr("\t\tclass_name: \"{}\"\r\n"), window_class.lpszClassName).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
-			
-			return result;
+			return ::std::nullopt;
 		}
-		
-		this->atom = result.class_atom;
-		this->name = window_class.lpszClassName;
-
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered\r\n"), result.class_atom).c_str());
-
 		return result;
 	}
-	auto WindowClass::Register(const WindowClassArgs& window_class_args) -> RegisterResult
-	{
-		return this->Register(window_class_args.BuildWindowClass());
-	}
-	*/
 	auto WindowClass::Unregister() noexcept -> UnregisterResult
 	{
 		UnregisterResult result{};
@@ -426,7 +403,7 @@ namespace
 			(
 				args.ex_style,
 				Petal::IWindow::ToWinResource(class_atom),
-				args.Title().c_str(),
+				args.window_title.CStr(),
 				args.style,
 				args.position.x,
 				args.position.y,
