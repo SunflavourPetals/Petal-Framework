@@ -201,38 +201,6 @@ namespace Petal
 
 		return result;
 	}
-
-	/*
-	WindowClassArgs::WindowClassArgs()
-	{
-		const ::std::lock_guard<::std::mutex> lock(PetalUnnamed::window_class_number_mutex);
-#if defined Petal_Enable_Unicode
-		TString number{ std::to_wstring(PetalUnnamed::window_class_number) };
-#else
-		TString number{ std::to_string(PetalUnnamed::window_class_number) };
-#endif
-		this->UpdateClassName(Petal_TStr("Petal-window-class-") + number);
-		PetalUnnamed::window_class_number += 1;
-	}
-	[[nodiscard]] Win32WindowClass WindowClassArgs::BuildWindowClass() const noexcept
-	{
-		Win32WindowClass window_class{};
-		window_class.cbSize = sizeof(Win32WindowClass);
-		window_class.style = this->style;
-		window_class.lpfnWndProc = this->window_process;
-		window_class.cbClsExtra = this->class_extra;
-		window_class.cbWndExtra = this->window_extra;
-		window_class.hInstance = WinMain::HIns();
-		window_class.hIcon = this->icon;
-		window_class.hCursor = this->cursor;
-		window_class.hbrBackground = this->background_brush;
-		window_class.lpszMenuName = (this->using_int_menu_resource) ? IWindow::ToWinResource(this->menu_resource) :
-			((this->menu_name.length() > 0) ? this->menu_name.c_str() : nullptr);
-		window_class.lpszClassName = (this->class_name.length() > 0) ? this->class_name.c_str() : nullptr;
-		window_class.hIconSm = this->icon_sm;
-		return window_class;
-	}
-	*/
 }
 
 namespace Petal
