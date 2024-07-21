@@ -50,12 +50,13 @@ namespace App
 		}
 		AppWindow() : RawInputWindow()
 		{
-			window_class = Petal::WindowClassRegister{Petal_TStr("MyApp")}.Register();
+			window_class = Petal::WindowClassRegister{ Petal_TStr("MyApp") }.Register();
 			Create(window_class.ClassAtom(), Petal::WindowCreatingArgs{
-				.window_title = Petal_TStr("Hello Visual Studio 2022 Community Preview")
-			});
-		//	UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
-			
+				.window_title = Petal::TStringView{ Petal_TStr("Hello Visual Studio 2022 Community Preview") }
+				// 智障 intellisense 报错 E0415	不存在从 "const wchar_t [43]" 转换到 "Petal::WindowCreatingArgs::TitleString" 的适当构造函数
+				});
+			//	UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
+
 			// for test vvv
 			{
 				Petal::WindowClass window_class = Petal::WindowClassRegister{ Petal_TStr("abc") }.Register();

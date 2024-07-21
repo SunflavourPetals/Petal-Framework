@@ -74,6 +74,11 @@ namespace Petal
 	inline constexpr win32error win32_no_error{ ERROR_SUCCESS };
 	inline constexpr win32bool win32_true{ TRUE };
 	inline constexpr win32bool win32_false{ FALSE };
+
+	inline win32error LastWin32Error() noexcept
+	{
+		return ::GetLastError();
+	}
 }
 
 #endif // !Petal_Header_WinTypes

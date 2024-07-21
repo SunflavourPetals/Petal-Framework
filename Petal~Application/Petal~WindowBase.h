@@ -17,30 +17,6 @@ namespace Petal
 	class WindowCreatingArgs;
 	class WindowClassHash;
 	class WindowClass;
-	struct WindowClassRegisteringResult final
-	{
-		win32atom class_atom{ 0 };
-		win32error win32_error{ win32_no_error };
-		operator bool() const noexcept { return this->win32_error == win32_no_error; }
-	};
-	struct WindowClassUnregisteringResult final
-	{
-		win32bool value{ win32_true };
-		win32error win32_error{ win32_no_error };
-		operator bool() const noexcept { return this->win32_error == win32_no_error; }
-	};
-	struct WindowCreatingResult final
-	{
-		win32hwnd window_handle{ nullptr };
-		win32error win32_error{ win32_no_error };
-		operator bool() const noexcept { return this->win32_error == win32_no_error; }
-	};
-	struct WindowDestroyingResult final
-	{
-		win32bool value{ win32_false };
-		win32error win32_error{ win32_no_error };
-		operator bool() const noexcept { return this->win32_error == win32_no_error; }
-	};
 }
 
 namespace Petal::Abstract
@@ -106,10 +82,9 @@ namespace Petal
 	{
 	private:
 		using SelfRef = WindowClassRegister&;
-		using Result = WindowClassRegisteringResult;
 		SelfRef Self() noexcept { return *this; }
 	public:
-		Result Register();
+		win32atom Register();
 		SelfRef Size(win32uint size) noexcept
 		{
 			cbSize = size;
@@ -164,6 +139,11 @@ namespace Petal
 		{
 			this->class_name = StringToCStyleString(class_name);
 			lpszClassName = this->class_name.c_str();
+			return Self();
+		}
+		SelfRef ClassName(::std::nullptr_t) noexcept
+		{
+			lpszClassName = nullptr;
 			return Self();
 		}
 		SelfRef MenuName(TStringView menu_name) noexcept
@@ -236,14 +216,12 @@ namespace Petal
 	class WindowClass
 	{
 	public:
-		using RegisterResult = WindowClassRegisteringResult;
-		using UnregisterResult = WindowClassUnregisteringResult;
 		using Hash = WindowClassHash;
 	public:
 		[[nodiscard]] auto ClassInfo() const noexcept -> ::std::optional<Win32WindowClass>;
 		[[nodiscard]] auto ClassAtom() const noexcept -> win32atom { return atom; }
-		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom(); }
-		auto Unregister() noexcept -> UnregisterResult;
+		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom() == 0; }
+		auto Unregister() noexcept -> boolean;
 		auto Reset() noexcept -> void { WindowClass temp{ ::std::move(*this) }; }
 		auto Unbind() noexcept -> win32atom
 		{
@@ -252,8 +230,6 @@ namespace Petal
 	public:
 		WindowClass() = default;
 		WindowClass(win32atom atom) : atom{ atom } {}
-		WindowClass(RegisterResult result) :
-			atom{ result.win32_error == win32_no_error ? result.class_atom : win32atom{} } {}
 		WindowClass(const WindowClass&) = delete;
 		WindowClass(WindowClass&& o) noexcept
 		{
@@ -266,6 +242,7 @@ namespace Petal
 			o.atom = ::std::exchange(this->atom, o.atom);
 			return *this;
 		}
+		explicit operator bool() const noexcept { return Valid(); }
 	private:
 		win32atom atom{};
 	};
@@ -294,9 +271,6 @@ namespace Petal::Abstract
 	class Window
 	{
 	public:
-		using CreateResult = WindowCreatingResult;
-		using DestroyResult = WindowDestroyingResult;
-	public:
 		virtual win32lres Process(win32msg message, win32wprm w_param, win32lprm l_param) = 0;
 	public:
 		void Bind(win32hwnd window_handle);
@@ -306,11 +280,11 @@ namespace Petal::Abstract
 		auto Create(
 			win32atom class_atom,
 			const WindowCreatingArgs& args = {},
-			boolean interpret_args_size_as_client_size = true) -> CreateResult;
+			boolean interpret_args_size_as_client_size = true) -> win32handle;
 		auto Create(
 			const WindowCreatingArgs& args = {},
-			boolean interpret_args_size_as_client_size = true) -> CreateResult;
-		auto Destroy() noexcept -> DestroyResult;
+			boolean interpret_args_size_as_client_size = true) -> win32handle;
+		auto Destroy() noexcept -> win32bool;
 	protected:
 		[[nodiscard]] auto WindowLongPtr(int index) const noexcept -> win32lptr
 		{

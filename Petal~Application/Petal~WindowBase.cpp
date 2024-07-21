@@ -80,63 +80,48 @@ namespace Petal::Abstract
 		}
 		window_handle = {};
 	}
-	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> CreateResult
+	auto Window::Create(win32atom class_atom, const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> win32handle
 	{
 		if (Valid() && !Destroy())
 		{
-			throw ::std::exception{ "[Petal] Failed in destroy window and can not create a new window to bind (Petal::Abstract::Window) object" };
+			throw ::std::exception{ "[Petal] Failed to destroy window in Window::Create" };
 		}
-
-		CreateResult result{};
 
 		PetalUnnamed::global_window = this;
 
-		result.window_handle = PetalUnnamed::IWin32::PetalCreateWindow(class_atom, *this, args, interpret_args_size_as_client_size);
+		auto window_handle = PetalUnnamed::IWin32::PetalCreateWindow(class_atom, *this, args, interpret_args_size_as_client_size);
 
 		PetalUnnamed::global_window = nullptr;
 
-		if (result.window_handle == nullptr)
+		if (window_handle == nullptr)
 		{
-			result.win32_error = ::GetLastError();
-
-			Petal_VSDbgT("[Petal] Failed in Window::Create!\r\n");
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tclass_atom: \"{}\"\r\n"), class_atom).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
-			
-			return result;
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in Window::Create! class_atom: \"{}\"\r\n"), class_atom).c_str());
 		}
-
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been created\r\n"), static_cast<void*>(result.window_handle)).c_str());
-
-		return result;
+		else
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been created\r\n"), static_cast<void*>(window_handle)).c_str());
+		}
+		return window_handle;
 	}
-	auto Window::Create(const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> CreateResult
+	auto Window::Create(const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> win32handle
 	{
-		WindowClass window_class = WindowClassRegister{}.Register();
-		return this->Create(window_class.ClassAtom(), args, interpret_args_size_as_client_size);
+		return this->Create(WindowClassRegister{}.Register(), args, interpret_args_size_as_client_size);
 	}
-	auto Window::Destroy() noexcept -> DestroyResult
+	auto Window::Destroy() noexcept -> win32bool
 	{
-		DestroyResult result{};
-
 		const ptrc<void> temp_handle = static_cast<ptr<void>>(this->WindowHandle());
 
-		result.value = PetalUnnamed::IWin32::PetalDestroyWindow(this->WindowHandle());
+		auto result = PetalUnnamed::IWin32::PetalDestroyWindow(this->WindowHandle());
 
-		if (result.value == win32_false)
+		if (result == win32_false)
 		{
-			result.win32_error = ::GetLastError();
-
-			Petal_VSDbgT("[Petal] Failed in Window::Destroy!\r\n");
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWindow_handle: {}\r\n"), temp_handle).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
-
-			return result;
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in Window::Destroy! Window_handle: {}\r\n"), temp_handle).c_str());
 		}
-
-		this->Unbind();
-
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), temp_handle).c_str());
+		else
+		{
+			this->Unbind();
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window(handle:{}) has been destroyed\r\n"), temp_handle).c_str());
+		}
 
 		return result;
 	}
@@ -180,26 +165,22 @@ namespace Petal
 		}
 		ClassName(Petal_TStr("Petal-window-class-") + number);
 	}
-	auto WindowClassRegister::Register() -> Result
+	auto WindowClassRegister::Register() -> win32atom
 	{
-		Result result{};
+		win32atom atom{};
 
-		result.class_atom = PetalUnnamed::IWin32::RegisterPetalWindowClass(Self());
+		atom = PetalUnnamed::IWin32::RegisterPetalWindowClass(Self());
 
-		if (result.class_atom == 0)
+		if (atom == 0)
 		{
-			result.win32_error = ::GetLastError();
-
-			Petal_VSDbgT("[Petal] Failed in WindowClassRegister::Register!\r\n");
-			Petal_VSDebugOutput(::std::format(Petal_TStr("\t\tclass_name: \"{}\"\r\n"), this->class_name).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\terror code: {}\r\n"), result.win32_error).c_str());
-
-			return result;
+			Petal_VSDebugOutput(::std::format(Petal_TStr("[Petal] Failed in WindowClassRegister::Register! class_name: \"{}\"\r\n"), this->class_name).c_str());
 		}
-
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered\r\n"), result.class_atom).c_str());
-
-		return result;
+		else
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been registered\r\n"), atom).c_str());
+		}
+		
+		return atom;
 	}
 }
 
@@ -214,26 +195,19 @@ namespace Petal
 		}
 		return result;
 	}
-	auto WindowClass::Unregister() noexcept -> UnregisterResult
+	auto WindowClass::Unregister() noexcept -> boolean
 	{
-		UnregisterResult result{};
+		auto result = PetalUnnamed::IWin32::UnregisterPetalWindowClass(this->ClassAtom());
 
-		result.value = PetalUnnamed::IWin32::UnregisterPetalWindowClass(this->ClassAtom());
-
-		if (result.value == win32_false)
+		if (result)
 		{
-			result.win32_error = ::GetLastError(); // noexcept
-
-			Petal_VSDbgT("[Petal] Failed in WindowClass::Unregister!\r\n");
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tin class_atom: {}\r\n"), this->ClassAtom()).c_str());
-			Petal_VSDbg(::std::format(Petal_DbgStr("\t\tWin32: error code {}\r\n"), result.win32_error).c_str());
-
-			return result;
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in WindowClass::Unregister! in class_atom: {}\r\n"), this->ClassAtom()).c_str());
 		}
-
-		Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), this->ClassAtom()).c_str());
-
-		this->Unbind();
+		else
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), this->ClassAtom()).c_str());
+			this->Unbind();
+		}
 
 		return result;
 	}
