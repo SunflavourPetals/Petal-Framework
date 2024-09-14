@@ -205,7 +205,7 @@ namespace Petal
 		{
 			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), this->ClassAtom()).c_str());
 			this->Unbind();
-			}
+		}
 		else
 		{
 			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in WindowClass::Unregister! in class_atom: {}\r\n"), this->ClassAtom()).c_str());
