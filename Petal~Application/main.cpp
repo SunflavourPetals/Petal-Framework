@@ -32,6 +32,10 @@ namespace App
 	class AppWindow : public Petal::RawInputWindow // Test raw input window
 	{
 	public:
+		void MouseMButtonDownEvent(Petal::MouseMButtonDownMessage& e) override
+		{
+			Petal::Debug::println("mid btn down");
+		}
 		void RawKeyboardEvent(
 			Petal::RawKeyboardMessage& e,
 			Petal::Win32RawInput& raw_input,
@@ -50,25 +54,8 @@ namespace App
 		}
 		AppWindow() : RawInputWindow()
 		{
-			window_class = Petal::WindowClassRegister{ Petal_TStr("MyApp") }.Register();
-			Create(window_class.ClassAtom(), Petal::WindowCreatingArgs{
-				.window_title = Petal::TStringView{ Petal_TStr("Hello Visual Studio 2022 Community Preview") }
-				// 智障 intellisense 报错 E0415	不存在从 "const wchar_t [43]" 转换到 "Petal::WindowCreatingArgs::TitleString" 的适当构造函数
-				});
-			//	UpdateTitle(Petal_TStr("Hello Visual Studio 2022 Community Preview"));
-
-			// for test vvv
-			{
-				Petal::WindowClass window_class = Petal::WindowClassRegister{ Petal_TStr("abc") }.Register();
-				Petal::Win32WindowClass wc{};
-				Petal::TString ts;
-				ts = Petal_TStr("abc");
-				if (Petal::IWindow::WindowClassInfo(Petal::WinMain::HIns(), ts.c_str(), wc))
-				{
-					Petal::Debug::println(L"success {} {} {}", (void*)wc.lpszClassName, (void*)ts.c_str(), (void*)Petal_TStr("abc"));
-				}
-			}
-			// for test ^^^
+			using namespace std::string_view_literals;
+			Create(Petal::WindowCreatingArgs{ .window_title = Petal_TStr("Hello Visual Studio 2022 Community Preview"sv) });
 
 			Show();
 			UpdateWindow();

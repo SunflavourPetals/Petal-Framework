@@ -105,7 +105,9 @@ namespace Petal::Abstract
 	}
 	auto Window::Create(const WindowCreatingArgs& args, boolean interpret_args_size_as_client_size) -> win32handle
 	{
-		return this->Create(WindowClassRegister{}.Register(), args, interpret_args_size_as_client_size);
+		using namespace ::std::string_view_literals;
+		static WindowClass petal_default_shared_window_class = WindowClassRegister{ Petal_TStr("petal_default_shared_window_class"sv)}.Register();
+		return this->Create(petal_default_shared_window_class.ClassAtom(), args, interpret_args_size_as_client_size);
 	}
 	auto Window::Destroy() noexcept -> win32bool
 	{
@@ -201,12 +203,12 @@ namespace Petal
 
 		if (result)
 		{
-			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in WindowClass::Unregister! in class_atom: {}\r\n"), this->ClassAtom()).c_str());
-		}
-		else
-		{
 			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Window class(atom:{}) has been unregistered\r\n"), this->ClassAtom()).c_str());
 			this->Unbind();
+			}
+		else
+		{
+			Petal_VSDbg(::std::format(Petal_DbgStr("[Petal] Failed in WindowClass::Unregister! in class_atom: {}\r\n"), this->ClassAtom()).c_str());
 		}
 
 		return result;

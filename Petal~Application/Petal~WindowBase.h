@@ -220,7 +220,7 @@ namespace Petal
 	public:
 		[[nodiscard]] auto ClassInfo() const noexcept -> ::std::optional<Win32WindowClass>;
 		[[nodiscard]] auto ClassAtom() const noexcept -> win32atom { return atom; }
-		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom() == 0; }
+		[[nodiscard]] auto Valid() const noexcept -> boolean { return ClassAtom() != 0; }
 		auto Unregister() noexcept -> boolean;
 		auto Reset() noexcept -> void { WindowClass temp{ ::std::move(*this) }; }
 		auto Unbind() noexcept -> win32atom
