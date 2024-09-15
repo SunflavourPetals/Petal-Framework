@@ -28,7 +28,7 @@ namespace Petal::Abstract
 	public:
 		virtual void Write(BasicStringView<CharType, TraitsType> str) = 0;
 		virtual LineBreakMode LnMode() noexcept = 0;
-		friend Output& operator<<(Output& out, typename BasicStringView<CharType, TraitsType> str)
+		friend Output& operator<<(Output& out, BasicStringView<CharType, TraitsType> str)
 		{
 			out.Write(str);
 			return out;
@@ -63,9 +63,9 @@ namespace Petal
 		constexpr tsize LEN_LF{ 1 };
 		constexpr tsize LEN_CR{ 1 };
 
-		static const InnerChar CRLF[4]{ cr, lf, nul, nul };
-		static const InnerChar LF[2]{ lf, nul };
-		static const InnerChar CR[2]{ cr, nul };
+		const InnerChar CRLF[4]{ cr, lf, nul, nul };
+		const InnerChar LF[2]{ lf, nul };
+		const InnerChar CR[2]{ cr, nul };
 
 		switch (mode)
 		{

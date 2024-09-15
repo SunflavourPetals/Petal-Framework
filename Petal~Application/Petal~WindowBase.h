@@ -10,6 +10,7 @@
 
 #include <utility>
 #include <optional>
+#include <type_traits>
 
 namespace Petal
 {
@@ -184,7 +185,7 @@ namespace Petal
 		public:
 			TitleString() = default;
 			TitleString(TStringView window_title) { UpdateString(window_title); }
-			TitleString& operator=(TStringView window_title) { UpdateString(window_title); }
+			TitleString& operator=(TStringView window_title) { UpdateString(window_title); return *this; }
 			ptrc<TChar> CStr() const noexcept { return string.c_str(); }
 		private:
 			void UpdateString(TStringView str) { string = StringToCStyleString(str); }
@@ -253,7 +254,7 @@ namespace Petal
 		using KeyTy = WindowClass;
 		using ResultTy = ::std::size_t;
 		[[nodiscard]] ResultTy operator() (const KeyTy& o) const
-			noexcept(noexcept(WindowClassHash::HashValue({})))
+			noexcept(noexcept(::std::declval<::std::hash<win32atom>>()({})))
 		{
 			return HashValue(o);
 		}
@@ -360,7 +361,7 @@ namespace Petal
 
 namespace Petal::IWindow
 {
-	inline [[nodiscard]] win32ctstr ToWinResource(win32word integer) noexcept
+	[[nodiscard]] inline win32ctstr ToWinResource(win32word integer) noexcept
 	{
 		return reinterpret_cast<win32ctstr>(static_cast<win32ulptr>(integer));
 	}
@@ -369,19 +370,19 @@ namespace Petal::IWindow
 	{
 		return ::DefWindowProcW(window_handle, message, w_param, l_param);
 	}
-	inline [[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept
+	[[nodiscard]] inline win32hicon LoadDefaultWinAppIcon() noexcept
 	{
 		return ::LoadIconW(nullptr, reinterpret_cast<win32tstr>(IDI_APPLICATION));
 	}
-	inline [[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept
+	[[nodiscard]] inline  win32hcursor LoadDefaultWinAppCursor() noexcept
 	{
 		return ::LoadCursorW(nullptr, reinterpret_cast<win32tstr>(IDC_ARROW));
 	}
-	inline [[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
+	[[nodiscard]] inline win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
 	{
 		return ::GetWindowLongPtrW(hwnd, index);
 	}
-	inline [[nodiscard]] auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
+	[[nodiscard]] inline auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
 	{
 		return ::GetClassInfoExW(hins, window_class, &out);
 	}
@@ -394,19 +395,19 @@ namespace Petal::IWindow
 	{
 		return ::DefWindowProcA(window_handle, message, w_param, l_param);
 	}
-	inline [[nodiscard]] win32hicon LoadDefaultWinAppIcon() noexcept
+	[[nodiscard]] inline win32hicon LoadDefaultWinAppIcon() noexcept
 	{
 		return ::LoadIconA(nullptr, reinterpret_cast<win32tstr>(IDI_APPLICATION));
 	}
-	inline [[nodiscard]] win32hcursor LoadDefaultWinAppCursor() noexcept
+	[[nodiscard]] inline win32hcursor LoadDefaultWinAppCursor() noexcept
 	{
 		return ::LoadCursorA(nullptr, reinterpret_cast<win32tstr>(IDC_ARROW));
 	}
-	inline [[nodiscard]] win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
+	[[nodiscard]] inline win32lptr WindowLongPtr(win32hwnd hwnd, i32 index) noexcept
 	{
 		return ::GetWindowLongPtrA(hwnd, index);
 	}
-	inline [[nodiscard]] auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
+	[[nodiscard]] inline auto WindowClassInfo(win32hins hins, ptrc<TChar> window_class, Win32WindowClass& out) noexcept -> win32bool
 	{
 		return ::GetClassInfoExA(hins, window_class, &out);
 	}

@@ -320,11 +320,11 @@ namespace Petal
 	class BasicCStringRef
 	{
 	public:
-		using Hash = typename CStringRefHash<CharT>;
+		using Hash = CStringRefHash<CharT>;
 	public:
 		using value_type = CharT;
-		using pointer = typename ptr<CharT>;
-		using const_pointer = typename ptrc<CharT>;
+		using pointer = ptr<CharT>;
+		using const_pointer = ptrc<CharT>;
 		using reference = CharT&;
 		using const_reference = const CharT&;
 		using const_iterator = CStringRefIterator<value_type>;

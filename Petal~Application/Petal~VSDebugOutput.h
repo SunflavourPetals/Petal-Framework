@@ -22,7 +22,7 @@ namespace Petal::Abstract
 		using typename Base::TraitsType;
 		using CStringType = Petal::ptrc<CharType>;
 	public:
-		virtual void Write(BasicStringView<CharType, TraitsType> str) = 0;
+		virtual void Write(BasicStringView<CharType, TraitsType> str) override = 0;
 		virtual void WriteCStr(CStringType c_str) noexcept = 0;
 		virtual LineBreakMode LnMode() noexcept override { return this->line_break_mode; }
 	public:

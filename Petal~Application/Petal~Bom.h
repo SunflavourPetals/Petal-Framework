@@ -31,8 +31,8 @@ namespace Petal::BOM
 		Bom(Bom&&) noexcept = default;
 		~Bom() = default;
 	private:
-		tsize size{ 0 };
 		byte data[8]{};
+		tsize size{ 0 };
 	};
 
 	inline const Bom no_bom{};

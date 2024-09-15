@@ -121,37 +121,55 @@ namespace Petal::TypeTraits
 	template <typename Ty>
 	using PointerElementType = typename PointerElement<Ty>::Type;
 
-#define Petal_Generate_RemoveOneXPtr(X) \
-		template <typename Ty> \
-		struct RemoveOne##X##Pointer { using Type = Ty; }; \
-		template <Concept::##X##Pointer Ty> \
-		struct RemoveOne##X##Pointer<Ty> { using Type = PointerElementType<Ty>; }; \
-		template <typename Ty> \
-		using RemoveOne##X##PointerType = typename RemoveOne##X##Pointer<Ty>::Type
+	// Remove one raw pointer
+	template <typename Ty> struct RemoveOneRawPointer { using Type = Ty; };
+	template <Concept::RawPointer Ty> struct RemoveOneRawPointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneRawPointerType = typename RemoveOneRawPointer<Ty>::Type;
+	// Remove one unique pointer
+	template <typename Ty> struct RemoveOneUniquePointer { using Type = Ty; };
+	template <Concept::UniquePointer Ty> struct RemoveOneUniquePointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneUniquePointerType = typename RemoveOneUniquePointer<Ty>::Type;
+	// Remove one shared pointer
+	template <typename Ty> struct RemoveOneSharedPointer { using Type = Ty; };
+	template <Concept::SharedPointer Ty> struct RemoveOneSharedPointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneSharedPointerType = typename RemoveOneSharedPointer<Ty>::Type;
+	// Remove one weak pointer
+	template <typename Ty> struct RemoveOneWeakPointer { using Type = Ty; };
+	template <Concept::WeakPointer Ty> struct RemoveOneWeakPointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneWeakPointerType = typename RemoveOneWeakPointer<Ty>::Type;
+	// Remove one smart pointer
+	template <typename Ty> struct RemoveOneSmartPointer { using Type = Ty; };
+	template <Concept::SmartPointer Ty> struct RemoveOneSmartPointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneSmartPointerType = typename RemoveOneSmartPointer<Ty>::Type;
+	// Remove one any pointer
+	template <typename Ty> struct RemoveOneAnyPointer { using Type = Ty; };
+	template <Concept::AnyPointer Ty> struct RemoveOneAnyPointer<Ty> { using Type = PointerElementType<Ty>; };
+	template <typename Ty> using RemoveOneAnyPointerType = typename RemoveOneAnyPointer<Ty>::Type;
 
-	Petal_Generate_RemoveOneXPtr(Raw);      // Remove one raw pointer
-	Petal_Generate_RemoveOneXPtr(Unique);   // Remove one unique pointer
-	Petal_Generate_RemoveOneXPtr(Shared);   // Remove one shared pointer
-	Petal_Generate_RemoveOneXPtr(Weak);     // Remove one weak pointer
-	Petal_Generate_RemoveOneXPtr(Smart);    // Remove one smart pointer
-	Petal_Generate_RemoveOneXPtr(Any);      // Remove one any pointer
-#undef Petal_Generate_RemoveOneXPtr
-
-#define Petal_Generate_RemoveAllXPtr(X) \
-		template <typename Ty> \
-		struct RemoveAll##X##Pointer { using Type = Ty; }; \
-		template <Concept::##X##Pointer Ty> \
-		struct RemoveAll##X##Pointer<Ty> { using Type = typename RemoveAll##X##Pointer<RemoveOne##X##PointerType<Ty>>::Type; }; \
-		template <typename Ty> \
-		using RemoveAll##X##PointerType = typename RemoveAll##X##Pointer<Ty>::Type
-
-	Petal_Generate_RemoveAllXPtr(Raw);      // Remove all raw pointer
-	Petal_Generate_RemoveAllXPtr(Unique);   // Remove all unique pointer
-	Petal_Generate_RemoveAllXPtr(Shared);   // Remove all shared pointer
-	Petal_Generate_RemoveAllXPtr(Weak);     // Remove all weak pointer
-	Petal_Generate_RemoveAllXPtr(Smart);    // Remove all smart pointer
-	Petal_Generate_RemoveAllXPtr(Any);      // Remove all any pointer
-#undef Petal_Generate_RemoveAllXPtr
+	// Remove all raw pointer
+	template <typename Ty> struct RemoveAllRawPointer { using Type = Ty; };
+	template <Concept::RawPointer Ty> struct RemoveAllRawPointer<Ty> { using Type = typename RemoveAllRawPointer<RemoveOneRawPointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllRawPointerType = typename RemoveAllRawPointer<Ty>::Type;
+	// Remove all unique pointer
+	template <typename Ty> struct RemoveAllUniquePointer { using Type = Ty; };
+	template <Concept::UniquePointer Ty> struct RemoveAllUniquePointer<Ty> { using Type = typename RemoveAllUniquePointer<RemoveOneUniquePointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllUniquePointerType = typename RemoveAllUniquePointer<Ty>::Type;
+	// Remove all shared pointer
+	template <typename Ty> struct RemoveAllSharedPointer { using Type = Ty; };
+	template <Concept::SharedPointer Ty> struct RemoveAllSharedPointer<Ty> { using Type = typename RemoveAllSharedPointer<RemoveOneSharedPointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllSharedPointerType = typename RemoveAllSharedPointer<Ty>::Type;
+	// Remove all weak pointer
+	template <typename Ty> struct RemoveAllWeakPointer { using Type = Ty; };
+	template <Concept::WeakPointer Ty> struct RemoveAllWeakPointer<Ty> { using Type = typename RemoveAllWeakPointer<RemoveOneWeakPointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllWeakPointerType = typename RemoveAllWeakPointer<Ty>::Type;
+	// Remove all smart pointer
+	template <typename Ty> struct RemoveAllSmartPointer { using Type = Ty; };
+	template <Concept::SmartPointer Ty> struct RemoveAllSmartPointer<Ty> { using Type = typename RemoveAllSmartPointer<RemoveOneSmartPointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllSmartPointerType = typename RemoveAllSmartPointer<Ty>::Type;
+	// Remove all any pointer
+	template <typename Ty> struct RemoveAllAnyPointer { using Type = Ty; };
+	template <Concept::AnyPointer Ty> struct RemoveAllAnyPointer<Ty> { using Type = typename RemoveAllAnyPointer<RemoveOneAnyPointerType<Ty>>::Type; };
+	template <typename Ty> using RemoveAllAnyPointerType = typename RemoveAllAnyPointer<Ty>::Type;
 }
 
 #endif // !Petal_Header_PointerTraits
