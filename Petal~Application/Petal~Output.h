@@ -53,7 +53,7 @@ namespace Petal::Abstract
 namespace Petal
 {
 	template <typename CharT>
-	inline constexpr BasicCStringRef<CharT> GetLn(LineBreakMode mode) noexcept
+	inline BasicCStringRef<CharT> GetLn(LineBreakMode mode) noexcept
 	{
 		using InnerChar = CharT;
 		constexpr InnerChar cr{ InnerChar{ EnumChar::cr } };
@@ -63,9 +63,9 @@ namespace Petal
 		constexpr tsize LEN_LF{ 1 };
 		constexpr tsize LEN_CR{ 1 };
 
-		const InnerChar CRLF[4]{ cr, lf, nul, nul };
-		const InnerChar LF[2]{ lf, nul };
-		const InnerChar CR[2]{ cr, nul };
+		static const InnerChar CRLF[4]{ cr, lf, nul, nul };
+		static const InnerChar LF[2]{ lf, nul };
+		static const InnerChar CR[2]{ cr, nul };
 
 		switch (mode)
 		{
