@@ -33,6 +33,7 @@ namespace Petal::Keyboard
 		using ControllerType = Abstract::Keyboard::Controller;
 		using DeltaCountType = Tick;
 		const DeltaCountType delta_count{};
+		const DeltaCountType frequency{};
 		const ControllerType& controller;
 	};
 }
@@ -97,7 +98,7 @@ namespace Petal::Abstract::Keyboard
 		const WrappedState& GetState() const noexcept { return state; }
 		const WrappedState& GetLastState() const noexcept { return last_state; }
 	public:
-		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Tick delta_count = 0);
+		void Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Tick delta_count = 0, Tick frequency = 1);
 	private:
 		static void ExecuteEventProcess(Abstract::KeyboardEventProcess& proc, Resource& resource);
 		static void ExecuteEventProcess(Concept::GenericKeyboardEventProcessPointer auto& pointer, Resource& resource);
@@ -138,10 +139,10 @@ namespace Petal::Abstract::Keyboard
 			proc.Execution(resource);
 		}
 	}
-	inline void Controller::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Keyboard::Tick delta_count)
+	inline void Controller::Update(Concept::GenericKeyboardEventProcessIterator auto begin, Concept::GenericKeyboardEventProcessIterator auto end, Tick delta_count, Tick frequency)
 	{
 		this->QueryState();
-		Resource resource{ delta_count, *this };
+		Resource resource{ delta_count, frequency, *this };
 		for (; begin != end; ++begin)
 		{
 			this->ExecuteEventProcess(*begin, resource);

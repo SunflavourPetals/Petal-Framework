@@ -62,6 +62,7 @@ namespace Petal
 
 	using Win32Rect = typename ::RECT;
 	using Win32Message = typename ::MSG;
+	using Win32LargeInteger = ::LARGE_INTEGER;
 
 #ifdef Petal_Enable_Unicode
 	using Win32WindowClass = typename ::WNDCLASSEXW;

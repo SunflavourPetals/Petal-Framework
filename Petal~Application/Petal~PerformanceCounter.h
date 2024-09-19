@@ -3,6 +3,8 @@
 #ifndef Petal_Header_PerformanceCounter
 #define Petal_Header_PerformanceCounter
 
+#include <utility>
+
 #include "Petal~BasicTypes.h"
 #include "Petal~WinTypes.h"
 
@@ -11,8 +13,11 @@ namespace Petal
 	class PerformanceCounter final
 	{
 	public:
-		using Tick = i64;
+		using Tick = decltype(::std::declval<Win32LargeInteger>().QuadPart);
 		using Second = f64;
+	public:
+		static Tick QueryFrequency() noexcept;
+		static Tick QueryCounter() noexcept;
 	public:
 		void Reset() noexcept; // Reset this counter
 		void Count() noexcept; // Count
@@ -53,8 +58,8 @@ namespace Petal
 	}
 	inline void PerformanceCounter::Reset() noexcept
 	{
-		::QueryPerformanceFrequency(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->frequency));
-		::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+		this->frequency = QueryFrequency();
+		this->current = QueryCounter();
 		this->base = this->current;
 		this->delta = 0;
 		this->delta_paused = 0;
@@ -67,7 +72,7 @@ namespace Petal
 		Tick prev = this->current;
 		if (this->state_paused == true)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->current = QueryCounter();
 			this->delta_paused = this->current - prev;
 			if (this->delta_paused < 0)
 			{
@@ -77,7 +82,7 @@ namespace Petal
 		}
 		else
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->current = QueryCounter();
 			this->delta = this->current - prev;
 			if (this->delta < 0)
 			{
@@ -90,7 +95,7 @@ namespace Petal
 	{
 		if (this->state_paused == false)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->current = QueryCounter();
 			this->base_paused = this->current;
 			this->delta = 0;
 			this->delta_paused = 0;
@@ -101,7 +106,7 @@ namespace Petal
 	{
 		if (this->state_paused == true)
 		{
-			::QueryPerformanceCounter(reinterpret_cast<ptr<::LARGE_INTEGER>>(&this->current));
+			this->current = QueryCounter();
 			this->total_paused += (this->current - this->base_paused);
 			this->delta = 0;
 			this->delta_paused = 0;
@@ -143,6 +148,18 @@ namespace Petal
 	inline boolean PerformanceCounter::PauseState() const noexcept
 	{
 		return this->state_paused;
+	}
+	inline auto PerformanceCounter::QueryFrequency() noexcept -> Tick
+	{
+		Win32LargeInteger counts{};
+		::QueryPerformanceFrequency(&counts);
+		return counts.QuadPart;
+	}
+	inline auto PerformanceCounter::QueryCounter() noexcept -> Tick
+	{
+		Win32LargeInteger counts{};
+		::QueryPerformanceCounter(&counts);
+		return counts.QuadPart;
 	}
 }
 

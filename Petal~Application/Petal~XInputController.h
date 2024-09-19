@@ -22,6 +22,7 @@ namespace Petal::XInput
 		using ControllerType = Controller;
 		using DeltaCountType = Tick;
 		const DeltaCountType delta_count{};
+		const DeltaCountType frequency{};
 		const ControllerType& controller;
 	};
 }
@@ -168,7 +169,7 @@ namespace Petal::XInput
 		void ClearState() noexcept { gamepad.ClearState(); }
 		void ClearLastState() noexcept { last_gamepad.ClearState(); }
 		boolean UpdateUserIndex(UserIndexValue::Type user_index) noexcept { return gamepad.UpdateUserIndex(user_index); }
-		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count = 0);
+		win32dword Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count = 0, Tick frequency = 1);
 		const WrappedGamepad& GetWrappedGamepad() const noexcept { return gamepad; }
 		const WrappedGamepad& GetLastWrappedGamepad() const noexcept { return last_gamepad; }
 	private:
@@ -262,10 +263,10 @@ namespace Petal::XInput
 		last_gamepad = gamepad;
 		return gamepad.QueryState();
 	}
-	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count)
+	inline win32dword Controller::Update(Concept::GenericXInputEventProcessIterator auto begin, Concept::GenericXInputEventProcessIterator auto end, Tick delta_count, Tick frequency)
 	{
 		auto result{ QueryState() };
-		Resource resource{ delta_count, *this };
+		Resource resource{ delta_count, frequency, *this };
 		for (; begin != end; ++begin)
 		{
 			ExecuteEventProcess(*begin, resource);
