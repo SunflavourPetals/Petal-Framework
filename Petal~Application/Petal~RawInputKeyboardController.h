@@ -12,9 +12,13 @@ namespace Petal::Keyboard
 	protected:
 		void QueryState() noexcept override {};
 	public:
-		void UpdateKeyState(VirtualKey::Type vk_code, boolean pushed) noexcept
+		void UpdateState() noexcept
 		{
-			this->last_state.Set(vk_code, this->state.Pushed(vk_code));
+			this->last_state = this->state;
+		}
+		void UpdateState(VirtualKey::Type vk_code, boolean pushed) noexcept
+		{
+			UpdateState();
 			this->state.Set(vk_code, pushed);
 		}
 	public:
